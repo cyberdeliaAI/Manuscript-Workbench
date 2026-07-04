@@ -1,0 +1,5 @@
+python-docx>=1.1.0
+requests>=2.31.0
+markdown>=3.6
+lxml>=6.0.0
+trafilatura>=1.12.0

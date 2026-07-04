@@ -1,0 +1,15 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.Python
+.venv/
+venv/
+env/
+.env
+.pytest_cache/
+.mypy_cache/
+*.log
+*.tmp
+*.bak
+*.docx
+*.zip
