@@ -4,6 +4,10 @@ Local web app for cleaning manuscripts, structuring text with Markdown, importin
 
 User guide: [USER_GUIDE.md](USER_GUIDE.md)
 
+## Screenshot
+
+![Manuscript Workbench screenshot](screenshot/screenshot01.png)
+
 ## Install
 
 ```bash
