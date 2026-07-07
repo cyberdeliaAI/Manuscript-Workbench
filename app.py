@@ -1370,6 +1370,18 @@ textarea.prompt{height:190px;resize:vertical;font-family:var(--mono);line-height
         <option value="verse">Verse</option>
         <option value="written-note">Written note</option>
       </select>
+      <select id="quickIcon" title="Insert icon">
+        <option value="">Insert icon...</option>
+        <option value="📌">📌 Important</option>
+        <option value="💡">💡 Tip</option>
+        <option value="⚠️">⚠️ Warning</option>
+        <option value="ℹ️">ℹ️ Info</option>
+        <option value="✅">✅ Done</option>
+        <option value="🔧">🔧 Setup</option>
+        <option value="❗">❗ Attention</option>
+        <option value="🔒">🔒 Security</option>
+        <option value="📝">📝 Note</option>
+      </select>
       <button data-quick-inline="bold" class="b" title="Bold">B</button>
       <button data-quick-inline="italic" class="i" title="Italic">I</button>
       <button data-quick-inline="u" class="u" title="Underline">U</button>
@@ -1597,7 +1609,7 @@ textarea.prompt{height:190px;resize:vertical;font-family:var(--mono);line-height
 <div class="toast" id="toast"></div>
 <div class="modal" id="previewModal">
   <div class="modal-card" id="modalCard">
-    <div class="modal-head"><div><div class="modal-title" id="previewTitle">Preview</div><div class="small" id="previewSub">before / after</div></div><div class="modal-actions"><button data-view="split" class="mini viewBtn">Split</button><button data-view="after-only" class="mini viewBtn">After only</button><button data-view="before-only" class="mini viewBtn">Before only</button><label class="small"><input type="checkbox" id="autoScroll" checked> auto-scroll</label><button id="bottomBtn" class="mini">Bottom</button><button id="closePreviewBtn" class="mini">Close</button></div></div>
+    <div class="modal-head"><div><div class="modal-title" id="previewTitle">Preview</div><div class="small" id="previewSub">before / after</div></div><div class="modal-actions"><button data-view="split" class="mini viewBtn">Split</button><button data-view="after-only" class="mini viewBtn">After only</button><button data-view="before-only" class="mini viewBtn">Before only</button><label class="small"><input type="checkbox" id="previewLinked"> linked scroll</label><label class="small"><input type="checkbox" id="autoScroll" checked> auto-scroll</label><button id="bottomBtn" class="mini">Bottom</button><button id="closePreviewBtn" class="mini">Close</button></div></div>
     <div class="integrity-panel" id="integrityPanel"></div>
     <div class="preview-grid"><div class="pane before-pane"><div class="pane-head"><span>Before</span></div><div class="preview-box" id="beforeBox"></div></div><div class="pane after-pane"><div class="pane-head"><span>After</span><span id="streamState" class="small"></span></div><div class="preview-box" id="afterBox"></div></div></div>
     <div class="modal-foot"><span class="lm-status" id="previewStatus">Ready.</span><div class="modal-actions"><button id="comparePreviewBtn">Open in Compare</button><button id="stopBtn" class="danger" disabled>Stop generation</button><button id="applyPreviewBtn" class="primary" disabled>Apply change</button></div></div>
@@ -1671,6 +1683,7 @@ let previewState = {before:'', after:'', start:0, end:0, title:'Preview', finish
 let lastDiag = null;
 let savedSelection = null;
 let scrollSyncing = false;
+let previewScrollSyncing = false;
 let markdownPreviewTimer = null;
 let markdownPreviewRequest = 0;
 let markdownServerAvailable = true;
@@ -1847,7 +1860,9 @@ function applyInline(kind){ const s=editor.selectionStart,e=editor.selectionEnd;
 function restoreSavedSelection(){ if(savedSelection){ editor.focus(); editor.setSelectionRange(savedSelection.start,savedSelection.end); } }
 function restoreSelectionForQuickAction(){ if(savedSelection){ restoreSavedSelection(); } else { editor.focus(); } }
 function applyQuickStyle(marker){ restoreSelectionForQuickAction(); if(marker==='normal') clearVellumMark(); else if(marker) markLines(marker); $('#quickStyle').value=''; updateSelectionMenu(); }
+function applyQuickIcon(icon){ if(!icon) return; restoreSelectionForQuickAction(); const s=editor.selectionStart,e=editor.selectionEnd, sel=editor.value.slice(s,e); replaceRange(s,e,`${icon} ${sel}`); $('#quickIcon').value=''; updateSelectionMenu(); }
 $('#quickStyle').addEventListener('change',()=>applyQuickStyle($('#quickStyle').value));
+$('#quickIcon').addEventListener('change',()=>applyQuickIcon($('#quickIcon').value));
 document.querySelectorAll('[data-quick-inline]').forEach(btn=>{ btn.addEventListener('mousedown',e=>e.preventDefault()); btn.addEventListener('click',()=>{ restoreSelectionForQuickAction(); applyInline(btn.dataset.quickInline); updateSelectionMenu(); }); });
 $('#quickAiRewrite').addEventListener('mousedown',e=>e.preventDefault());
 $('#quickAiRewrite').addEventListener('click',()=>{ restoreSelectionForQuickAction(); startLM('rewrite','selection',false); });
@@ -2015,6 +2030,7 @@ function setPreviewProgress(done,total){ previewState.progress={done,total,perce
 function openPreview(title,before,after,start,end,running,applyMode='replace'){ previewState={title,before,after,start,end,finished:!running,running,partial:false,expectedMarkers:null,applyMode,progress:null}; clearIntegrityGuardrails(); $('#previewTitle').textContent=title; $('#previewSub').textContent=previewSubText(); $('#beforeBox').textContent=before; $('#afterBox').textContent=after; $('#previewModal').classList.add('open'); setPreviewView(localStorage.getItem('vp.py.previewView')||'split'); $('#applyPreviewBtn').disabled=running || !after || applyMode==='none'; $('#comparePreviewBtn').disabled=!before&&!after; setStopButtons(running); setLmBusy(running); $('#showPreviewBtn').disabled=false; $('#streamState').textContent=running?'generating...':'ready'; $('#previewStatus').textContent=running?'Generating...':(applyMode==='none'?'Review ready.':'Preview ready.'); }
 function updatePreview(){ $('#afterBox').textContent=previewState.after; $('#previewSub').textContent=previewSubText(); $('#comparePreviewBtn').disabled=!previewState.before&&!previewState.after; if($('#autoScroll').checked){ const b=$('#afterBox'); b.scrollTop=b.scrollHeight; } }
 function finishPreviewError(msg){ previewState.running=false; setStopButtons(false); setLmBusy(false); $('#streamState').textContent='error'; $('#previewStatus').textContent=msg; }
+function syncPreviewScroll(source,target){ if(previewScrollSyncing || !$('#previewLinked').checked || !target) return; previewScrollSyncing=true; const maxSource=Math.max(1,source.scrollHeight-source.clientHeight); const maxTarget=Math.max(0,target.scrollHeight-target.clientHeight); target.scrollTop=(source.scrollTop/maxSource)*maxTarget; requestAnimationFrame(()=>{ previewScrollSyncing=false; }); }
 $('#showPreviewBtn').addEventListener('click',()=>{ $('#previewModal').classList.add('open'); updatePreview(); });
 $('#closePreviewBtn').addEventListener('click',()=>$('#previewModal').classList.remove('open'));
 $('#comparePreviewBtn').addEventListener('click',()=>openCompare(previewState.before||'',previewState.after||'','Loaded preview into Compare.'));
@@ -2026,6 +2042,8 @@ $('#stopBtn').addEventListener('click',stopLmGeneration);
 $('#lmStopBtn').addEventListener('click',stopLmGeneration);
 $('#bottomBtn').addEventListener('click',()=>{ $('#autoScroll').checked=true; const b=$('#afterBox'); b.scrollTop=b.scrollHeight; });
 $('#afterBox').addEventListener('scroll',()=>{ const b=$('#afterBox'); if(b.scrollTop + b.clientHeight < b.scrollHeight - 40) $('#autoScroll').checked=false; });
+$('#beforeBox').addEventListener('scroll',()=>syncPreviewScroll($('#beforeBox'),$('#afterBox')));
+$('#afterBox').addEventListener('scroll',()=>syncPreviewScroll($('#afterBox'),$('#beforeBox')));
 document.querySelectorAll('.viewBtn').forEach(b=>b.addEventListener('click',()=>setPreviewView(b.dataset.view)));
 function setPreviewView(view){ if(!['split','after-only','before-only'].includes(view)) view='split'; const modal=$('#previewModal'), card=$('#modalCard'); [modal,card].forEach(el=>{ el.classList.remove('after-only','before-only'); if(view==='after-only') el.classList.add('after-only'); if(view==='before-only') el.classList.add('before-only'); }); document.querySelectorAll('.viewBtn').forEach(btn=>btn.classList.toggle('active',btn.dataset.view===view)); localStorage.setItem('vp.py.previewView',view); }
 
