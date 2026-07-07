@@ -1324,7 +1324,7 @@ main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 380px;grid-template
 .editor-foot{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:10px 16px;border-top:1px solid var(--line)}.sel-info,.small{font-family:var(--mono);font-size:11px;color:var(--faint)}.sel-info{justify-self:end}.scope-toggle{justify-self:start;display:flex;gap:2px;background:var(--bg-raised);border:1px solid var(--line);border-radius:6px;padding:2px}.scope-toggle label{font-size:12px;font-weight:700;padding:6px 10px;border-radius:4px;cursor:pointer;color:var(--muted);white-space:nowrap}.scope-toggle input{display:none}.scope-toggle label:has(input:checked){background:var(--amber)}.scope-toggle label:has(input:checked) span{color:#241505}@media(max-width:760px){.editor-foot{grid-template-columns:1fr}.scope-toggle,.wrap-control,.sel-info{justify-self:start}}
 .sidebar{display:flex;flex-direction:column;gap:16px;overflow-y:auto;min-height:0;height:100%;padding-right:4px;overscroll-behavior:contain}.sidebar .card{flex:0 0 auto}.panel-title{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);padding:12px 16px 8px}.panel-body{padding:0 16px 12px}.row{display:flex;gap:8px;align-items:center;margin-bottom:8px}.row label{font-size:11px;color:var(--muted);min-width:82px}input[type=text],select,textarea.prompt{width:100%;background:#171613;border:1px solid var(--line);color:var(--text);border-radius:6px;padding:7px 8px;font-size:12px}.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.meta-grid label{display:flex;flex-direction:column;font-size:10px;color:var(--faint);gap:3px}.meta-grid input{font-family:var(--sans)}
 .diag-row,.vellum-row{display:flex;align-items:center;gap:8px;padding:7px 16px;border-top:1px solid var(--line-soft)}.diag-row .lbl,.vellum-row .vtext{flex:1;min-width:0;font-size:12px;color:var(--muted);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.diag-row .count{font-family:var(--mono);font-size:12px;font-weight:800;color:var(--text);min-width:24px;text-align:right}.diag-row .jump,.vellum-row .jump{font-family:var(--mono);font-size:11px;padding:4px 7px;border-radius:4px}.diag-row.zero .count{color:var(--green)}.diag-row.zero .jump{display:none}.diag-row.zero .lbl{color:var(--faint)}.dot.grey{background:var(--faint)}.dot.rust{background:var(--rust)}.dot.amber{background:var(--amber)}.dot.blue{background:var(--blue)}.dot.violet{background:var(--violet)}.vellum-help,.empty-hint{font-size:11px;line-height:1.4;color:var(--faint);padding:8px 16px 4px}.vellum-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:10px 16px;border-top:1px solid var(--line-soft)}.vsum{background:var(--bg-raised);border:1px solid var(--line-soft);border-radius:6px;padding:6px 8px;font-family:var(--mono);font-size:11px;color:var(--muted)}.vsum b{color:var(--text)}.vellum-row .tag{font-family:var(--mono);font-size:10px;font-weight:800;color:#211507;background:var(--amber);border-radius:4px;padding:3px 5px;min-width:54px;text-align:center;white-space:nowrap}.vellum-row .tag.sub{background:var(--blue);color:#071720}.vellum-row .tag.supp{background:var(--violet);color:#170d20}.vellum-row .tag.warn{background:var(--rust);color:#210b05}.marker-legend{font-family:var(--mono);font-size:10.5px;line-height:1.45;color:var(--faint);padding:8px 16px 12px;border-top:1px solid var(--line-soft)}
-.fix-group{border-top:1px solid var(--line-soft)}.fix-group-title{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:10px 16px 4px}.fix-row{display:flex;align-items:center;gap:8px;padding:5px 16px}.fix-row button{flex:1;text-align:left;font-size:12px;padding:8px 10px}.fix-row button.destructive{border-color:#6f5132}.fix-row button.destructive:after{content:" preview";float:right;color:var(--amber);font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}.fix-note{font-size:11px;color:var(--faint);padding:0 16px 8px;display:flex;align-items:flex-start;gap:6px;line-height:1.4}.fix-note input{margin:2px 0 0}.fix-note.caveat{color:#b58a5e}.lm-panel{border-top:1px solid var(--line-soft);padding:10px 16px 14px;display:flex;flex-direction:column;gap:10px}.ai-section{border:1px solid var(--line-soft);border-radius:8px;background:#1c1b17;overflow:hidden}.ai-section summary{cursor:pointer;list-style:none;padding:9px 10px;font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;justify-content:space-between}.ai-section summary::-webkit-details-marker{display:none}.ai-section summary:after{content:"+";color:var(--faint);font-size:14px}.ai-section[open] summary{border-bottom:1px solid var(--line-soft);color:var(--text)}.ai-section[open] summary:after{content:"-"} .ai-section-body{padding:10px;display:flex;flex-direction:column;gap:10px}.lm-field{display:flex;flex-direction:column;gap:5px}.lm-field label{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}.lm-field input,.lm-field select,.lm-field textarea{width:100%;background:var(--bg-editor);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:8px 9px;font-family:var(--mono);font-size:11.5px}.lm-field textarea{min-height:160px;resize:vertical;line-height:1.45;white-space:pre-wrap}.lm-field textarea.compact{min-height:72px}.advanced-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.lm-note{color:#b58a5e;font-size:11px;line-height:1.4}
+.fix-group{border-top:1px solid var(--line-soft)}.fix-group-title{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:10px 16px 4px}.fix-row{display:flex;align-items:center;gap:8px;padding:5px 16px}.fix-row button{flex:1;text-align:left;font-size:12px;padding:8px 10px}.fix-row button.destructive{border-color:#6f5132}.fix-row button.destructive:after{content:" preview";float:right;color:var(--amber);font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}.fix-note{font-size:11px;color:var(--faint);padding:0 16px 8px;display:flex;align-items:flex-start;gap:6px;line-height:1.4}.fix-note input{margin:2px 0 0}.fix-note.caveat{color:#b58a5e}.lm-panel{border-top:1px solid var(--line-soft);padding:10px 16px 14px;display:flex;flex-direction:column;gap:14px}.ai-block{display:flex;flex-direction:column;gap:9px}.ai-block-title{font-family:var(--mono);font-size:10.5px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--amber);padding:0 2px}.ai-section{border:1px solid var(--line-soft);border-radius:8px;background:#1c1b17;overflow:hidden}.ai-section summary,.ai-static-title{cursor:pointer;list-style:none;padding:9px 10px;font-family:var(--mono);font-size:11px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--text);background:#24221c;display:flex;align-items:center;justify-content:space-between}.ai-section summary::-webkit-details-marker{display:none}.ai-section summary:after{content:"+";color:var(--amber);font-size:14px}.ai-section[open] summary{border-bottom:1px solid var(--line-soft);background:#2a261d;color:#fff}.ai-section[open] summary:after{content:"-"}.ai-section.static .ai-static-title{cursor:default;border-bottom:1px solid var(--line-soft);color:#fff;background:#2a261d}.ai-section-body{padding:10px;display:flex;flex-direction:column;gap:10px}.lm-field{display:flex;flex-direction:column;gap:5px}.lm-field label{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}.lm-field input,.lm-field select,.lm-field textarea{width:100%;background:var(--bg-editor);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:8px 9px;font-family:var(--mono);font-size:11.5px}.lm-field textarea{min-height:160px;resize:vertical;line-height:1.45;white-space:pre-wrap}.lm-field textarea.compact{min-height:72px}.advanced-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.lm-note{color:#b58a5e;font-size:11px;line-height:1.4}
 .side-tabs{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;padding:0 0 8px;background:var(--bg-panel)}.side-tabs button{min-width:0;padding:7px 4px;font-size:11px;border-radius:6px}.side-tabs button.active{background:var(--amber);border-color:var(--amber);color:#241505}.side-panel{display:none;flex-direction:column;gap:16px}.side-panel.active{display:flex}.wrap-control{justify-self:center;display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap}.wrap-control input{margin:0;accent-color:var(--amber)}
 .issue-list{display:flex;flex-direction:column;gap:6px}.issue{border:1px solid var(--line-soft);border-radius:7px;padding:8px;background:#1c1b17}.issue .top{display:flex;align-items:center;gap:7px}.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0}.dot.error{background:var(--rust)}.dot.warning{background:var(--amber)}.dot.info{background:var(--blue)}.issue .msg{font-size:12px;line-height:1.35}.issue .sample{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.issue button{margin-left:auto}.ok{color:var(--green)}.warn{color:var(--amber)}.err{color:#e89a7e}.hint{font-size:11px;line-height:1.45;color:var(--faint);margin:6px 0 0}.divider{height:1px;background:var(--line-soft);margin:10px -14px}.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:80;background:var(--bg-raised);border:1px solid #356e8f;border-radius:8px;padding:9px 14px;font-family:var(--mono);font-size:12px;opacity:0;pointer-events:none;transition:.2s;max-width:88vw}.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
 .outline-list{border-top:1px solid var(--line-soft)}.outline-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 16px;border-top:1px solid var(--line-soft)}.outline-row:first-child{border-top:0}.outline-row.sub{padding-left:30px}.outline-tag{font-family:var(--mono);font-size:10px;font-weight:800;color:#211507;background:var(--amber);border-radius:4px;padding:3px 5px;min-width:34px;text-align:center}.outline-row.l1 .outline-tag{background:var(--amber);color:#211507}.outline-row.l2 .outline-tag{background:var(--blue);color:#071720}.outline-row.l3 .outline-tag{background:var(--green);color:#07190b}.outline-row.l4 .outline-tag{background:var(--violet);color:#170d20}.outline-row.l5 .outline-tag{background:var(--rust);color:#210b05}.outline-row.l6 .outline-tag{background:#777065;color:#11100d}.outline-main{min-width:0}.outline-title{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.outline-meta{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:2px}.outline-actions{display:flex;gap:5px}.outline-actions button{font-family:var(--mono);font-size:10.5px;padding:4px 6px}.outline-toggle{width:24px;padding-left:0!important;padding-right:0!important}
@@ -1450,55 +1450,61 @@ textarea.prompt{height:190px;resize:vertical;font-family:var(--mono);line-height
 
     <div class="side-panel" data-side-panel="ai">
       <div class="card" id="lmPanel">
-        <div class="panel-title">AI Provider</div>
+        <div class="panel-title">AI Tools</div>
         <div class="lm-panel">
-          <details class="ai-section">
-            <summary>Provider setup</summary>
-            <div class="ai-section-body">
-              <div class="lm-field"><label for="lmProvider">Provider</label><select id="lmProvider"><option value="lmstudio">LM Studio (easy GUI)</option><option value="omlx">oMLX (Mac MLX)</option><option value="ollama">Ollama (cross-platform)</option><option value="custom">Custom OpenAI-compatible</option></select></div>
-              <div class="lm-field"><label for="lmBase">Endpoint</label><input id="lmBase" type="text" value="http://localhost:1234/v1" spellcheck="false"></div>
-              <div class="lm-field"><label for="lmApiKey">API Key</label><input id="lmApiKey" type="password" placeholder="optional; required by some providers such as oMLX" spellcheck="false" autocomplete="off"></div>
-              <div class="lm-field"><label for="lmModel">Model</label><select id="lmModel"><option value="">Detect first available model</option></select></div>
-              <div class="lm-grid"><button id="detectModelBtn">Detect Model</button><button id="lmTestBtn">Test</button></div>
-            </div>
-          </details>
-          <details class="ai-section" open>
-            <summary>Rewrite & clean</summary>
-            <div class="ai-section-body">
-              <div class="lm-field"><label for="promptSelect">Prompt preset</label><select id="promptSelect"></select></div>
-              <div class="lm-field"><label for="lmStrength">Rewrite strength</label><select id="lmStrength"><option value="default">Prompt default</option><option value="light">Light</option><option value="medium" selected>Medium</option><option value="strong">Strong</option></select></div>
-              <div class="lm-grid"><button id="rewriteSelBtn" class="primary">Rewrite Selection</button><button id="rewriteParaBtn">Current Paragraph</button><button id="rewriteWholeBtn">Rewrite Whole</button><button id="rewriteChunkBtn" title="Uses the current selection if there is one; otherwise rewrites the whole text in chunks.">Rewrite Chunked</button><button id="cleanSelBtn">AI Clean Selection</button><button id="cleanParaBtn">AI Clean Paragraph</button><button id="cleanWholeBtn">AI Clean Whole</button><button id="cleanChunkBtn" title="Uses the current selection if there is one; otherwise cleans the whole text in chunks.">AI Clean Chunked</button></div>
-            </div>
-          </details>
-          <details class="ai-section" open>
-            <summary>Guided tools</summary>
-            <div class="ai-section-body">
-              <div class="lm-field"><label for="guidedContext">Goal / answers / context</label><textarea class="compact" id="guidedContext" placeholder="Optional. Example: make this warmer, less formal, for newsletter readers; or paste answers to AI questions here."></textarea></div>
-              <div class="lm-grid"><button id="askImproveBtn">Improve Questions</button><button id="feedbackOnlyBtn">Feedback Only</button><button id="rewriteGuidedBtn" class="primary">Rewrite with Guidance</button><button id="translateSelBtn">Translate Selection</button></div>
-              <div class="lm-field"><label for="translateTarget">Translate to</label><input id="translateTarget" type="text" value="English" spellcheck="false"></div>
-            </div>
-          </details>
-          <details class="ai-section">
-            <summary>Prompt editor</summary>
-            <div class="ai-section-body">
-              <div class="lm-field"><label for="promptText">System prompt</label><textarea class="prompt" id="promptText"></textarea></div>
-              <div class="prompt-actions"><button id="savePromptBtn">Save Prompt</button><button id="savePromptAsBtn">Save As New</button><button id="deletePromptBtn">Delete</button><button id="resetPromptsBtn">Reset Defaults</button></div>
-            </div>
-          </details>
-          <details class="ai-section">
-            <summary>Advanced request options</summary>
-            <div class="ai-section-body">
-              <div class="advanced-grid">
-                <div class="lm-field"><label for="advTemperature">Temperature</label><input id="advTemperature" type="text" placeholder="provider default"></div>
-                <div class="lm-field"><label for="advTopP">Top P</label><input id="advTopP" type="text" placeholder="provider default"></div>
-                <div class="lm-field"><label for="advTopK">Top K</label><input id="advTopK" type="text" placeholder="provider default"></div>
-                <div class="lm-field"><label for="advRepeatPenalty">Repeat penalty</label><input id="advRepeatPenalty" type="text" placeholder="provider default"></div>
-                <div class="lm-field"><label for="advMaxTokens">Max tokens</label><input id="advMaxTokens" type="text" placeholder="provider default"></div>
-                <div class="lm-field"><label for="chunkSize">Chunk size</label><input id="chunkSize" type="text" value="6000"></div>
+          <div class="ai-block">
+            <div class="ai-block-title">Writing actions</div>
+            <details class="ai-section" open>
+              <summary>Rewrite & clean</summary>
+              <div class="ai-section-body">
+                <div class="lm-field"><label for="promptSelect">Prompt preset</label><select id="promptSelect"></select></div>
+                <div class="lm-field"><label for="lmStrength">Rewrite strength</label><select id="lmStrength"><option value="default">Prompt default</option><option value="light">Light</option><option value="medium" selected>Medium</option><option value="strong">Strong</option></select></div>
+                <div class="lm-grid"><button id="rewriteSelBtn" class="primary">Rewrite Selection</button><button id="rewriteParaBtn">Current Paragraph</button><button id="rewriteWholeBtn">Rewrite Whole</button><button id="rewriteChunkBtn" title="Uses the current selection if there is one; otherwise rewrites the whole text in chunks.">Rewrite Chunked</button><button id="cleanSelBtn">AI Clean Selection</button><button id="cleanParaBtn">AI Clean Paragraph</button><button id="cleanWholeBtn">AI Clean Whole</button><button id="cleanChunkBtn" title="Uses the current selection if there is one; otherwise cleans the whole text in chunks.">AI Clean Chunked</button></div>
               </div>
-              <div class="hint">Leave fields empty to use the provider or model defaults.</div>
+            </details>
+            <details class="ai-section" open>
+              <summary>Guided tools</summary>
+              <div class="ai-section-body">
+                <div class="lm-field"><label for="guidedContext">Goal / answers / context</label><textarea class="compact" id="guidedContext" placeholder="Optional. Example: make this warmer, less formal, for newsletter readers; or paste answers to AI questions here."></textarea></div>
+                <div class="lm-grid"><button id="askImproveBtn">Improve Questions</button><button id="feedbackOnlyBtn">Feedback Only</button><button id="rewriteGuidedBtn" class="primary">Rewrite with Guidance</button><button id="translateSelBtn">Translate Selection</button></div>
+                <div class="lm-field"><label for="translateTarget">Translate to</label><input id="translateTarget" type="text" value="English" spellcheck="false"></div>
+              </div>
+            </details>
+            <details class="ai-section">
+              <summary>Prompt editor</summary>
+              <div class="ai-section-body">
+                <div class="lm-field"><label for="promptText">System prompt</label><textarea class="prompt" id="promptText"></textarea></div>
+                <div class="prompt-actions"><button id="savePromptBtn">Save Prompt</button><button id="savePromptAsBtn">Save As New</button><button id="deletePromptBtn">Delete</button><button id="resetPromptsBtn">Reset Defaults</button></div>
+              </div>
+            </details>
+          </div>
+          <div class="ai-block">
+            <div class="ai-block-title">Provider & request</div>
+            <div class="ai-section static">
+              <div class="ai-static-title">Provider setup</div>
+              <div class="ai-section-body">
+                <div class="lm-field"><label for="lmProvider">Provider</label><select id="lmProvider"><option value="lmstudio">LM Studio (easy GUI)</option><option value="omlx">oMLX (Mac MLX)</option><option value="ollama">Ollama (cross-platform)</option><option value="custom">Custom OpenAI-compatible</option></select></div>
+                <div class="lm-field"><label for="lmBase">Endpoint</label><input id="lmBase" type="text" value="http://localhost:1234/v1" spellcheck="false"></div>
+                <div class="lm-field"><label for="lmApiKey">API Key</label><input id="lmApiKey" type="password" placeholder="optional; required by some providers such as oMLX" spellcheck="false" autocomplete="off"></div>
+                <div class="lm-field"><label for="lmModel">Model</label><select id="lmModel"><option value="">Detect first available model</option></select></div>
+                <div class="lm-grid"><button id="detectModelBtn">Detect Model</button><button id="lmTestBtn">Test</button></div>
+              </div>
             </div>
-          </details>
+            <details class="ai-section">
+              <summary>Advanced request options</summary>
+              <div class="ai-section-body">
+                <div class="advanced-grid">
+                  <div class="lm-field"><label for="advTemperature">Temperature</label><input id="advTemperature" type="text" placeholder="provider default"></div>
+                  <div class="lm-field"><label for="advTopP">Top P</label><input id="advTopP" type="text" placeholder="provider default"></div>
+                  <div class="lm-field"><label for="advTopK">Top K</label><input id="advTopK" type="text" placeholder="provider default"></div>
+                  <div class="lm-field"><label for="advRepeatPenalty">Repeat penalty</label><input id="advRepeatPenalty" type="text" placeholder="provider default"></div>
+                  <div class="lm-field"><label for="advMaxTokens">Max tokens</label><input id="advMaxTokens" type="text" placeholder="provider default"></div>
+                  <div class="lm-field"><label for="chunkSize">Chunk size</label><input id="chunkSize" type="text" value="6000"></div>
+                </div>
+                <div class="hint">Leave fields empty to use the provider or model defaults.</div>
+              </div>
+            </details>
+          </div>
           <div class="lm-grid"><button id="lmStopBtn" class="danger wide" disabled>Stop generation</button><button id="showPreviewBtn" class="wide" disabled>Show Preview</button></div>
           <div class="lm-status" id="lmStatus">Local AI idle.</div>
           <div class="lm-note" id="lmNote">This app sends only model + messages + stream to the selected OpenAI-compatible local endpoint. Runtime settings stay in your provider app.</div>
