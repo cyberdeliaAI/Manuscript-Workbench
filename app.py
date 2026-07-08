@@ -1443,6 +1443,7 @@ textarea.prompt{height:190px;resize:vertical;font-family:var(--mono);line-height
       <button data-quick-inline="sc" class="sc" title="Small Caps">SC</button>
       <button data-quick-inline="mono" class="mono" title="Monospace">Mono</button>
       <button data-quick-inline="sans" title="Sans Serif">Sans</button>
+      <button id="quickQuote" title="Mark selected/current lines as quote">Quote</button>
       <span class="sep"></span>
       <button id="openFindBtn" title="Find and replace">Find</button>
       <button id="togglePreview" title="Toggle rendered Markdown preview">Preview</button>
@@ -1938,6 +1939,8 @@ function applyQuickIcon(icon){ if(!icon) return; restoreSelectionForQuickAction(
 $('#quickStyle').addEventListener('change',()=>applyQuickStyle($('#quickStyle').value));
 $('#quickIcon').addEventListener('change',()=>applyQuickIcon($('#quickIcon').value));
 document.querySelectorAll('[data-quick-inline]').forEach(btn=>{ btn.addEventListener('mousedown',e=>e.preventDefault()); btn.addEventListener('click',()=>{ restoreSelectionForQuickAction(); applyInline(btn.dataset.quickInline); updateSelectionMenu(); }); });
+$('#quickQuote').addEventListener('mousedown',e=>e.preventDefault());
+$('#quickQuote').addEventListener('click',()=>{ restoreSelectionForQuickAction(); markLines('quote'); updateSelectionMenu(); });
 $('#quickAiRewrite').addEventListener('mousedown',e=>e.preventDefault());
 $('#quickAiRewrite').addEventListener('click',()=>{ restoreSelectionForQuickAction(); startLM('rewrite','selection',false); });
 $('#quickAiClean').addEventListener('mousedown',e=>e.preventDefault());
