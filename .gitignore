@@ -13,3 +13,5 @@ env/
 *.bak
 *.docx
 *.zip
+manuscript_workbench_settings.json
+manuscript_workbench_settings.json.tmp

@@ -63,6 +63,8 @@ except Exception:  # pragma: no cover
 APP_HOST = "127.0.0.1"
 APP_PORT = int(os.environ.get("MANUSCRIPT_WORKBENCH_PORT") or os.environ.get("VELLUM_PREP_PORT", "8765"))
 APP_NAME = "Manuscript Workbench — Python"
+APP_VERSION = "1.2"
+SETTINGS_PATH = Path(__file__).with_name("manuscript_workbench_settings.json")
 MAX_JSON_BYTES = 80 * 1024 * 1024
 MAX_URL_IMPORT_BYTES = 12 * 1024 * 1024
 
@@ -181,6 +183,27 @@ def text_response(handler: BaseHTTPRequestHandler, text: str, status: int = 200,
     handler.send_header("Content-Length", str(len(body)))
     handler.end_headers()
     handler.wfile.write(body)
+
+
+def read_app_settings() -> Dict[str, Any]:
+    try:
+        if SETTINGS_PATH.exists():
+            data = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+            return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+    return {}
+
+
+def write_app_settings(settings: Dict[str, Any]) -> None:
+    payload = {
+        "version": APP_VERSION,
+        "savedAt": _dt.datetime.now(_dt.timezone.utc).isoformat(),
+        "settings": settings if isinstance(settings, dict) else {},
+    }
+    tmp = SETTINGS_PATH.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
+    tmp.replace(SETTINGS_PATH)
 
 
 def normalize_line_endings(text: str) -> Tuple[str, List[str]]:
@@ -701,6 +724,29 @@ def render_markdown_html(text: str) -> str:
         output_format="html5",
     )
     return sanitize_markdown_html(rendered)
+
+
+def render_help_page(markdown_text: str) -> str:
+    try:
+        body = render_markdown_html(markdown_text)
+    except Exception:
+        body = f"<pre>{html_std.escape(markdown_text)}</pre>"
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manuscript Workbench Help</title>
+<style>
+body{{margin:0;background:#171613;color:#ede7da;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}}
+main{{max-width:900px;margin:0 auto;padding:34px 28px 64px}}
+h1,h2,h3{{line-height:1.2;color:#fff}} h1{{font-size:32px}} h2{{margin-top:2em;border-top:1px solid #3a372f;padding-top:1em}}
+a{{color:#7fc4ef}} code{{background:#2a2823;border-radius:4px;padding:.1em .32em}} pre{{background:#211f1b;border:1px solid #3a372f;border-radius:8px;padding:14px;overflow:auto}}
+blockquote{{border-left:4px solid #e0a458;margin:1em 0;padding:.2em 0 .2em 1em;color:#d8d0c1}} table{{border-collapse:collapse;width:100%}} th,td{{border:1px solid #3a372f;padding:6px 8px}}
+</style>
+</head>
+<body><main>{body}</main></body>
+</html>"""
 
 
 def readable_html_fragment(source: str) -> str:
@@ -1312,7 +1358,7 @@ HTML = r'''<!DOCTYPE html>
 *{box-sizing:border-box} html,body{height:100%} body{margin:0;background:var(--bg-deep);color:var(--text);font-family:var(--sans);display:flex;flex-direction:column;overflow:hidden}
 header{display:grid;grid-template-columns:minmax(220px,1fr) auto;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#1c1a16,#171613)}
 .brand{display:flex;flex-direction:column;gap:3px;min-width:0}.mark{font-family:var(--mono);font-weight:800;letter-spacing:.10em;text-transform:uppercase;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mark span{color:var(--amber)}.sub{font-size:11px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}.actions button,.actions .btn{flex:0 0 auto}.filename{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:0;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}.actions button,.actions .btn{flex:0 0 auto}.filename{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:0;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.header-menu{position:relative}.header-menu summary{list-style:none}.header-menu summary::-webkit-details-marker{display:none}.menu-panel{position:absolute;right:0;top:calc(100% + 7px);z-index:45;display:grid;grid-template-columns:1fr;gap:6px;min-width:210px;background:var(--bg-panel);border:1px solid var(--line);border-radius:8px;padding:8px;box-shadow:0 16px 38px rgba(0,0,0,.4)}.menu-panel button,.menu-panel .btn,.menu-panel a.btn{width:100%;text-align:left;justify-content:flex-start;text-decoration:none;display:block}.menu-sep{height:1px;background:var(--line-soft);margin:2px 0}
 @media(max-width:980px){header{grid-template-columns:1fr}.actions{justify-content:flex-start;flex-wrap:wrap}.filename{max-width:min(100%,420px)}}
 button,.btn,select,input[type=text],textarea{font-family:var(--sans)} button,.btn{font-size:12px;font-weight:700;color:var(--text);background:var(--bg-raised);border:1px solid var(--line);border-radius:6px;padding:7px 10px;cursor:pointer;transition:.12s}button:hover,.btn:hover{border-color:#356e8f;background:#31302a}button:disabled{opacity:.45;cursor:not-allowed}.primary{background:var(--blue);border-color:var(--blue);color:#0c1a22}.amber{background:var(--amber);border-color:var(--amber);color:#251704}.danger{border-color:#754333;color:#ffd7c5}.mini{font-size:11px;padding:5px 7px}.wide{width:100%}input[type=file]{display:none}
 button.active{background:var(--amber);border-color:var(--amber);color:#241505}
@@ -1326,7 +1372,7 @@ main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 380px;grid-template
 .diag-row,.vellum-row{display:flex;align-items:center;gap:8px;padding:7px 16px;border-top:1px solid var(--line-soft)}.diag-row .lbl,.vellum-row .vtext{flex:1;min-width:0;font-size:12px;color:var(--muted);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.diag-row .count{font-family:var(--mono);font-size:12px;font-weight:800;color:var(--text);min-width:24px;text-align:right}.diag-row .jump,.vellum-row .jump{font-family:var(--mono);font-size:11px;padding:4px 7px;border-radius:4px}.diag-row.zero .count{color:var(--green)}.diag-row.zero .jump{display:none}.diag-row.zero .lbl{color:var(--faint)}.dot.grey{background:var(--faint)}.dot.rust{background:var(--rust)}.dot.amber{background:var(--amber)}.dot.blue{background:var(--blue)}.dot.violet{background:var(--violet)}.vellum-help,.empty-hint{font-size:11px;line-height:1.4;color:var(--faint);padding:8px 16px 4px}.vellum-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:10px 16px;border-top:1px solid var(--line-soft)}.vsum{background:var(--bg-raised);border:1px solid var(--line-soft);border-radius:6px;padding:6px 8px;font-family:var(--mono);font-size:11px;color:var(--muted)}.vsum b{color:var(--text)}.vellum-row .tag{font-family:var(--mono);font-size:10px;font-weight:800;color:#211507;background:var(--amber);border-radius:4px;padding:3px 5px;min-width:54px;text-align:center;white-space:nowrap}.vellum-row .tag.sub{background:var(--blue);color:#071720}.vellum-row .tag.supp{background:var(--violet);color:#170d20}.vellum-row .tag.warn{background:var(--rust);color:#210b05}.marker-legend{font-family:var(--mono);font-size:10.5px;line-height:1.45;color:var(--faint);padding:8px 16px 12px;border-top:1px solid var(--line-soft)}
 .fix-group{border-top:1px solid var(--line-soft)}.fix-group-title{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:10px 16px 4px}.fix-row{display:flex;align-items:center;gap:8px;padding:5px 16px}.fix-row button{flex:1;text-align:left;font-size:12px;padding:8px 10px}.fix-row button.destructive{border-color:#6f5132}.fix-row button.destructive:after{content:" preview";float:right;color:var(--amber);font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}.fix-note{font-size:11px;color:var(--faint);padding:0 16px 8px;display:flex;align-items:flex-start;gap:6px;line-height:1.4}.fix-note input{margin:2px 0 0}.fix-note.caveat{color:#b58a5e}.lm-panel{border-top:1px solid var(--line-soft);padding:10px 16px 14px;display:flex;flex-direction:column;gap:14px}.ai-block{display:flex;flex-direction:column;gap:9px}.ai-block-title{font-family:var(--mono);font-size:10.5px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--amber);padding:0 2px}.ai-section{border:1px solid var(--line-soft);border-radius:8px;background:#1c1b17;overflow:hidden}.ai-section summary,.ai-static-title{cursor:pointer;list-style:none;padding:9px 10px;font-family:var(--mono);font-size:11px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--text);background:#24221c;display:flex;align-items:center;justify-content:space-between}.ai-section summary::-webkit-details-marker{display:none}.ai-section summary:after{content:"+";color:var(--amber);font-size:14px}.ai-section[open] summary{border-bottom:1px solid var(--line-soft);background:#2a261d;color:#fff}.ai-section[open] summary:after{content:"-"}.ai-section.static .ai-static-title{cursor:default;border-bottom:1px solid var(--line-soft);color:#fff;background:#2a261d}.ai-section-body{padding:10px;display:flex;flex-direction:column;gap:10px}.lm-field{display:flex;flex-direction:column;gap:5px}.lm-field label{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}.lm-field input,.lm-field select,.lm-field textarea{width:100%;background:var(--bg-editor);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:8px 9px;font-family:var(--mono);font-size:11.5px}.lm-field textarea{min-height:160px;resize:vertical;line-height:1.45;white-space:pre-wrap}.lm-field textarea.compact{min-height:72px}.advanced-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.lm-note{color:#b58a5e;font-size:11px;line-height:1.4}
 .side-tabs{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;padding:0 0 8px;background:var(--bg-panel)}.side-tabs button{min-width:0;padding:7px 4px;font-size:11px;border-radius:6px}.side-tabs button.active{background:var(--amber);border-color:var(--amber);color:#241505}.side-panel{display:none;flex-direction:column;gap:16px}.side-panel.active{display:flex}.wrap-control{justify-self:center;display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap}.wrap-control input{margin:0;accent-color:var(--amber)}
-.issue-list{display:flex;flex-direction:column;gap:6px}.issue{border:1px solid var(--line-soft);border-radius:7px;padding:8px;background:#1c1b17}.issue .top{display:flex;align-items:center;gap:7px}.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0}.dot.error{background:var(--rust)}.dot.warning{background:var(--amber)}.dot.info{background:var(--blue)}.issue .msg{font-size:12px;line-height:1.35}.issue .sample{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.issue button{margin-left:auto}.ok{color:var(--green)}.warn{color:var(--amber)}.err{color:#e89a7e}.hint{font-size:11px;line-height:1.45;color:var(--faint);margin:6px 0 0}.divider{height:1px;background:var(--line-soft);margin:10px -14px}.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:80;background:var(--bg-raised);border:1px solid #356e8f;border-radius:8px;padding:9px 14px;font-family:var(--mono);font-size:12px;opacity:0;pointer-events:none;transition:.2s;max-width:88vw}.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+.issue-list{display:flex;flex-direction:column;gap:6px}.issue{border:1px solid var(--line-soft);border-radius:7px;padding:8px;background:#1c1b17}.issue .top{display:flex;align-items:center;gap:7px}.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0}.dot.error{background:var(--rust)}.dot.warning{background:var(--amber)}.dot.info{background:var(--blue)}.issue .msg{font-size:12px;line-height:1.35}.issue .sample{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.issue button{margin-left:auto}.ok{color:var(--green)}.warn{color:var(--amber)}.err{color:#e89a7e}.hint{font-size:11px;line-height:1.45;color:var(--faint);margin:6px 0 0}.about-text{color:var(--text)}.about-text code{color:#fff}.divider{height:1px;background:var(--line-soft);margin:10px -14px}.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:80;background:var(--bg-raised);border:1px solid #356e8f;border-radius:8px;padding:9px 14px;font-family:var(--mono);font-size:12px;opacity:0;pointer-events:none;transition:.2s;max-width:88vw}.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
 .outline-list{border-top:1px solid var(--line-soft)}.outline-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 16px;border-top:1px solid var(--line-soft)}.outline-row:first-child{border-top:0}.outline-row.sub{padding-left:30px}.outline-tag{font-family:var(--mono);font-size:10px;font-weight:800;color:#211507;background:var(--amber);border-radius:4px;padding:3px 5px;min-width:34px;text-align:center}.outline-row.l1 .outline-tag{background:var(--amber);color:#211507}.outline-row.l2 .outline-tag{background:var(--blue);color:#071720}.outline-row.l3 .outline-tag{background:var(--green);color:#07190b}.outline-row.l4 .outline-tag{background:var(--violet);color:#170d20}.outline-row.l5 .outline-tag{background:var(--rust);color:#210b05}.outline-row.l6 .outline-tag{background:#777065;color:#11100d}.outline-main{min-width:0}.outline-title{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.outline-meta{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:2px}.outline-actions{display:flex;gap:5px}.outline-actions button{font-family:var(--mono);font-size:10.5px;padding:4px 6px}.outline-toggle{width:24px;padding-left:0!important;padding-right:0!important}
 .merge-list{flex:1;min-height:0;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:6px}.merge-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;border:1px solid var(--line-soft);border-radius:7px;background:#181713;padding:8px 9px}.merge-name{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.merge-meta{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:2px}.merge-actions{display:flex;gap:5px}.merge-actions button{font-family:var(--mono);font-size:10.5px;padding:4px 6px}
 .find-body{padding:12px;display:flex;flex-direction:column;gap:10px}.find-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.find-field{display:flex;flex-direction:column;gap:5px}.find-field label,.find-options label{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}.find-field input{width:100%;background:var(--bg-editor);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:8px 9px;font-family:var(--mono);font-size:12px}.find-options{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.find-options label{display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0}.find-options select{width:auto;background:var(--bg-editor);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:12px}
@@ -1339,18 +1385,27 @@ textarea.prompt{height:190px;resize:vertical;font-family:var(--mono);line-height
 </head>
 <body>
 <header>
-  <div class="brand"><div class="mark">Manuscript <span>Workbench</span></div><div class="sub">local Python edition · Markdown-friendly structure · DOCX import/export · local AI streaming</div></div>
+  <div class="brand"><div class="mark">Manuscript <span>Workbench</span></div><div class="sub">v1.2 · local Python edition · Markdown-friendly structure · DOCX import/export · local AI streaming</div></div>
   <div class="actions">
     <span class="filename" id="filename">no file loaded</span>
-    <label class="btn" for="fileInput">Load File</label><input type="file" id="fileInput" accept=".txt,.md,.markdown,.rtf,.docx,.doc,.html,.htm,text/plain,text/markdown,text/x-markdown,text/html,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-    <button id="importUrlBtn">Import URL</button>
-    <label class="btn" for="folderInput">Merge Folder</label><input type="file" id="folderInput" webkitdirectory directory multiple accept=".txt,.md,.markdown,.rtf,.docx,.doc,.html,.htm,text/plain,text/markdown,text/x-markdown,text/html,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-    <button id="compareBtn">Compare</button>
-    <button id="undoBtn" disabled>Undo</button>
-    <button id="clearBtn">Clear</button>
-    <button id="exportTxtBtn">Export TXT</button>
-    <button id="exportMarkedTxtBtn">Export Markdown</button>
-    <button id="exportDocxBtn" class="primary">Export DOCX</button>
+    <details class="header-menu" id="headerMenu">
+      <summary class="btn">☰ Menu</summary>
+      <div class="menu-panel">
+        <label class="btn" for="fileInput">Load File</label><input type="file" id="fileInput" accept=".txt,.md,.markdown,.rtf,.docx,.doc,.html,.htm,text/plain,text/markdown,text/x-markdown,text/html,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+        <button id="importUrlBtn">Import URL</button>
+        <label class="btn" for="folderInput">Merge Folder</label><input type="file" id="folderInput" webkitdirectory directory multiple accept=".txt,.md,.markdown,.rtf,.docx,.doc,.html,.htm,text/plain,text/markdown,text/x-markdown,text/html,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+        <button id="compareBtn">Compare</button>
+        <button id="undoBtn" disabled>Undo</button>
+        <button id="clearBtn">Clear</button>
+        <div class="menu-sep"></div>
+        <button id="exportTxtBtn">Export TXT</button>
+        <button id="exportMarkedTxtBtn">Export Markdown</button>
+        <button id="exportDocxBtn" class="primary">Export DOCX</button>
+        <div class="menu-sep"></div>
+        <button id="aboutBtn">About</button>
+        <a class="btn" href="/help" target="_blank" rel="noopener">Help / User Manual</a>
+      </div>
+    </details>
   </div>
 </header>
 <div class="recovery" id="recovery"><strong>Previous autosave found.</strong><span>Restore your last local session?</span><span class="spacer"></span><button id="restoreBtn" class="mini">Restore</button><button id="discardRestoreBtn" class="mini">Discard</button></div>
@@ -1613,6 +1668,16 @@ textarea.prompt{height:190px;resize:vertical;font-family:var(--mono);line-height
   <button id="selectionRunBtn" class="mini primary" type="button">Run</button>
 </div>
 <div class="toast" id="toast"></div>
+<div class="modal" id="aboutModal">
+  <div class="modal-card" style="max-width:560px;height:auto;min-height:0">
+    <div class="modal-head"><div><div class="modal-title">About Manuscript Workbench</div><div class="small">Version 1.2</div></div><div class="modal-actions"><button id="closeAboutBtn" class="mini">Close</button></div></div>
+    <div class="find-body">
+      <div class="hint about-text">Local-first manuscript, Markdown, cleanup, DOCX and AI rewrite workbench.</div>
+      <div class="hint about-text">Settings are saved locally next to the app in <code>manuscript_workbench_settings.json</code>.</div>
+      <div class="hint about-text">Help: open <a href="/help" target="_blank" rel="noopener">User Manual</a>.</div>
+    </div>
+  </div>
+</div>
 <div class="modal" id="previewModal">
   <div class="modal-card" id="modalCard">
     <div class="modal-head"><div><div class="modal-title" id="previewTitle">Preview</div><div class="small" id="previewSub">before / after</div></div><div class="modal-actions"><button data-view="split" class="mini viewBtn">Split</button><button data-view="after-only" class="mini viewBtn">After only</button><button data-view="before-only" class="mini viewBtn">Before only</button><label class="small"><input type="checkbox" id="previewLinked"> linked scroll</label><label class="small"><input type="checkbox" id="autoScroll" checked> auto-scroll</label><button id="bottomBtn" class="mini">Bottom</button><button id="closePreviewBtn" class="mini">Close</button></div></div>
@@ -1693,6 +1758,7 @@ let previewScrollSyncing = false;
 let markdownPreviewTimer = null;
 let markdownPreviewRequest = 0;
 let markdownServerAvailable = true;
+let settingsSaveTimer = null;
 let mergeFiles = [];
 let htmlImportState = null;
 let compareScrollSyncing = false;
@@ -1755,11 +1821,13 @@ const AI_PROVIDERS={
 
 function toast(msg){ toastEl.textContent=msg; toastEl.classList.add('show'); clearTimeout(toastEl._t); toastEl._t=setTimeout(()=>toastEl.classList.remove('show'),2600); }
 function api(path, data){ return fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data||{})}); }
+function apiGet(path){ return fetch(path,{method:'GET'}); }
 function getScope(){ return document.querySelector('input[name=scope]:checked')?.value || 'all'; }
 function selectedTextLength(){ return Math.max(0, editor.selectionEnd - editor.selectionStart); }
 function currentAiProvider(){ return AI_PROVIDERS[$('#lmProvider')?.value] || AI_PROVIDERS.custom; }
 function resetModelSelect(placeholder='Detect first available model'){ const sel=$('#lmModel'); if(!sel) return; sel.innerHTML=`<option value="">${escapeHtml(placeholder)}</option>`; }
-function updateProviderUi(){ const provider=currentAiProvider(); if($('#lmProvider').value!=='custom' && $('#lmBase').value.trim()!==provider.base){ $('#lmBase').value=provider.base; resetModelSelect(); } $('#lmNote').textContent=provider.note; $('#lmStatus').textContent=`${provider.label} idle.`; }
+function isKnownProviderBase(url){ return Object.values(AI_PROVIDERS).some(p=>p.base===url); }
+function updateProviderUi(){ const provider=currentAiProvider(); $('#lmNote').textContent=provider.note; $('#lmStatus').textContent=`${provider.label} idle.`; }
 function getMetadata(){ return {title:$('#metaTitle').value.trim(), subtitle:$('#metaSubtitle').value.trim(), author:$('#metaAuthor').value.trim(), language:$('#metaLanguage').value.trim(), series:$('#metaSeries').value.trim(), bookNumber:$('#metaBookNumber').value.trim(), publisher:$('#metaPublisher').value.trim(), filename:$('#metaFilename').value.trim()}; }
 function setMetadata(m){ m=m||{}; $('#metaTitle').value=m.title||''; $('#metaSubtitle').value=m.subtitle||''; $('#metaAuthor').value=m.author||''; $('#metaLanguage').value=m.language||''; $('#metaSeries').value=m.series||''; $('#metaBookNumber').value=m.bookNumber||''; $('#metaPublisher').value=m.publisher||''; $('#metaFilename').value=m.filename||''; }
 const MD_PREFIX_MARKERS={chapter:'# ',part:'# ',subhead1:'## ',subhead2:'### ',subhead3:'#### ',subhead4:'##### ',subhead5:'###### ',quote:'> '};
@@ -1898,6 +1966,11 @@ function syncCompareScroll(source,target){ if(compareScrollSyncing || !$('#compa
 async function loadCompareFile(file,side){ if(!file) return; try{ $('#compareStatus').textContent=`Loading ${file.name}...`; const data=await importFileObject(file); setCompareText(side,data.text||'',file.name); }catch(err){ $('#compareStatus').textContent=err.message; toast(err.message); alert(err.message); } }
 $('#compareBtn').addEventListener('click',()=>openCompare('', '', 'Ready.'));
 $('#closeCompareBtn').addEventListener('click',()=>$('#compareModal').classList.remove('open'));
+$('#aboutBtn').addEventListener('click',()=>$('#aboutModal').classList.add('open'));
+$('#closeAboutBtn').addEventListener('click',()=>$('#aboutModal').classList.remove('open'));
+$('.menu-panel').addEventListener('click',e=>e.stopPropagation());
+document.querySelectorAll('#headerMenu .menu-panel button,#headerMenu .menu-panel .btn').forEach(el=>el.addEventListener('click',()=>{ if(el.id!=='undoBtn') setTimeout(()=>$('#headerMenu').removeAttribute('open'),0); }));
+document.querySelectorAll('.modal').forEach(modal=>modal.addEventListener('mousedown',e=>{ if(e.target!==modal) return; if(modal.id==='previewModal' && previewState.running) return; modal.classList.remove('open'); }));
 $('#compareOriginal').addEventListener('input',updateCompareMeta); $('#compareRevised').addEventListener('input',updateCompareMeta);
 $('#compareOriginal').addEventListener('scroll',()=>syncCompareScroll($('#compareOriginal'),$('#compareRevised')));
 $('#compareRevised').addEventListener('scroll',()=>syncCompareScroll($('#compareRevised'),$('#compareOriginal')));
@@ -2055,17 +2128,17 @@ function setPreviewView(view){ if(!['split','after-only','before-only'].includes
 
 function scheduleAutosave(){ if(recoveryPending && !editor.value){ return; } clearTimeout(autosaveTimer); autosaveTimer=setTimeout(()=>{ if(recoveryPending && !editor.value) return; try{ const settings=getSettings(); delete settings.lmApiKey; const data={version:1,text:editor.value,metadata:getMetadata(),settings,savedAt:new Date().toISOString()}; localStorage.setItem('vp.py.autosave', JSON.stringify(data)); }catch(err){ if(!autosaveWarningShown){ autosaveWarningShown=true; toast('Autosave failed: browser storage is full. Export your work to disk.'); } } },700); }
 function getSettings(){ return {wrap:$('#wrapToggle').checked, previewOn:document.querySelector('.editor-card')?.classList.contains('preview-on')||false, scope:getScope(), vellumCollapsed:$('#vellumToolbar').classList.contains('collapsed'), sideTab:document.querySelector('[data-side-tab].active')?.dataset.sideTab||'check', lmProvider:$('#lmProvider')?.value||'lmstudio', lmBase:$('#lmBase').value, lmApiKey:$('#lmApiKey').value, lmModel:$('#lmModel').value, lmStrength:$('#lmStrength')?.value||'medium', chunkSize:$('#chunkSize').value, guidedContext:$('#guidedContext')?.value||'', translateTarget:$('#translateTarget')?.value||'English', advTemperature:$('#advTemperature')?.value||'', advTopP:$('#advTopP')?.value||'', advTopK:$('#advTopK')?.value||'', advRepeatPenalty:$('#advRepeatPenalty')?.value||'', advMaxTokens:$('#advMaxTokens')?.value||''}; }
-function saveSettings(){ try{ localStorage.setItem('vp.py.settings', JSON.stringify(getSettings())); }catch(err){} scheduleAutosave(); }
-function loadSettings(){ let s={}; try{s=JSON.parse(localStorage.getItem('vp.py.settings')||'{}');}catch(e){} $('#wrapToggle').checked=!!s.wrap; $('#wrapToggle').dispatchEvent(new Event('change')); const card=document.querySelector('.editor-card'); card.classList.toggle('preview-on',!!s.previewOn); $('#togglePreview').classList.toggle('active',!!s.previewOn); const scopeInput=document.querySelector(`input[name="scope"][value="${s.scope==='selection'?'selection':'all'}"]`); if(scopeInput) scopeInput.checked=true; const tb=$('#vellumToolbar'); const collapsed=s.vellumCollapsed!==false; tb.classList.toggle('collapsed',collapsed); $('#toggleVellum').textContent=collapsed?'Expand':'Collapse'; const savedTab=s.sideTab||localStorage.getItem('vp.py.sideTab')||'check'; activateSideTab(document.querySelector(`[data-side-tab="${savedTab}"]`)?savedTab:'check'); if(s.lmProvider && AI_PROVIDERS[s.lmProvider]) $('#lmProvider').value=s.lmProvider; if(s.lmBase) $('#lmBase').value=s.lmBase; else if($('#lmProvider').value!=='custom') $('#lmBase').value=currentAiProvider().base; if(s.lmApiKey) $('#lmApiKey').value=s.lmApiKey; updateProviderUi(); if(s.lmBase) $('#lmBase').value=s.lmBase; if(s.lmModel){ const sel=$('#lmModel'); if(!Array.from(sel.options).some(o=>o.value===s.lmModel)){ const opt=document.createElement('option'); opt.value=s.lmModel; opt.textContent=s.lmModel; sel.appendChild(opt); } sel.value=s.lmModel; } if(s.lmStrength) $('#lmStrength').value=s.lmStrength; if(s.chunkSize) $('#chunkSize').value=s.chunkSize; if(s.guidedContext) $('#guidedContext').value=s.guidedContext; if(s.translateTarget) $('#translateTarget').value=s.translateTarget; ['advTemperature','advTopP','advTopK','advRepeatPenalty','advMaxTokens'].forEach(id=>{ if(s[id]) $('#'+id).value=s[id]; }); }
-['metaTitle','metaSubtitle','metaAuthor','metaLanguage','metaSeries','metaBookNumber','metaPublisher','metaFilename','lmBase','lmApiKey','lmModel','chunkSize','guidedContext','translateTarget','advTemperature','advTopP','advTopK','advRepeatPenalty','advMaxTokens'].forEach(id=>$('#'+id).addEventListener('input',()=>{ if(id==='lmBase' && $('#lmProvider').value!=='custom'){ $('#lmProvider').value='custom'; updateProviderUi(); } saveSettings(); updateStats(); }));
-$('#lmProvider').addEventListener('change',()=>{ updateProviderUi(); saveSettings(); });
+function saveSettings(){ const settings=getSettings(); try{ localStorage.setItem('vp.py.settings', JSON.stringify(settings)); }catch(err){} clearTimeout(settingsSaveTimer); settingsSaveTimer=setTimeout(()=>{ api('/api/settings',{settings}).catch(()=>{}); },350); scheduleAutosave(); }
+async function loadSettings(){ let s={}; try{s=JSON.parse(localStorage.getItem('vp.py.settings')||'{}');}catch(e){} try{ const res=await apiGet('/api/settings'); if(res.ok){ const data=await res.json(); if(data && data.settings) s={...s,...data.settings}; } }catch(e){} try{ localStorage.setItem('vp.py.settings', JSON.stringify(s)); }catch(e){} $('#wrapToggle').checked=!!s.wrap; $('#wrapToggle').dispatchEvent(new Event('change')); const card=document.querySelector('.editor-card'); card.classList.toggle('preview-on',!!s.previewOn); $('#togglePreview').classList.toggle('active',!!s.previewOn); const scopeInput=document.querySelector(`input[name="scope"][value="${s.scope==='selection'?'selection':'all'}"]`); if(scopeInput) scopeInput.checked=true; const tb=$('#vellumToolbar'); const collapsed=s.vellumCollapsed!==false; tb.classList.toggle('collapsed',collapsed); $('#toggleVellum').textContent=collapsed?'Expand':'Collapse'; const savedTab=s.sideTab||localStorage.getItem('vp.py.sideTab')||'check'; activateSideTab(document.querySelector(`[data-side-tab="${savedTab}"]`)?savedTab:'check'); if(s.lmProvider && AI_PROVIDERS[s.lmProvider]) $('#lmProvider').value=s.lmProvider; if(s.lmBase) $('#lmBase').value=s.lmBase; else $('#lmBase').value=currentAiProvider().base; if(s.lmApiKey) $('#lmApiKey').value=s.lmApiKey; updateProviderUi(); if(s.lmModel){ const sel=$('#lmModel'); if(!Array.from(sel.options).some(o=>o.value===s.lmModel)){ const opt=document.createElement('option'); opt.value=s.lmModel; opt.textContent=s.lmModel; sel.appendChild(opt); } sel.value=s.lmModel; } if(s.lmStrength) $('#lmStrength').value=s.lmStrength; if(s.chunkSize) $('#chunkSize').value=s.chunkSize; if(s.guidedContext) $('#guidedContext').value=s.guidedContext; if(s.translateTarget) $('#translateTarget').value=s.translateTarget; ['advTemperature','advTopP','advTopK','advRepeatPenalty','advMaxTokens'].forEach(id=>{ if(s[id]) $('#'+id).value=s[id]; }); }
+['metaTitle','metaSubtitle','metaAuthor','metaLanguage','metaSeries','metaBookNumber','metaPublisher','metaFilename','lmBase','lmApiKey','lmModel','chunkSize','guidedContext','translateTarget','advTemperature','advTopP','advTopK','advRepeatPenalty','advMaxTokens'].forEach(id=>$('#'+id).addEventListener('input',()=>{ saveSettings(); updateStats(); }));
+$('#lmProvider').addEventListener('change',()=>{ const base=$('#lmBase').value.trim(); const provider=currentAiProvider(); if(!base || isKnownProviderBase(base)) $('#lmBase').value=provider.base; updateProviderUi(); saveSettings(); });
 $('#lmStrength').addEventListener('change',saveSettings);
 $('#lmModel').addEventListener('change',saveSettings);
 function showRecoveryIfNeeded(){ const raw=localStorage.getItem('vp.py.autosave'); if(!raw) return; try{ const data=JSON.parse(raw); if(data.text && !editor.value){ recoveryData=data; recoveryPending=true; $('#recovery').classList.add('show'); } }catch(e){} }
 $('#restoreBtn').addEventListener('click',()=>{ const data=recoveryData||JSON.parse(localStorage.getItem('vp.py.autosave')||'{}'); recoveryPending=false; editor.value=data.text||''; setMetadata(data.metadata||{}); if(data.settings){ try{ localStorage.setItem('vp.py.settings',JSON.stringify(data.settings)); loadSettings(); }catch(e){} } $('#recovery').classList.remove('show'); updateStats(); toast(`Autosave restored: ${(editor.value.match(/\S+/g)||[]).length.toLocaleString()} words`); });
 $('#discardRestoreBtn').addEventListener('click',()=>{ recoveryPending=false; recoveryData=null; localStorage.removeItem('vp.py.autosave'); $('#recovery').classList.remove('show'); updateStats(); });
 window.addEventListener('resize',syncFindHighlights);
-loadPrompts(); loadSettings(); showRecoveryIfNeeded(); updateStats();
+loadPrompts(); loadSettings().then(()=>{ showRecoveryIfNeeded(); updateStats(); });
 </script>
 </body>
 </html>
@@ -2091,7 +2164,21 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
         if parsed.path in ("/", "/index.html"):
             text_response(self, HTML, content_type="text/html; charset=utf-8")
         elif parsed.path == "/api/health":
-            json_response(self, {"ok": True, "app": APP_NAME, "python_docx": Document is not None, "requests": requests is not None, "markdown": markdown_lib is not None, "lxml": lxml_html is not None, "trafilatura": trafilatura is not None})
+            json_response(self, {"ok": True, "app": APP_NAME, "version": APP_VERSION, "python_docx": Document is not None, "requests": requests is not None, "markdown": markdown_lib is not None, "lxml": lxml_html is not None, "trafilatura": trafilatura is not None})
+        elif parsed.path == "/api/settings":
+            json_response(self, read_app_settings())
+        elif parsed.path == "/help":
+            guide = Path(__file__).with_name("USER_GUIDE.md")
+            if guide.exists():
+                text_response(self, render_help_page(guide.read_text(encoding="utf-8")), content_type="text/html; charset=utf-8")
+            else:
+                text_response(self, "User guide not found.", HTTPStatus.NOT_FOUND)
+        elif parsed.path == "/USER_GUIDE.md":
+            guide = Path(__file__).with_name("USER_GUIDE.md")
+            if guide.exists():
+                text_response(self, guide.read_text(encoding="utf-8"), content_type="text/markdown; charset=utf-8")
+            else:
+                text_response(self, "User guide not found.", HTTPStatus.NOT_FOUND)
         else:
             text_response(self, "Not found", HTTPStatus.NOT_FOUND)
 
@@ -2139,6 +2226,11 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
             elif parsed.path == "/api/render_markdown":
                 payload = get_json_body(self)
                 json_response(self, {"html": render_markdown_html(payload.get("text") or ""), "engine": "python-markdown"})
+            elif parsed.path == "/api/settings":
+                payload = get_json_body(self)
+                settings = payload.get("settings") if isinstance(payload.get("settings"), dict) else payload
+                write_app_settings(settings)
+                json_response(self, {"ok": True, "path": str(SETTINGS_PATH)})
             elif parsed.path == "/api/export_docx":
                 payload = get_json_body(self)
                 text = payload.get("text") or ""
