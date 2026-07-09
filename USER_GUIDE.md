@@ -573,7 +573,7 @@ In the **Prompt editor** section you can edit the active prompt (`Save Prompt`),
 
 For long documents, always prefer the **Chunked** variants: a small provider context window can otherwise truncate or derail the output. Chunks split preferentially at chapter headings and blank lines, with the target size set by `Chunk size` (default 6000 characters, minimum 1200). Progress is shown per chunk.
 
-Use **Rewrite by Heading** when the text has clear Markdown sections and you want the model to process each chapter/subsection as its own request. This can work better than length-based chunking for chapter-level rewrites or translation-style workflows, because each request starts at a natural structural boundary.
+Use **Rewrite by Heading** when the text has clear Markdown sections and you want the model to process each chapter/subsection as its own request. This can work better than length-based chunking for chapter-level rewrites or translation-style workflows, because each request starts at a natural structural boundary. If one heading section is larger than `Chunk size`, the app splits that section further on whole paragraphs; it does not cut a paragraph in half.
 
 ### Guided tools
 
@@ -581,7 +581,7 @@ Use **Rewrite by Heading** when the text has clear Markdown sections and you wan
 - **Feedback Only** — editorial feedback (clarity, flow, tone, structure, consistency) without a rewrite. Review-only.
 - **Rewrite with Guidance** — rewrites the selection using your notes in `Goal / answers / context`.
 - **Translate Selection** — translates the selection into the language in `Translate to`, preserving Markdown structure.
-- **Translate by Heading** — translates the current selection, or the entire document when nothing is selected, section by section at Markdown headings.
+- **Translate by Heading** — translates the current selection, or the entire document when nothing is selected, section by section at Markdown headings. Oversized heading sections are split further on whole paragraphs.
 
 A productive loop: select a passage → `Improve Questions` → paste your answers into `Goal / answers / context` → `Rewrite with Guidance` → review and apply.
 
