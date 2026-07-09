@@ -571,7 +571,7 @@ In the **Prompt editor** section you can edit the active prompt (`Save Prompt`),
 | Rewrite Chunked / AI Clean Chunked | the current selection, or the entire document when nothing is selected, in multiple sequential requests |
 | Rewrite by Heading | the current selection, or the entire document when nothing is selected, split at Markdown headings `#` through `######` |
 
-For long documents, always prefer the **Chunked** variants: a small provider context window can otherwise truncate or derail the output. Chunks split preferentially at chapter headings and blank lines, with the target size set by `Chunk size` (default 6000 characters, minimum 1200). Progress is shown per chunk.
+For long documents, always prefer the **Chunked** variants: a small provider context window can otherwise truncate or derail the output. Chunks split preferentially at chapter headings and whole paragraphs, with the target size set by `Chunk size` (default 6000 characters, minimum 1200). The app avoids cutting a paragraph in half; if a single paragraph is larger than `Chunk size`, it is sent whole and the preview status warns you. Progress is shown per chunk.
 
 Use **Rewrite by Heading** when the text has clear Markdown sections and you want the model to process each chapter/subsection as its own request. This can work better than length-based chunking for chapter-level rewrites or translation-style workflows, because each request starts at a natural structural boundary. If one heading section is larger than `Chunk size`, the app splits that section further on whole paragraphs; it does not cut a paragraph in half.
 
