@@ -14,7 +14,7 @@ Node is only needed for the JavaScript tests.
 
 | Path | What it holds |
 |---|---|
-| `tests/python/` | pytest suites. `legacy_loader.py` is the single place that decides which implementation is under test. |
+| `tests/python/` | pytest suites. `implementation.py` is the single place that decides which implementation is under test (a flat facade over the `manuscript_workbench` package). |
 | `tests/js/` | `node:test` suites. `adapter.js` is the single place that loads the client-side functions. |
 | `tests/fixtures/corpus.json` | Shared EN/NL sample texts used by both languages (built by `tests/tools/build_corpus.py`). |
 | `tests/fixtures/golden/` | Golden snapshots of observable behaviour (`py_snapshot.json`, `js_snapshot.json`). |

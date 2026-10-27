@@ -13,7 +13,7 @@ import pytest
 os.environ["NO_PROXY"] = "*"
 os.environ["no_proxy"] = "*"
 
-from legacy_loader import load_legacy_app  # noqa: E402
+from implementation import load_implementation  # noqa: E402
 from mock_openai import MockOpenAI  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -22,8 +22,8 @@ FIXTURES = ROOT / "tests" / "fixtures"
 
 @pytest.fixture(scope="session")
 def mw():
-    """The implementation under test (the legacy single-file app until phase 2)."""
-    return load_legacy_app()
+    """The implementation under test (the manuscript_workbench package, through a flat facade)."""
+    return load_implementation()
 
 
 @pytest.fixture(scope="session")

@@ -1,12 +1,12 @@
 'use strict';
-// Loads the pure functions of the current single-file app (the embedded <script> in app.py) into a
+// Loads the pure functions of the current frontend script (static/js/legacy-app.js) into a
 // sandbox with a stubbed DOM. After the restructure (phase 2) only this file changes: it will import the
 // real modules from static/js instead, and every test keeps using the same function names.
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-const APP_PATH = path.resolve(__dirname, '..', '..', 'app.py');
+const SCRIPT_PATH = path.resolve(__dirname, '..', '..', 'static', 'js', 'legacy-app.js');
 
 const EXPORTS = [
   'FIXES', 'SAFE_FIX_SEQUENCE', 'DESTRUCTIVE_FIXES', 'safeCleanup',
@@ -33,12 +33,9 @@ function makeStub() {
 }
 
 function embeddedScript() {
-  const src = fs.readFileSync(APP_PATH, 'utf8');
-  const start = src.indexOf('<script>\n', src.indexOf("HTML = r'''")) + '<script>\n'.length;
-  const end = src.indexOf('</script>', start);
-  let js = src.slice(start, end);
+  const js = fs.readFileSync(SCRIPT_PATH, 'utf8');
   const bootstrap = /\nloadPrompts\(\); loadSettings\(\)[^\n]*\n?$/;
-  if (!bootstrap.test(js)) throw new Error('bootstrap line not found in embedded script');
+  if (!bootstrap.test(js)) throw new Error('bootstrap line not found in the script');
   return js.replace(bootstrap, '\n'); // the last line starts the app and needs a real DOM
 }
 
@@ -56,7 +53,7 @@ function loadApi() {
   };
   sandbox.window = sandbox;
   vm.createContext(sandbox);
-  vm.runInContext(embeddedScript(), sandbox, { filename: 'app.py:embedded.js' });
+  vm.runInContext(embeddedScript(), sandbox, { filename: 'static/js/legacy-app.js' });
   return vm.runInContext('({' + EXPORTS.join(',') + '})', sandbox);
 }
 

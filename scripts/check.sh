@@ -18,16 +18,7 @@ echo "== python: tests"
 
 if command -v node >/dev/null 2>&1; then
   echo "== javascript: syntax"
-  tmp="$(mktemp -d)"
-  "$PY" -B - "$tmp/embedded.js" <<'EOF'
-import pathlib, sys
-src = pathlib.Path("app.py").read_text(encoding="utf-8")
-a = src.index("<script>\n", src.index("HTML = r'''")) + len("<script>\n")
-b = src.index("</script>", a)
-pathlib.Path(sys.argv[1]).write_text(src[a:b], encoding="utf-8")
-EOF
-  node --check "$tmp/embedded.js" && echo ok
-  rm -rf "$tmp"
+  for f in static/js/*.js; do node --check "$f"; done && echo ok
   echo "== javascript: tests"
   node --test tests/js/
 else
