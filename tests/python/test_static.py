@@ -9,18 +9,22 @@ def test_index_references_external_assets_and_has_no_inline_script(server):
     page = body.decode("utf-8")
     assert status == 200 and headers["Content-Type"].startswith("text/html")
     assert '<link rel="stylesheet" href="/static/css/app.css">' in page
-    assert "/static/js/" in page
+    assert '<script type="module" src="/static/js/main.js"></script>' in page
+    assert 'style="' not in page, "inline style attributes would need 'unsafe-inline' for styles"
     import re
 
     inline_scripts = [m for m in re.findall(r"<script(?![^>]*\bsrc=)[^>]*>", page)]
     assert inline_scripts == [], "inline <script> blocks would need 'unsafe-inline'"
-    assert "script-src 'self'" in headers["Content-Security-Policy"]
-    assert "script-src 'self' 'unsafe-inline'" not in headers["Content-Security-Policy"]
+    csp = headers["Content-Security-Policy"]
+    assert "script-src 'self'" in csp and "style-src 'self'" in csp
+    assert "unsafe-inline" not in csp
 
 
 @pytest.mark.parametrize("path,content_type", [
     ("/static/css/app.css", "text/css"),
-    ("/static/js/legacy-app.js", "text/javascript"),
+    ("/static/js/main.js", "text/javascript"),
+    ("/static/js/core/cleaning.js", "text/javascript"),
+    ("/static/js/ui/ai.js", "text/javascript"),
 ])
 def test_static_files_are_served_with_their_content_type(server, path, content_type):
     status, headers, body = server.request("GET", path, token=False)
@@ -35,7 +39,8 @@ def test_static_files_are_served_with_their_content_type(server, path, content_t
     "/static/..%2fapp.py",
     "/static/css/../../manuscript_workbench/server.py",
     "/static/index.html",        # the raw template has no token; only "/" serves the page
-    "/static/js/legacy-app.js%00.png",
+    "/static/js/main.js%00.png",
+    "/static/js/package.json",   # only whitelisted file types are served
     "/static/",
     "/static/nope.js",
 ])

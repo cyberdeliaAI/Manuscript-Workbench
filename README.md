@@ -89,6 +89,37 @@ Use **Export Markdown** to keep the editable Markdown manuscript.
 
 Use **Export DOCX** for a formatted Word document.
 
+## Project layout
+
+```text
+app.py                      thin launcher (python app.py)
+manuscript_workbench/       the Python backend
+  server.py                   HTTP server, request handler, static files
+  http_util.py  settings.py   responses and security headers, persisted settings
+  importers.py  docx_import.py  htmlimport.py  textio.py   file and URL import
+  netsafe.py                  safe URL fetching for Import URL
+  mdrender.py  structure.py   Markdown preview (sanitizer) and structure vocabulary
+  docx_export.py  preflight.py  export and preflight checks
+  ai.py                       helpers for OpenAI-compatible providers
+static/                     the frontend (served from /static/, no build step)
+  index.html  css/app.css
+  js/main.js                  entry point (ES modules)
+  js/core/                    pure logic: cleaning, diagnostics, chunking, guardrails (no DOM, unit-tested)
+  js/ui/                      DOM-bound modules, one per feature
+tests/                      pytest + node:test suites (see tests/README.md)
+```
+
+## Development
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt   # once
+npm install                                                              # optional: lint and formatting
+./scripts/check.sh                                                       # syntax, tests, lint
+```
+
+The app needs no npm packages. Node (22.12 or newer) is only used for the JavaScript tests, `npm run lint` and
+`npm run format`.
+
 ## Notes
 
 - `.md` / `.markdown` import opens Markdown directly.

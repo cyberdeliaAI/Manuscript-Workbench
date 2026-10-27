@@ -18,7 +18,13 @@ echo "== python: tests"
 
 if command -v node >/dev/null 2>&1; then
   echo "== javascript: syntax"
-  for f in static/js/*.js; do node --check "$f"; done && echo ok
+  find static/js -name "*.js" -print0 | xargs -0 -n1 node --check && echo ok
+  if [ -x node_modules/.bin/eslint ]; then
+    echo "== javascript: lint"
+    node_modules/.bin/eslint static tests
+  else
+    echo "== javascript: lint skipped (run 'npm install' once to enable it)"
+  fi
   echo "== javascript: tests"
   node --test tests/js/
 else

@@ -23,7 +23,7 @@ def content_security_policy(allow_remote_images: bool = False) -> str:
     return "; ".join([
         "default-src 'self'",
         "script-src 'self'",
-        "style-src 'self' 'unsafe-inline'",
+        "style-src 'self'",
         images,
         "connect-src 'self'",
         "object-src 'none'",

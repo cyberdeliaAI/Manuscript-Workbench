@@ -75,14 +75,14 @@
       <button id="quickAiClean" title="AI Clean Selection">Clean</button>
       <button id="quickClearMark" title="Clear heading/structure marker">Clear</button>
     </div>
-    <div class="toolbar collapsed" id="vellumToolbar">
-      <div class="toolbar-head"><div class="toolbar-title">Markdown tools</div><button id="toggleVellum" class="mini">Expand</button></div>
+    <div class="toolbar collapsed" id="structureToolbar">
+      <div class="toolbar-head"><div class="toolbar-title">Markdown tools</div><button id="toggleStructureTools" class="mini">Expand</button></div>
       <div class="toolbar-body">
         <span class="group-label">Structure</span>
         <button data-marker="chapter" title="Marks this line as a chapter heading for Markdown/DOCX export.">Chapter</button><button data-marker="part" title="Marks a larger section that contains multiple chapters, such as Part One.">Part</button><button data-marker="subhead1" title="Marks a section title inside a chapter.">Subhead 1</button><button data-marker="subhead2" title="Marks a lower-level section title inside a chapter.">Subhead 2</button><button data-marker="subhead3" title="Marks a third-level section title inside a chapter.">Subhead 3</button><button data-marker="subhead4" title="Marks a fourth-level section title inside a chapter. Use sparingly.">Subhead 4</button><button data-marker="subhead5" title="Marks a fifth-level section title inside a chapter. Use rarely.">Subhead 5</button>
         <button data-marker="subtitle" title="Adds a chapter subtitle. It appears with the chapter heading but is not normally a TOC item.">Subtitle</button><button data-marker="element-author" title="Adds an author credit for this chapter/section, useful for anthologies or guest sections.">Element Author</button><button data-marker="hidden-heading" title="Keeps the element title for structure/TOC while hiding the visible heading in the book.">Hidden Heading</button>
         <span class="group-label">Special</span>
-        <button data-marker="quote" title="Formats this paragraph as an inset block quotation.">Quote</button><button data-marker="verse" title="Formats lines as poetry, lyrics, or verse where line breaks matter.">Verse</button><button data-marker="attribution" title="Formats a quote attribution, usually aligned after a block quote.">Attribution</button><button data-marker="centered" title="Centers this paragraph as an alignment block.">Centered</button><button data-marker="flush-left" title="Forces this paragraph flush left, overriding normal paragraph styling.">Flush Left</button><button data-marker="written-note" title="Formats text as a note written by a character.">Written Note</button><button data-marker="text-conversation" title="Formats text messages or chat-style dialogue between characters.">Text Conversation</button><button data-marker="caption" title="Formats this line as an image caption.">Caption</button><button data-marker="inline-image" title="Marks a placeholder line for an inline image to handle later in Word or another editor.">Inline Image</button><button data-insert="ornament" title="Inserts an ornamental break, a styled divider often used between scenes.">Ornament</button><button data-insert="scene" title="Inserts a plain scene break for a change of time, place, or narrator.">Scene Break</button><button id="clearVellumBtn" title="Removes the structure marker from the selected/current line without deleting the text.">Clear Mark</button>
+        <button data-marker="quote" title="Formats this paragraph as an inset block quotation.">Quote</button><button data-marker="verse" title="Formats lines as poetry, lyrics, or verse where line breaks matter.">Verse</button><button data-marker="attribution" title="Formats a quote attribution, usually aligned after a block quote.">Attribution</button><button data-marker="centered" title="Centers this paragraph as an alignment block.">Centered</button><button data-marker="flush-left" title="Forces this paragraph flush left, overriding normal paragraph styling.">Flush Left</button><button data-marker="written-note" title="Formats text as a note written by a character.">Written Note</button><button data-marker="text-conversation" title="Formats text messages or chat-style dialogue between characters.">Text Conversation</button><button data-marker="caption" title="Formats this line as an image caption.">Caption</button><button data-marker="inline-image" title="Marks a placeholder line for an inline image to handle later in Word or another editor.">Inline Image</button><button data-insert="ornament" title="Inserts an ornamental break, a styled divider often used between scenes.">Ornament</button><button data-insert="scene" title="Inserts a plain scene break for a change of time, place, or narrator.">Scene Break</button><button id="clearStructureBtn" title="Removes the structure marker from the selected/current line without deleting the text.">Clear Mark</button>
         <span class="group-label">Inline</span>
         <button data-inline="italic" title="Wraps the selected text in italic markup for export.">Italic</button><button data-inline="bold" title="Wraps the selected text in bold markup for export.">Bold</button><button data-inline="u" title="Marks selected text as underlined for Word export.">Underline</button><button data-inline="sc" title="Marks selected text as small caps for DOCX export.">Small Caps</button><button data-inline="mono" title="Marks selected text as monospace, useful for code or machine text.">Monospace</button><button data-inline="sans" title="Marks selected text as sans serif for a distinct inline style.">Sans Serif</button>
       </div>
@@ -105,7 +105,7 @@
       <button data-side-tab="outline" type="button">Outline</button>
       <button data-side-tab="clean" type="button">Clean</button>
       <button data-side-tab="ai" type="button">AI</button>
-      <button data-side-tab="vellum" type="button" title="Markdown">MD</button>
+      <button data-side-tab="markdown" type="button" title="Markdown">MD</button>
       <button data-side-tab="book" type="button">Book</button>
     </div>
 
@@ -242,12 +242,12 @@
       </div>
     </div>
 
-    <div class="side-panel" data-side-panel="vellum">
+    <div class="side-panel" data-side-panel="markdown">
       <div class="card">
         <div class="panel-title">Markdown Structure</div>
-        <div class="vellum-help">Marked lines are exported as real Word styles. Use the toolbar above the editor to mark structure and inline formatting.</div>
-        <div class="vellum-summary" id="vellumSummary"></div>
-        <div id="vellumList"></div>
+        <div class="structure-help">Marked lines are exported as real Word styles. Use the toolbar above the editor to mark structure and inline formatting.</div>
+        <div class="structure-summary" id="structureSummary"></div>
+        <div id="structureList"></div>
         <div class="marker-legend">Markdown structure includes # chapter, ## subhead, &gt; quote, ***, and fenced blocks like ::: verse or ::: written-note.</div>
       </div>
     </div>
@@ -261,7 +261,7 @@
       </div>
       <div class="card">
         <div class="panel-title">Preview</div>
-        <div class="panel-body"><label class="fix-note" style="padding:0"><input type="checkbox" id="allowRemoteImages"> <span>Load remote images in the Markdown preview</span></label><p class="hint">Off by default, so a manuscript cannot make your browser contact other servers. Reload the page after changing this.</p></div>
+        <div class="panel-body"><label class="fix-note flush"><input type="checkbox" id="allowRemoteImages"> <span>Load remote images in the Markdown preview</span></label><p class="hint">Off by default, so a manuscript cannot make your browser contact other servers. Reload the page after changing this.</p></div>
       </div>
     </div>
   </div>
@@ -289,7 +289,7 @@
       <option value="mark-quote">Quote</option>
       <option value="mark-verse">Verse</option>
       <option value="mark-written-note">Written Note</option>
-      <option value="clear-vellum">Clear Structure Mark</option>
+      <option value="clear-structure">Clear Structure Mark</option>
     </optgroup>
     <optgroup label="Clean">
       <option value="safe-clean">Safe Cleanup Selection</option>
@@ -299,7 +299,7 @@
 </div>
 <div class="toast" id="toast"></div>
 <div class="modal" id="aboutModal">
-  <div class="modal-card" style="max-width:560px;height:auto;min-height:0">
+  <div class="modal-card modal-narrow-560">
     <div class="modal-head"><div><div class="modal-title">About Manuscript Workbench</div><div class="small">Version 1.2</div></div><div class="modal-actions"><button id="closeAboutBtn" class="mini">Close</button></div></div>
     <div class="find-body">
       <div class="hint about-text">Local-first manuscript, Markdown, cleanup, DOCX and AI rewrite workbench.</div>
@@ -327,14 +327,14 @@
   </div>
 </div>
 <div class="modal" id="mergeModal">
-  <div class="modal-card" style="max-width:760px;height:78vh">
+  <div class="modal-card modal-tall-760">
     <div class="modal-head"><div><div class="modal-title">Merge Folder</div><div class="small" id="mergeSub">Arrange files before merging</div></div><div class="modal-actions"><button id="mergeCancelBtn" class="mini">Cancel</button></div></div>
     <div class="merge-list" id="mergeList"></div>
     <div class="modal-foot"><span class="lm-status" id="mergeStatus">Ready.</span><div class="modal-actions"><button id="mergeBtn" class="primary">Merge into editor</button></div></div>
   </div>
 </div>
 <div class="modal" id="urlModal">
-  <div class="modal-card" style="max-width:720px;height:auto;min-height:0">
+  <div class="modal-card modal-narrow-720">
     <div class="modal-head"><div><div class="modal-title">Import URL</div><div class="small">Fetch a web page and extract readable text</div></div><div class="modal-actions"><button id="urlCancelBtn" class="mini">Cancel</button></div></div>
     <div class="find-body">
       <div class="find-field"><label for="urlInput">URL</label><input id="urlInput" type="text" spellcheck="false" placeholder="https://example.com/article"></div>
@@ -351,7 +351,7 @@
   </div>
 </div>
 <div class="modal" id="findModal">
-  <div class="modal-card" style="max-width:760px;height:auto;min-height:0">
+  <div class="modal-card modal-narrow-760">
     <div class="modal-head"><div><div class="modal-title">Find / Replace</div><div class="small">Search whole manuscript or current selection</div></div><div class="modal-actions"><button id="closeFindBtn" class="mini">Close</button></div></div>
     <div class="find-body">
       <div class="find-grid">
@@ -367,6 +367,6 @@
     <div class="modal-foot"><span class="lm-status" id="findStatus">Ready.</span><div class="modal-actions"><button id="findPrevBtn">Previous</button><button id="findNextBtn" class="primary">Next</button><button id="replaceOneBtn">Replace</button><button id="replaceAllBtn" class="danger">Replace All</button></div></div>
   </div>
 </div>
-<script src="/static/js/legacy-app.js"></script>
+<script type="module" src="/static/js/main.js"></script>
 </body>
 </html>

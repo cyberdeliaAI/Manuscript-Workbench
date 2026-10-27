@@ -7,15 +7,15 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt   # once
 ./scripts/check.sh
 ```
 
-`check.sh` runs a Python syntax check, `pytest`, a `node --check` of the embedded script and `node --test`.
-Node is only needed for the JavaScript tests.
+`check.sh` runs a Python syntax check, `pytest`, a `node --check` of every frontend module, ESLint (when `npm install` was run) and `node --test`.
+Node (22.12 or newer) is only needed for the JavaScript tests and lint.
 
 ## Layout
 
 | Path | What it holds |
 |---|---|
 | `tests/python/` | pytest suites. `implementation.py` is the single place that decides which implementation is under test (a flat facade over the `manuscript_workbench` package). |
-| `tests/js/` | `node:test` suites. `adapter.js` is the single place that loads the client-side functions. |
+| `tests/js/` | `node:test` suites. `adapter.js` loads the pure modules in `static/js/core/` (via `require()` of ES modules) as one flat object. |
 | `tests/fixtures/corpus.json` | Shared EN/NL sample texts used by both languages (built by `tests/tools/build_corpus.py`). |
 | `tests/fixtures/golden/` | Golden snapshots of observable behaviour (`py_snapshot.json`, `js_snapshot.json`). |
 | `tests/tools/` | Generators for the corpus and the golden files. |
@@ -23,7 +23,7 @@ Node is only needed for the JavaScript tests.
 ## Three kinds of tests
 
 1. **Behaviour tests** (`test_behaviour.py`, `behaviour.test.js`): readable assertions about what must keep working.
-2. **Golden snapshots** (`test_snapshot.py`, `legacy_snapshot.test.js`): the output of every important function over the
+2. **Golden snapshots** (`test_snapshot.py`, `snapshot.test.js`): the output of every important function over the
    whole corpus. A refactor must not change them. When a change is *intended*, regenerate and review the diff:
 
    ```bash
