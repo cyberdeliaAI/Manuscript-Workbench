@@ -751,7 +751,7 @@
       "ligatures": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
       "mojibake": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
       "pageNumbers": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
-      "quotesCurly": "# Hoofdstuk Een\n\n\u2018Wat doe je daar?\u2019 vroeg Anna. \u2018Ik kijk naar \u2018t water,\u2019 zei hij.\n\n\u2018s Avonds liepen ze naar huis. Hij maakte foto\u2019s van zo\u2019n oude brug -- prachtig...\n\n\u201cDat is \u2018m niet,\u201d zei ze. \u201cHet is z\u2019n broer.\u201d\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "quotesCurly": "# Hoofdstuk Een\n\n\u2018Wat doe je daar?\u2019 vroeg Anna. \u2018Ik kijk naar \u2019t water,\u2019 zei hij.\n\n\u2019s Avonds liepen ze naar huis. Hij maakte foto\u2019s van zo\u2019n oude brug -- prachtig...\n\n\u201cDat is \u2019m niet,\u201d zei ze. \u201cHet is z\u2019n broer.\u201d\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
       "quotesStraight": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
       "repeatLines": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
       "safeCleanup": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
@@ -887,7 +887,7 @@
       "blankRuns": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
       "collapseSpaces": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a | 1 |\n| b | 2 |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
       "controlChars": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
-      "dashEm": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n\u2014\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "dashEm": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
       "ellipsis": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
       "indentation": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n- nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
       "invisible": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
@@ -1203,37 +1203,10 @@
       "pageNumbers",
       "quotesCurly",
       "quotesStraight",
-      "repeatLines"
+      "repeatLines",
+      "spaceAfterPunct"
     ],
     "escapeHtml": "&lt;a href=&quot;x&quot;&gt;&amp;&#39;&lt;/a&gt;",
-    "extractStreamMeta": [
-      [
-        "abc<<MW_FINISH_REASON:stop>>",
-        {
-          "reasons": [
-            "stop"
-          ],
-          "text": "abc"
-        }
-      ],
-      [
-        "a<<MW_FINISH_REASON:length>>b<<MW_FINISH_REASON:stop>>",
-        {
-          "reasons": [
-            "length",
-            "stop"
-          ],
-          "text": "ab"
-        }
-      ],
-      [
-        "none",
-        {
-          "reasons": [],
-          "text": "none"
-        }
-      ]
-    ],
     "isSceneBreak": [
       [
         "***",
@@ -1351,7 +1324,6 @@
       "trailingSpaces",
       "collapseSpaces",
       "spaceBeforePunct",
-      "spaceAfterPunct",
       "trimDoc"
     ],
     "sanitizeLmFinalText": [

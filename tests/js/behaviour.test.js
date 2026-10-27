@@ -86,14 +86,14 @@ test('integrity guardrails flag large length changes and missing names', () => {
   assert.ok(result.issues.some((s) => s.startsWith('names missing')));
 });
 
-test('stream helpers', () => {
+test('final AI text is cleaned of think blocks, code fences and chatter', () => {
   assert.equal(api.sanitizeLmFinalText('<think>x</think>Answer'), 'Answer');
-  const meta = api.extractStreamMeta('abc<<MW_FINISH_REASON:length>>');
-  assert.equal(meta.text, 'abc');
-  assert.deepEqual([...meta.reasons], ['length']);
+  assert.equal(api.sanitizeLmFinalText('```markdown\n# T\ntext\n```'), '# T\ntext');
+  assert.equal(api.sanitizeLmFinalText("Here is the rewritten text:\n\nBody"), 'Body');
 });
 
-test('safe cleanup sequence and destructive set (current definition)', () => {
-  assert.ok(api.SAFE_FIX_SEQUENCE.includes('spaceAfterPunct')); // changes in phase 1
-  assert.ok(api.DESTRUCTIVE_FIXES.has('dashEm') && api.DESTRUCTIVE_FIXES.has('join'));
+test('structural cleanups are previewed before they are applied', () => {
+  for (const id of ['join', 'dashEm', 'blankRuns', 'pageNumbers', 'repeatLines', 'quotesCurly']) {
+    assert.ok(api.DESTRUCTIVE_FIXES.has(id), id);
+  }
 });

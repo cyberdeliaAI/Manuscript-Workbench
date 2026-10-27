@@ -32,10 +32,11 @@ def corpus() -> Dict[str, str]:
 
 
 class LiveServer:
-    def __init__(self, host: str, port: int, settings_path: pathlib.Path) -> None:
+    def __init__(self, host: str, port: int, settings_path: pathlib.Path, token: str) -> None:
         self.host = host
         self.port = port
         self.settings_path = settings_path
+        self.token = token
 
     def request(
         self,
@@ -44,8 +45,11 @@ class LiveServer:
         body: Any = None,
         headers: Optional[Dict[str, str]] = None,
         raw_body: Optional[bytes] = None,
+        token: bool = True,
     ) -> Tuple[int, Dict[str, str], bytes]:
         hdrs = dict(headers or {})
+        if token and "X-MW-Token" not in hdrs:
+            hdrs["X-MW-Token"] = self.token
         payload: Optional[bytes] = raw_body
         if payload is None and body is not None:
             payload = json.dumps(body).encode("utf-8")
@@ -69,7 +73,7 @@ def server(mw, tmp_path, monkeypatch):
     thread.start()
     host, port = srv.server_address[:2]
     try:
-        yield LiveServer(host, port, settings_path)
+        yield LiveServer(host, port, settings_path, srv.session_token)
     finally:
         srv.shutdown()
         srv.server_close()

@@ -33,9 +33,9 @@ Node is only needed for the JavaScript tests.
    ```
 
    The diff of the golden file is the behaviour change; it belongs in the same commit as the code change.
-3. **Known-issue tests** (`test_known_issues.py`, `known_issues.test.js`): the desired behaviour for defects found in the
-   2026-10-27 analysis. Python ones are `xfail(strict=True)` (an unexpected pass fails the run, so a fixed bug cannot keep its
-   marker); JS ones are `todo`. Fixing a bug means deleting its marker.
+3. **Regression tests** (`test_regressions.py`, `test_ai_stream.py`, `regressions.test.js`): one test per defect found in the
+   2026-10-27 analysis (security hardening, sanitizer, SSRF, typography, AI stream). While a defect was open its test was
+   written as a strict `xfail` / `todo`; once fixed the marker was removed and the test is now an ordinary guard.
 
 ## Mock provider
 

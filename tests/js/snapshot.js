@@ -30,7 +30,6 @@ const SANITIZE_LM_CASES = [
   'Plain output',
   'Hier is de herschreven tekst:\n\nInhoud',
 ];
-const STREAM_META_CASES = ['abc<<MW_FINISH_REASON:stop>>', 'a<<MW_FINISH_REASON:length>>b<<MW_FINISH_REASON:stop>>', 'none'];
 const SCENE_CASES = ['***', '* * *', '---', '- - -', '~~~', '###', '#', '###a', '•••', 'text', ''];
 const JOIN_CASES = [
   ['The sentence continues here and goes on', 'with the next line of the text.'],
@@ -82,7 +81,6 @@ function computeSnapshot(api, corpus) {
   }
   snap.misc = {
     sanitizeLmFinalText: SANITIZE_LM_CASES.map((s) => [s, api.sanitizeLmFinalText(s)]),
-    extractStreamMeta: STREAM_META_CASES.map((s) => [s, plain(api.extractStreamMeta(s))]),
     isSceneBreak: SCENE_CASES.map((s) => [s, api.isSceneBreak(s)]),
     shouldJoinLines: JOIN_CASES.map(([a, b]) => [a, b, api.shouldJoinLines(a, b)]),
     unwrapInlineText: INLINE_CASES.map(([s, k]) => [s, k, api.unwrapInlineText(s, k)]),

@@ -43,6 +43,17 @@ def _docx_summary(data: bytes) -> Dict[str, Any]:
     }
 
 
+FAKE_DNS = {"example.com": ["93.184.216.34"], "localtest.me": ["127.0.0.1"], "intranet": ["10.1.2.3"]}
+
+
+def _fake_resolver(hostname, port):
+    import socket
+
+    if hostname in FAKE_DNS:
+        return FAKE_DNS[hostname]
+    raise socket.gaierror(f"unknown host {hostname}")
+
+
 def _outcome(fn, *args):
     try:
         return {"ok": fn(*args)}
@@ -95,6 +106,7 @@ HOST_CASES = [
 URL_CASES = [
     "http://127.1:8765/", "http://2130706433/", "http://127.0.0.1/", "file:///etc/passwd",
     "http://user:pw@example.com/", "ftp://example.com/", "https://example.com/a?b=1#c", "example.com",
+    "http://localtest.me/", "http://intranet/", "http://[::1]:8765/", "http://nonexistent.invalid/",
 ]
 
 LINE_CASES = [
@@ -147,7 +159,14 @@ def compute_snapshot(mw: Any, corpus: Dict[str, str]) -> Dict[str, Any]:
     snap["docx_roundtrip"] = {"text": text_back, "notes": notes_back}
 
     snap["is_blocked_import_host"] = {h: mw.is_blocked_import_host(h) for h in HOST_CASES}
-    snap["validate_import_url"] = {u: _outcome(mw.validate_import_url, u) for u in URL_CASES}
+    original_resolver = getattr(mw, "_resolve_host", None)
+    if original_resolver is not None:  # the resolver is faked so the snapshot never depends on real DNS
+        mw._resolve_host = _fake_resolver
+    try:
+        snap["validate_import_url"] = {u: _outcome(mw.validate_import_url, u) for u in URL_CASES}
+    finally:
+        if original_resolver is not None:
+            mw._resolve_host = original_resolver
     snap["normalize_base_url"] = {
         f"{base}|{prov}": mw.normalize_base_url(base, prov)
         for base, prov in [("", "lmstudio"), ("localhost:1234", "lmstudio"), ("http://localhost:8000", "omlx"),

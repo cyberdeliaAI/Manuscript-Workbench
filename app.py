@@ -13,14 +13,18 @@ from __future__ import annotations
 import base64
 import datetime as _dt
 import errno
+import hmac
 import html as html_std
 import ipaddress
 import io
 import json
 import os
 import re
+import secrets
+import socket
 import sys
 import tempfile
+import time
 import traceback
 import urllib.parse
 from html.parser import HTMLParser
@@ -67,6 +71,18 @@ APP_VERSION = "1.2"
 SETTINGS_PATH = Path(__file__).with_name("manuscript_workbench_settings.json")
 MAX_JSON_BYTES = 80 * 1024 * 1024
 MAX_URL_IMPORT_BYTES = 12 * 1024 * 1024
+MAX_IMPORT_REDIRECTS = 5
+# Settings that must never be written to disk by the server (the browser keeps them in localStorage).
+SECRET_SETTING_KEYS = ("lmApiKey",)
+
+
+class HttpError(Exception):
+    """An error with a specific HTTP status that is safe to show to the client."""
+
+    def __init__(self, status: int, message: str) -> None:
+        super().__init__(message)
+        self.status = status
+        self.message = message
 
 PARAGRAPH_STYLE_MAP = {
     "chapter": "Heading 1",
@@ -167,29 +183,68 @@ WORD_NUMS = {
 }
 
 
+def content_security_policy(allow_remote_images: bool = False) -> str:
+    """CSP for the main page. Remote images stay blocked in the Markdown preview unless the user opts in."""
+    images = "img-src 'self' data: https: http:" if allow_remote_images else "img-src 'self' data:"
+    return "; ".join([
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline'",
+        images,
+        "connect-src 'self'",
+        "object-src 'none'",
+        "base-uri 'none'",
+        "form-action 'none'",
+        "frame-ancestors 'none'",
+    ])
+
+
+HELP_CSP = "default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'none'"
+
+
+def _send_security_headers(handler: BaseHTTPRequestHandler, extra: Optional[Dict[str, str]] = None) -> None:
+    handler.send_header("X-Content-Type-Options", "nosniff")
+    handler.send_header("Referrer-Policy", "no-referrer")
+    handler.send_header("Cache-Control", "no-store")
+    for name, value in (extra or {}).items():
+        handler.send_header(name, value)
+
+
 def json_response(handler: BaseHTTPRequestHandler, payload: Any, status: int = 200) -> None:
     body = json.dumps(payload, ensure_ascii=False, indent=None).encode("utf-8")
     handler.send_response(status)
     handler.send_header("Content-Type", "application/json; charset=utf-8")
     handler.send_header("Content-Length", str(len(body)))
+    _send_security_headers(handler)
     handler.end_headers()
     handler.wfile.write(body)
 
 
-def text_response(handler: BaseHTTPRequestHandler, text: str, status: int = 200, content_type: str = "text/plain; charset=utf-8") -> None:
+def text_response(handler: BaseHTTPRequestHandler, text: str, status: int = 200, content_type: str = "text/plain; charset=utf-8", headers: Optional[Dict[str, str]] = None) -> None:
     body = text.encode("utf-8")
     handler.send_response(status)
     handler.send_header("Content-Type", content_type)
     handler.send_header("Content-Length", str(len(body)))
+    _send_security_headers(handler, headers)
     handler.end_headers()
     handler.wfile.write(body)
+
+
+def without_secret_settings(settings: Any) -> Dict[str, Any]:
+    if not isinstance(settings, dict):
+        return {}
+    return {key: value for key, value in settings.items() if key not in SECRET_SETTING_KEYS}
 
 
 def read_app_settings() -> Dict[str, Any]:
     try:
         if SETTINGS_PATH.exists():
             data = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
-            return data if isinstance(data, dict) else {}
+            if not isinstance(data, dict):
+                return {}
+            if "settings" in data:
+                data["settings"] = without_secret_settings(data["settings"])
+            return data
     except Exception:
         return {}
     return {}
@@ -199,11 +254,26 @@ def write_app_settings(settings: Dict[str, Any]) -> None:
     payload = {
         "version": APP_VERSION,
         "savedAt": _dt.datetime.now(_dt.timezone.utc).isoformat(),
-        "settings": settings if isinstance(settings, dict) else {},
+        "settings": without_secret_settings(settings),
     }
     tmp = SETTINGS_PATH.with_suffix(".json.tmp")
     tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
     tmp.replace(SETTINGS_PATH)
+
+
+def scrub_stored_secrets() -> bool:
+    """Remove secrets that an older version wrote to the settings file. Returns True if the file was cleaned."""
+    try:
+        if not SETTINGS_PATH.exists():
+            return False
+        data = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return False
+    stored = data.get("settings") if isinstance(data, dict) else None
+    if not isinstance(stored, dict) or not any(key in stored for key in SECRET_SETTING_KEYS):
+        return False
+    write_app_settings(stored)
+    return True
 
 
 def normalize_line_endings(text: str) -> Tuple[str, List[str]]:
@@ -514,16 +584,64 @@ def html_import_options(source: str, filename: str = "import.html", url: str = "
     }
 
 
-def is_blocked_import_host(hostname: str) -> bool:
-    host = (hostname or "").strip().lower().rstrip(".")
-    if not host or host in {"localhost", "127.0.0.1", "::1"} or host.endswith(".localhost"):
-        return True
+BLOCKED_IMPORT_MESSAGE = "Local, private, and internal addresses are blocked for URL import."
+
+
+def _resolve_host(hostname: str, port: int) -> List[str]:
+    """Addresses a hostname resolves to. A separate function so tests can run without DNS."""
+    infos = socket.getaddrinfo(hostname, port, proto=socket.IPPROTO_TCP)
+    return sorted({str(info[4][0]) for info in infos})
+
+
+def _ip_is_public(ip: Any) -> bool:
+    mapped = getattr(ip, "ipv4_mapped", None)
+    if mapped is not None:
+        ip = mapped
+    return not (ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_multicast or ip.is_reserved or ip.is_unspecified)
+
+
+def _literal_ip(host: str) -> Any:
+    """Parse a host as an IP address, including the legacy spellings the OS resolver accepts
+    (127.1, 2130706433, 0x7f.0.0.1, 0177.0.0.1). Returns None when the host is a name."""
     try:
-        ip = ipaddress.ip_address(host)
-        return ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_multicast or ip.is_reserved
+        return ipaddress.ip_address(host)
     except ValueError:
         pass
-    return False
+    try:
+        return ipaddress.ip_address(socket.inet_ntoa(socket.inet_aton(host)))
+    except (OSError, ValueError):
+        return None
+
+
+def is_blocked_import_host(hostname: str) -> bool:
+    """Syntactic check: localhost names and literal addresses (in any spelling) that are not public."""
+    host = (hostname or "").strip().lower().rstrip(".").strip("[]")
+    if not host or host == "localhost" or host.endswith(".localhost"):
+        return True
+    ip = _literal_ip(host.split("%", 1)[0])
+    return ip is not None and not _ip_is_public(ip)
+
+
+def assert_public_host(hostname: str, port: int) -> None:
+    """Refuse hosts that are, or resolve to, local/private/internal addresses.
+
+    Residual risk (documented): DNS can answer differently between this check and the actual connection
+    (DNS rebinding). The server only listens on loopback, so this is a best-effort guard.
+    """
+    host = (hostname or "").strip()
+    if is_blocked_import_host(host):
+        raise ValueError(BLOCKED_IMPORT_MESSAGE)
+    if _literal_ip(host.strip("[]").split("%", 1)[0]) is not None:
+        return  # a public literal address: nothing to resolve
+    try:
+        addresses = _resolve_host(host, port)
+    except OSError as exc:
+        raise ValueError(f"Could not resolve host: {host}") from exc
+    if not addresses:
+        raise ValueError(f"Could not resolve host: {host}")
+    for address in addresses:
+        if is_blocked_import_host(address):
+            raise ValueError(BLOCKED_IMPORT_MESSAGE)
 
 
 def validate_import_url(raw_url: str) -> str:
@@ -533,41 +651,54 @@ def validate_import_url(raw_url: str) -> str:
         raise ValueError("Use a full http:// or https:// URL.")
     if parsed.username or parsed.password:
         raise ValueError("URLs with embedded usernames or passwords are not supported.")
-    if is_blocked_import_host(parsed.hostname or ""):
-        raise ValueError("Local, private, and internal addresses are blocked for URL import.")
+    port = parsed.port or (443 if parsed.scheme == "https" else 80)
+    assert_public_host(parsed.hostname or "", port)
     return urllib.parse.urlunparse(parsed)
 
 
 def fetch_url_bytes(url: str) -> Tuple[bytes, str, str]:
     if requests is None:
         raise RuntimeError("requests is not installed. Run: pip install -r requirements.txt")
-    safe_url = validate_import_url(url)
     headers = {
         "User-Agent": "ManuscriptWorkbench/1.0 (+local import)",
         "Accept": "text/html,application/xhtml+xml,text/plain;q=0.8,*/*;q=0.5",
     }
-    with requests.get(safe_url, headers=headers, timeout=(8, 25), stream=True, allow_redirects=True) as resp:
-        resp.raise_for_status()
-        final_url = validate_import_url(resp.url)
-        content_type = resp.headers.get("Content-Type", "")
-        chunks: List[bytes] = []
-        total = 0
-        for chunk in resp.iter_content(chunk_size=65536):
-            if not chunk:
+    # Redirects are followed by hand so that every hop is validated *before* it is requested.
+    current = validate_import_url(url)
+    for _hop in range(MAX_IMPORT_REDIRECTS + 1):
+        with requests.get(current, headers=headers, timeout=(8, 25), stream=True, allow_redirects=False) as resp:
+            if resp.status_code in (301, 302, 303, 307, 308):
+                location = resp.headers.get("Location")
+                if not location:
+                    raise ValueError("The server sent a redirect without a Location header.")
+                current = validate_import_url(urllib.parse.urljoin(current, location))
                 continue
-            total += len(chunk)
-            if total > MAX_URL_IMPORT_BYTES:
-                raise ValueError("URL response is too large to import safely.")
-            chunks.append(chunk)
-    return b"".join(chunks), final_url, content_type
+            resp.raise_for_status()
+            content_type = resp.headers.get("Content-Type", "")
+            chunks: List[bytes] = []
+            total = 0
+            for chunk in resp.iter_content(chunk_size=65536):
+                if not chunk:
+                    continue
+                total += len(chunk)
+                if total > MAX_URL_IMPORT_BYTES:
+                    raise ValueError("URL response is too large to import safely.")
+                chunks.append(chunk)
+            return b"".join(chunks), current, content_type
+    raise ValueError("Too many redirects.")
 
 
 MARKDOWN_ALLOWED_TAGS = {
-    "a", "blockquote", "br", "code", "del", "div", "em", "h1", "h2", "h3", "h4", "h5", "h6",
-    "hr", "img", "li", "ol", "p", "pre", "span", "strong", "table", "tbody", "td", "th", "thead",
-    "tr", "u", "ul",
+    "a", "b", "blockquote", "br", "code", "del", "div", "em", "h1", "h2", "h3", "h4", "h5", "h6",
+    "hr", "i", "img", "li", "mark", "ol", "p", "pre", "s", "small", "span", "strong", "sub", "sup",
+    "table", "tbody", "td", "th", "thead", "tr", "u", "ul",
 }
 MARKDOWN_VOID_TAGS = {"br", "hr", "img"}
+# Tags that are removed together with everything inside them. Any other tag that is not allowed is
+# "unwrapped": the tag disappears but its text stays (so <font>text</font> does not lose its text).
+MARKDOWN_DROP_WITH_CONTENT_TAGS = {
+    "applet", "embed", "frameset", "iframe", "math", "noscript", "object", "script", "style", "svg", "template",
+}
 MARKDOWN_ALLOWED_ATTRS = {
     "a": {"href", "title"},
     "img": {"src", "alt", "title"},
@@ -596,11 +727,11 @@ class MarkdownHTMLSanitizer(HTMLParser):
 
     def handle_starttag(self, tag: str, attrs: List[Tuple[str, Optional[str]]]) -> None:
         tag = tag.lower()
-        if tag not in MARKDOWN_ALLOWED_TAGS:
+        if tag in MARKDOWN_DROP_WITH_CONTENT_TAGS:
             self.skip_depth += 1
             return
-        if self.skip_depth:
-            return
+        if tag not in MARKDOWN_ALLOWED_TAGS or self.skip_depth:
+            return  # unknown tag: unwrapped (only its text survives)
         clean_attrs: List[str] = []
         allowed = MARKDOWN_ALLOWED_ATTRS.get(tag, set())
         for name, value in attrs:
@@ -622,15 +753,18 @@ class MarkdownHTMLSanitizer(HTMLParser):
         self.parts.append(f"<{tag}{attr_text}>")
 
     def handle_startendtag(self, tag: str, attrs: List[Tuple[str, Optional[str]]]) -> None:
+        tag = tag.lower()
+        if tag in MARKDOWN_DROP_WITH_CONTENT_TAGS:
+            return  # a self-closed <svg/> has no content to skip and no end tag to wait for
         self.handle_starttag(tag, attrs)
 
     def handle_endtag(self, tag: str) -> None:
         tag = tag.lower()
-        if tag not in MARKDOWN_ALLOWED_TAGS:
+        if tag in MARKDOWN_DROP_WITH_CONTENT_TAGS:
             if self.skip_depth:
                 self.skip_depth -= 1
             return
-        if self.skip_depth:
+        if tag not in MARKDOWN_ALLOWED_TAGS or self.skip_depth:
             return
         if tag not in MARKDOWN_VOID_TAGS:
             self.parts.append(f"</{tag}>")
@@ -1105,15 +1239,6 @@ def add_marked_runs(paragraph: Any, text: str, doc: Any) -> None:
         paragraph.add_run(text[pos:])
 
 
-def strip_vellum_markers(text: str) -> str:
-    out: List[str] = []
-    for line in text.split("\n"):
-        if MARKDOWN_CONTAINER_RE.match(line):
-            continue
-        out.append(strip_structure_line(line))
-    return "\n".join(out)
-
-
 def roman_to_int(s: str) -> Optional[int]:
     s = s.upper()
     if not s or any(ch not in ROMAN_VALUES for ch in s):
@@ -1281,13 +1406,27 @@ def preflight(text: str, metadata: Dict[str, str]) -> Dict[str, Any]:
 
 
 def get_json_body(handler: BaseHTTPRequestHandler) -> Dict[str, Any]:
-    length = int(handler.headers.get("Content-Length", "0"))
+    content_type = (handler.headers.get("Content-Type") or "").split(";", 1)[0].strip().lower()
+    if content_type != "application/json":
+        raise HttpError(415, "Content-Type must be application/json.")
+    try:
+        length = int(handler.headers.get("Content-Length", "0"))
+    except ValueError:
+        raise HttpError(400, "Invalid Content-Length header.") from None
+    if length < 0:
+        raise HttpError(400, "Invalid Content-Length header.")
     if length > MAX_JSON_BYTES:
-        raise ValueError("Request is too large")
+        raise HttpError(413, "Request is too large.")
     data = handler.rfile.read(length)
     if not data:
         return {}
-    return json.loads(data.decode("utf-8"))
+    try:
+        payload = json.loads(data.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise HttpError(400, f"Invalid JSON: {exc}") from None
+    if not isinstance(payload, dict):
+        raise HttpError(400, "The JSON body must be an object.")
+    return payload
 
 
 def safe_filename(name: str, fallback: str = "manuscript") -> str:
@@ -1316,21 +1455,57 @@ def normalize_base_url(base_url: str, provider: str = "lmstudio") -> str:
     return base
 
 
-def resolve_lm_model(base_url: str, model: str = "") -> str:
-    if model.strip():
-        return model.strip()
-    if requests is None:
-        return "local-model"
-    try:
-        resp = requests.get(f"{base_url}/models", timeout=6)
-        resp.raise_for_status()
-        data = resp.json()
-        models = data.get("data") or []
-        if models:
-            return models[0].get("id") or "local-model"
-    except Exception:
-        pass
-    return "local-model"
+def validate_ai_base_url(base_url: str) -> str:
+    """The AI endpoint may be on the LAN, but it must be a plain http(s) URL without embedded credentials."""
+    parsed = urllib.parse.urlparse(base_url)
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+        raise HttpError(400, "The AI endpoint must be an http:// or https:// URL.")
+    if parsed.username or parsed.password:
+        raise HttpError(400, "AI endpoints with embedded credentials are not supported; use the API Key field.")
+    return base_url
+
+
+class ThinkStripper:
+    """Removes <think>...</think> blocks from a stream, including tags split across chunks."""
+
+    OPEN = "<think>"
+    CLOSE = "</think>"
+
+    def __init__(self) -> None:
+        self.in_think = False
+        self._buf = ""
+
+    @staticmethod
+    def _partial_suffix(buf: str, tag: str) -> int:
+        """Length of the longest proper prefix of `tag` that `buf` ends with (a possibly incomplete tag)."""
+        for size in range(min(len(tag) - 1, len(buf)), 0, -1):
+            if buf[-size:].lower() == tag[:size]:
+                return size
+        return 0
+
+    def feed(self, chunk: str) -> str:
+        self._buf += chunk
+        out: List[str] = []
+        while True:
+            tag = self.CLOSE if self.in_think else self.OPEN
+            match = re.search(re.escape(tag), self._buf, re.I)
+            if match:
+                if not self.in_think:
+                    out.append(self._buf[:match.start()])
+                self._buf = self._buf[match.end():]
+                self.in_think = not self.in_think
+                continue
+            keep = self._partial_suffix(self._buf, tag)
+            cut = len(self._buf) - keep
+            if not self.in_think:
+                out.append(self._buf[:cut])
+            self._buf = self._buf[cut:]
+            return "".join(out)
+
+    def flush(self) -> str:
+        rest = "" if self.in_think else self._buf
+        self._buf = ""
+        return rest
 
 
 def ai_request_headers(api_key: str = "") -> Dict[str, str]:
@@ -1346,6 +1521,7 @@ HTML = r'''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mw-token" content="">
 <title>Manuscript Workbench — Python</title>
 <style>
 :root{
@@ -1635,6 +1811,10 @@ textarea.prompt{height:190px;resize:vertical;font-family:var(--mono);line-height
           <label>Book Title<input id="metaTitle" type="text"></label><label>Subtitle<input id="metaSubtitle" type="text"></label><label>Author<input id="metaAuthor" type="text"></label><label>Language<input id="metaLanguage" type="text" placeholder="en / nl"></label><label>Series<input id="metaSeries" type="text"></label><label>Book #<input id="metaBookNumber" type="text"></label><label>Publisher<input id="metaPublisher" type="text"></label><label>Filename base<input id="metaFilename" type="text" placeholder="manuscript"></label>
         </div><p class="hint">Title/author go into DOCX core properties; the other fields are stored as keywords/comments where possible.</p></div>
       </div>
+      <div class="card">
+        <div class="panel-title">Preview</div>
+        <div class="panel-body"><label class="fix-note" style="padding:0"><input type="checkbox" id="allowRemoteImages"> <span>Load remote images in the Markdown preview</span></label><p class="hint">Off by default, so a manuscript cannot make your browser contact other servers. Reload the page after changing this.</p></div>
+      </div>
     </div>
   </div>
 </main>
@@ -1771,8 +1951,8 @@ let findScopeRange = null;
 const collapsedOutlineHeadings = new Set();
 const jumpPointers = {};
 const undoStack = [];
-const DESTRUCTIVE_FIXES = new Set(['htmlText','join','blankRuns','pageNumbers','repeatLines','indentation','quotesCurly','quotesStraight','dashEm','ellipsis']);
-const SAFE_FIX_SEQUENCE = ['mojibake','invisible','specialSpaces','controlChars','unicodeNFC','ligatures','tabsToSpace','trailingSpaces','collapseSpaces','spaceBeforePunct','spaceAfterPunct','trimDoc'];
+const DESTRUCTIVE_FIXES = new Set(['htmlText','join','blankRuns','pageNumbers','repeatLines','indentation','spaceAfterPunct','quotesCurly','quotesStraight','dashEm','ellipsis']);
+const SAFE_FIX_SEQUENCE = ['mojibake','invisible','specialSpaces','controlChars','unicodeNFC','ligatures','tabsToSpace','trailingSpaces','collapseSpaces','spaceBeforePunct','trimDoc'];
 const FIX_LABELS = {
   mojibake:'Repair mojibake', invisible:'Remove invisible characters', specialSpaces:'Normalize special spaces', controlChars:'Strip control characters',
   unicodeNFC:'Normalize Unicode composition', ligatures:'Replace typographic ligatures', join:'Join wrapped lines conservatively', blankRuns:'Normalize blank lines',
@@ -1823,8 +2003,10 @@ const AI_PROVIDERS={
 };
 
 function toast(msg){ toastEl.textContent=msg; toastEl.classList.add('show'); clearTimeout(toastEl._t); toastEl._t=setTimeout(()=>toastEl.classList.remove('show'),2600); }
-function api(path, data){ return fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data||{})}); }
-function apiGet(path){ return fetch(path,{method:'GET'}); }
+const MW_TOKEN=document.querySelector('meta[name="mw-token"]')?.content||'';
+function apiHeaders(){ return {'Content-Type':'application/json','X-MW-Token':MW_TOKEN}; }
+function api(path, data){ return fetch(path,{method:'POST',headers:apiHeaders(),body:JSON.stringify(data||{})}); }
+function apiGet(path){ return fetch(path,{method:'GET',headers:{'X-MW-Token':MW_TOKEN}}); }
 function getScope(){ return document.querySelector('input[name=scope]:checked')?.value || 'all'; }
 function selectedTextLength(){ return Math.max(0, editor.selectionEnd - editor.selectionStart); }
 function currentAiProvider(){ return AI_PROVIDERS[$('#lmProvider')?.value] || AI_PROVIDERS.custom; }
@@ -2013,7 +2195,9 @@ const SIG_RE=new RegExp('[\\u00C2-\\u00F4]['+CONT+']'); const SIG_RE_G=new RegEx
 function charToCp1252Byte(code){ if(code<=0xFF) return code; if(CP1252_SPECIALS[code]!==undefined) return CP1252_SPECIALS[code]; return -1; }
 function isEligible(code){ return (code>=0x80&&code<=0xFF)||CP1252_SPECIALS[code]!==undefined; }
 function decodeMojibakeRun(run){ const bytes=[]; for(const ch of run){ const b=charToCp1252Byte(ch.codePointAt(0)); if(b<0) return null; bytes.push(b); } const decoded=new TextDecoder('utf-8',{fatal:false}).decode(new Uint8Array(bytes)); return decoded.includes('\uFFFD')?null:decoded; }
-function fixMojibake(text){ const chars=[...text]; let out='',i=0; while(i<chars.length){ if(isEligible(chars[i].codePointAt(0))){ let j=i; while(j<chars.length&&isEligible(chars[j].codePointAt(0))) j++; const run=chars.slice(i,j).join(''); out += SIG_RE.test(run) ? (decodeMojibakeRun(run) ?? run) : run; i=j; } else { out+=chars[i]; i++; } } return out; }
+function utf8SequenceLength(lead){ return lead>=0xC2&&lead<=0xDF ? 2 : lead>=0xE0&&lead<=0xEF ? 3 : lead>=0xF0&&lead<=0xF4 ? 4 : 0; }
+function repairMojibakeRun(chars){ const strict=new TextDecoder('utf-8',{fatal:true}); let out='', i=0; while(i<chars.length){ const lead=charToCp1252Byte(chars[i].codePointAt(0)); const len=utf8SequenceLength(lead); if(len>0 && i+len<=chars.length){ const bytes=[lead]; let ok=true; for(let k=1;k<len;k++){ const b=charToCp1252Byte(chars[i+k].codePointAt(0)); if(b<0x80||b>0xBF){ ok=false; break; } bytes.push(b); } if(ok){ try{ out+=strict.decode(new Uint8Array(bytes)); i+=len; continue; }catch(e){} } } out+=chars[i]; i++; } return out; }
+function fixMojibake(text){ const chars=[...text]; let out='',i=0; while(i<chars.length){ if(isEligible(chars[i].codePointAt(0))){ let j=i; while(j<chars.length&&isEligible(chars[j].codePointAt(0))) j++; const run=chars.slice(i,j); out += SIG_RE.test(run.join('')) ? repairMojibakeRun(run) : run.join(''); i=j; } else { out+=chars[i]; i++; } } return out; }
 function isSceneBreak(line){ const t=line.trim(); return /^(?:\*\s*){3,}$/.test(t)||/^(?:[-–—]\s*){3,}$/.test(t)||/^#{1,3}$/.test(t)||/^~{3,}$/.test(t)||/^•{3,}$/.test(t); }
 function isListOrBullet(line){ return /^\s*(?:[-*•]\s+|\d{1,3}[.)]\s+|[a-zA-Z][.)]\s+)/.test(line); }
 function isLikelySectionTitle(line){ const t=line.trim(); if(!t||t.length>90) return false; if(isSceneBreak(t)||isListOrBullet(t)) return true; if(/^(?:chapter|hoofdstuk|part|deel|book|prologue|epilogue|appendix|contents|inhoud|acknowledg|copyright)\b/i.test(t)) return true; if(/^(?:[ivxlcdm]{1,8}|[IVXLCDM]{1,8}|\d{1,4})$/.test(t)) return true; if(t===t.toUpperCase()&&/[A-ZÀ-Ý]/.test(t)&&t.length<=70) return true; return false; }
@@ -2035,10 +2219,11 @@ function fixRepeatedLines(text){ const lines=text.split('\n'); const remove=repe
 function fixTabsToSpace(text){ return text.replace(/\t/g,' '); }
 function fixCollapseSpaces(text){ return text.split('\n').map(l=>l.replace(/(?<=\S) {2,}/g,' ')).join('\n'); }
 function fixSpaceBeforePunct(text){ return text.replace(/ +([,.;:!?])/g,'$1'); }
-function fixSpaceAfterPunct(text){ return text.replace(/([a-zà-ÿ]{2})([.!?])([A-ZÀ-Ý])/g,'$1$2 $3').replace(/([a-zà-ÿ]),([a-zà-ÿA-ZÀ-Ý])/g,'$1, $2'); }
-function fixQuotesCurly(text){ return text.replace(/(^|[\s([{—–-])'(?=(?:em|cause|til|tis|twas|n|round|bout|fore|gain|neath|cross)\b)/gi,'$1’').replace(/(^|[\s([{—–-])'(?=\d{2}s\b)/g,'$1’').replace(/(^|[\s([{—–-])"/g,'$1“').replace(/"/g,'”').replace(/(^|[\s([{—–-])'/g,'$1‘').replace(/'/g,'’'); }
+function fixSpaceAfterPunct(text){ return text.replace(/([a-zà-ÿ]{2})([.!?])([A-ZÀ-Ý])(?=[a-zà-ÿ])/g,'$1$2 $3').replace(/([a-zà-ÿ]),([a-zà-ÿA-ZÀ-Ý])/g,'$1, $2'); }
+function fixQuotesCurly(text){ return text.replace(/(^|[\s([{—–-])'(?=(?:em|cause|til|tis|twas|n|round|bout|fore|gain|neath|cross)\b)/gi,'$1’').replace(/(^|[\s([{—–-])'(?=\d{2}s\b)/g,'$1’').replace(/(^|[\s([{—–-])'(?=[stmkr]\b)/g,'$1’').replace(/(^|[\s([{—–-])"/g,'$1“').replace(/"/g,'”').replace(/(^|[\s([{—–-])'/g,'$1‘').replace(/'/g,'’'); }
 function fixQuotesStraight(text){ return text.replace(/[“”]/g,'"').replace(/[‘’]/g,"'"); }
-function fixDashEm(text){ return text.replace(/(^|[^-])---(?!-)/g,'$1—').replace(/(^|[^-])--(?!-)/g,'$1—'); }
+function isDashProtectedLine(line){ return /^\s*[-–—]{3,}\s*$/.test(line) || /^\s*\|?\s*:?-{2,}:?\s*(?:\|\s*:?-{2,}:?\s*)+\|?\s*$/.test(line); }
+function fixDashEm(text){ return text.split('\n').map(line=>isDashProtectedLine(line) ? line : line.replace(/(^|[^-])---(?!-)/g,'$1—').replace(/(^|[^-])--(?!-)/g,'$1—')).join('\n'); }
 function fixEllipsis(text){ return text.replace(/\.\s+\.\s+\./g,'…').replace(/\.{3}/g,'…'); }
 function fixHtmlText(text){ if(!/<[a-z!/][\s\S]*>/i.test(text) && !/&(?:[a-z][a-z0-9]+|#\d+|#x[0-9a-f]+);/i.test(text)) return text; const doc=new DOMParser().parseFromString(text,'text/html'); doc.querySelectorAll('script,style,noscript,template,svg,canvas,nav,header,footer,aside,form,menu,.sidebar,.navigation,.menu,.footer,.header,#sidebar,#navigation,#menu,#footer,#header').forEach(el=>el.remove()); const selectors=['main','article','[role="main"]','#content','#main','#article','.content','.post','.entry']; let root=null; selectors.forEach(sel=>{ doc.querySelectorAll(sel).forEach(el=>{ if(!root || (el.textContent||'').length>(root.textContent||'').length) root=el; }); }); root=root||doc.body; const blocks=new Set(['address','article','blockquote','body','dd','details','dialog','div','dl','dt','fieldset','figcaption','figure','h1','h2','h3','h4','h5','h6','hr','li','main','ol','p','pre','section','table','tbody','td','tfoot','th','thead','tr','ul']); const skip=new Set(['script','style','noscript','template','svg','canvas','nav','header','footer','aside','form','menu']); const walk=node=>{ if(node.nodeType===Node.TEXT_NODE) return node.nodeValue||''; if(node.nodeType!==Node.ELEMENT_NODE && node.nodeType!==Node.DOCUMENT_FRAGMENT_NODE && node.nodeType!==Node.DOCUMENT_NODE) return ''; const tag=(node.tagName||'').toLowerCase(); if(skip.has(tag)) return ''; if(tag==='br') return '\n'; let inner=''; node.childNodes.forEach(child=>{ inner += walk(child); }); if(tag==='td'||tag==='th') return `\n${inner}\t`; if(blocks.has(tag)) return `\n${inner}\n`; return inner; }; return walk(root).replace(/\u00a0/g,' ').replace(/[ \t\f\v]+/g,' ').replace(/ *\n */g,'\n').replace(/\n{3,}/g,'\n\n').trim(); }
 function fixTrimDoc(text){ return text.trim(); }
@@ -2064,7 +2249,7 @@ function savePrompts(){ localStorage.setItem('vp.py.prompts', JSON.stringify($('
 $('#promptSelect').addEventListener('change',()=>{ const p=$('#promptSelect')._prompts[$('#promptSelect').value]; $('#promptText').value=p?p.text:''; savePrompts(); });
 $('#savePromptBtn').addEventListener('click',()=>{ const prompts=$('#promptSelect')._prompts; prompts[$('#promptSelect').value].text=$('#promptText').value; savePrompts(); toast('Prompt saved'); });
 $('#savePromptAsBtn').addEventListener('click',()=>{ const name=prompt('Prompt name?'); if(!name) return; const prompts=$('#promptSelect')._prompts; prompts.push({name,text:$('#promptText').value}); savePrompts(); loadPrompts(); $('#promptSelect').value=prompts.length-1; savePrompts(); toast('Prompt added'); });
-$('#deletePromptBtn').addEventListener('click',()=>{ const prompts=$('#promptSelect')._prompts; if(prompts.length<=1){ toast('Keep at least one prompt.'); return; } prompts.splice(Number($('#promptSelect').value),1); savePrompts(); loadPrompts(); });
+$('#deletePromptBtn').addEventListener('click',()=>{ const prompts=$('#promptSelect')._prompts; const current=prompts[Number($('#promptSelect').value)]; if(current && DEFAULT_PROMPTS.some(p=>p.name===current.name)){ toast('Built-in prompts cannot be deleted. Edit it, or use Reset Defaults.'); return; } if(prompts.length<=1){ toast('Keep at least one prompt.'); return; } prompts.splice(Number($('#promptSelect').value),1); savePrompts(); loadPrompts(); });
 $('#resetPromptsBtn').addEventListener('click',()=>{ if(!confirm('Reset prompts to defaults?')) return; localStorage.setItem('vp.py.prompts', JSON.stringify(DEFAULT_PROMPTS)); localStorage.setItem('vp.py.promptIndex','0'); loadPrompts(); });
 
 $('#detectModelBtn').addEventListener('click',detectModels);
@@ -2105,8 +2290,8 @@ $('#translateHeadingBtn').addEventListener('click',()=>startGuidedSectioned('tra
 function setLmBusy(on){ ['rewriteSelBtn','rewriteParaBtn','rewriteWholeBtn','rewriteChunkBtn','rewriteHeadingBtn','cleanSelBtn','cleanParaBtn','cleanWholeBtn','cleanChunkBtn','askImproveBtn','feedbackOnlyBtn','rewriteGuidedBtn','translateSelBtn','translateHeadingBtn'].forEach(id=>{$('#'+id).disabled=on;}); }
 function noteStreamFinish(info){ (info?.finishReasons||[]).forEach(reason=>{ if(!previewState.finishReasons) previewState.finishReasons=[]; previewState.finishReasons.push(reason); }); }
 function finishWarningText(){ const reasons=previewState.finishReasons||[]; if(reasons.includes('length')) return 'Warning: the provider stopped because the output hit a length limit; the last section may be incomplete.'; if(reasons.includes('content_filter')) return 'Warning: the provider stopped because of a content filter.'; return ''; }
-async function startLM(task, scope, chunked){ if(previewState.running){ toast('Generation is already running. Stop it first.'); return; } try{ const range=getScopeRange(scope); const promptText=promptForTask(task); if(!range.text.trim()) throw new Error('No text to send.'); if(chunked){ await startLMChunked(task, scope, range, promptText); return; } const prep=prepareTextForLm(range.text); openPreview(`${task==='clean'?'AI Clean':'Rewrite'} ${scope}`, range.text, '', range.start, range.end, true); previewState.expectedMarkers=markerSignature(range.text); await streamOne(promptText, buildLmUserContent(prep.text, prep, task), txt=>{ previewState.after += txt; updatePreview(); }, `${task} ${scope}`); previewState.after=sanitizeLmFinalText(previewState.after); updatePreview(); previewState.finished=true; previewState.running=false; const hasOutput=!!previewState.after.trim(); $('#applyPreviewBtn').disabled=!hasOutput; setStopButtons(false); setLmBusy(false); $('#streamState').textContent='done'; $('#previewStatus').textContent=hasOutput?'Generation complete.':'Generation produced no applicable text.'; $('#lmStatus').textContent=$('#previewStatus').textContent; if(hasOutput){ renderIntegrityGuardrails(previewState.before,previewState.after); reportPreviewMarkerDrift(); } }catch(err){ if(err?.name==='AbortError' || previewState.partial){ markLmStopped(); return; } toast(err.message); $('#lmStatus').textContent=err.message; finishPreviewError(err.message); } }
-async function startGuidedAI(kind, scope){ if(previewState.running){ toast('Generation is already running. Stop it first.'); return; } try{ const range=getScopeRange(scope); if(!range.text.trim()) throw new Error('No text to send.'); const applyMode=(kind==='questions'||kind==='feedback')?'none':'replace'; const titles={questions:'Improve Questions',feedback:'Feedback Only','guided-rewrite':'Rewrite with Guidance',translate:'Translate Selection'}; openPreview(titles[kind]||'AI Tool', range.text, '', range.start, range.end, true, applyMode); previewState.expectedMarkers=applyMode==='replace'?markerSignature(range.text):null; await streamOne(guidedSystemPrompt(kind), guidedUserContent(kind, range.text), txt=>{ previewState.after += txt; updatePreview(); }, kind); previewState.after=sanitizeLmFinalText(previewState.after); updatePreview(); previewState.finished=true; previewState.running=false; const hasOutput=!!previewState.after.trim(); $('#applyPreviewBtn').disabled=applyMode==='none'||!hasOutput; setStopButtons(false); setLmBusy(false); $('#streamState').textContent='done'; $('#previewStatus').textContent=applyMode==='none'?'Guidance complete. Review only; not applicable.':(hasOutput?'Generation complete.':'Generation produced no applicable text.'); $('#lmStatus').textContent=$('#previewStatus').textContent; if(applyMode==='replace' && hasOutput){ renderIntegrityGuardrails(previewState.before,previewState.after); reportPreviewMarkerDrift(); } }catch(err){ if(err?.name==='AbortError' || previewState.partial){ markLmStopped(); return; } toast(err.message); $('#lmStatus').textContent=err.message; finishPreviewError(err.message); } }
+async function startLM(task, scope, chunked){ if(previewState.running){ toast('Generation is already running. Stop it first.'); return; } try{ const range=getScopeRange(scope); const promptText=promptForTask(task); if(!range.text.trim()) throw new Error('No text to send.'); if(chunked){ await startLMChunked(task, scope, range, promptText); return; } const prep=prepareTextForLm(range.text); openPreview(`${task==='clean'?'AI Clean':'Rewrite'} ${scope}`, range.text, '', range.start, range.end, true); previewState.expectedMarkers=markerSignature(range.text); noteStreamFinish(await streamOne(promptText, buildLmUserContent(prep.text, prep, task), txt=>{ previewState.after += txt; updatePreview(); }, `${task} ${scope}`)); previewState.after=sanitizeLmFinalText(previewState.after); updatePreview(); previewState.finished=true; previewState.running=false; const hasOutput=!!previewState.after.trim(); $('#applyPreviewBtn').disabled=!hasOutput; setStopButtons(false); setLmBusy(false); $('#streamState').textContent='done'; $('#previewStatus').textContent=hasOutput?('Generation complete.'+(finishWarningText()?' '+finishWarningText():'')):'Generation produced no applicable text.'; $('#lmStatus').textContent=$('#previewStatus').textContent; if(hasOutput){ renderIntegrityGuardrails(previewState.before,previewState.after); reportPreviewMarkerDrift(); } }catch(err){ if(err?.name==='AbortError' || previewState.partial){ markLmStopped(); return; } toast(err.message); $('#lmStatus').textContent=err.message; finishPreviewError(err.message); } }
+async function startGuidedAI(kind, scope){ if(previewState.running){ toast('Generation is already running. Stop it first.'); return; } try{ const range=getScopeRange(scope); if(!range.text.trim()) throw new Error('No text to send.'); const applyMode=(kind==='questions'||kind==='feedback')?'none':'replace'; const titles={questions:'Improve Questions',feedback:'Feedback Only','guided-rewrite':'Rewrite with Guidance',translate:'Translate Selection'}; openPreview(titles[kind]||'AI Tool', range.text, '', range.start, range.end, true, applyMode); previewState.expectedMarkers=applyMode==='replace'?markerSignature(range.text):null; noteStreamFinish(await streamOne(guidedSystemPrompt(kind), guidedUserContent(kind, range.text), txt=>{ previewState.after += txt; updatePreview(); }, kind)); previewState.after=sanitizeLmFinalText(previewState.after); updatePreview(); previewState.finished=true; previewState.running=false; const hasOutput=!!previewState.after.trim(); $('#applyPreviewBtn').disabled=applyMode==='none'||!hasOutput; setStopButtons(false); setLmBusy(false); $('#streamState').textContent='done'; $('#previewStatus').textContent=applyMode==='none'?'Guidance complete. Review only; not applicable.':(hasOutput?('Generation complete.'+(finishWarningText()?' '+finishWarningText():'')):'Generation produced no applicable text.'); $('#lmStatus').textContent=$('#previewStatus').textContent; if(applyMode==='replace' && hasOutput){ renderIntegrityGuardrails(previewState.before,previewState.after); reportPreviewMarkerDrift(); } }catch(err){ if(err?.name==='AbortError' || previewState.partial){ markLmStopped(); return; } toast(err.message); $('#lmStatus').textContent=err.message; finishPreviewError(err.message); } }
 function makeChunks(text, maxChars){ const headingSections=makeHeadingSectionsNoFallback(text); const chunks=[]; let largeParagraphs=0; headingSections.forEach(section=>{ if(maxChars>0 && section.length>maxChars*1.25){ const parts=makeParagraphChunks(section,maxChars); largeParagraphs += parts.largeParagraphCount||0; chunks.push(...parts); } else { chunks.push(section); } }); chunks.largeParagraphCount=largeParagraphs; return chunks.filter(chunk=>String(chunk||'').trim()); }
 function splitParagraphBlocks(text){ const lines=String(text||'').split('\n'); const blocks=[]; let buf=[]; const push=()=>{ if(buf.length){ blocks.push(buf.join('\n').trimEnd()); buf=[]; } }; for(const line of lines){ if(line.trim()===''){ push(); } else { buf.push(line); } } push(); return blocks.filter(block=>block.trim()); }
 function makeParagraphChunks(text,maxChars){ const blocks=splitParagraphBlocks(text); if(!blocks.length) return String(text||'').trim() ? [String(text||'')] : []; const chunks=[]; let buf=[], len=0, huge=0; const push=()=>{ if(buf.length){ chunks.push(buf.join('\n\n')); buf=[]; len=0; } }; blocks.forEach(block=>{ const addLen=block.length+(buf.length?2:0); if(maxChars>0 && len>0 && len+addLen>maxChars) push(); if(maxChars>0 && block.length>maxChars*1.25) huge++; buf.push(block); len += addLen; }); push(); chunks.largeParagraphCount=huge; return chunks; }
@@ -2118,8 +2303,12 @@ function headingSplitNote(sections){ const notes=[]; if(sections.oversizedCount)
 function finishSectionedPreview(label){ previewState.after=sanitizeLmFinalText(previewState.after); updatePreview(); previewState.finished=!previewState.partial && previewState.running; previewState.running=false; setStopButtons(false); setLmBusy(false); const hasOutput=!!previewState.after.trim(); const finalPct=previewState.progress?.percent ?? 0; $('#streamState').textContent=previewState.partial?`stopped · ${finalPct}%`:'done · 100%'; $('#applyPreviewBtn').disabled=!!previewState.partial || !hasOutput; const notes=[previewState.sectionSplitNote, finishWarningText()].filter(Boolean).join(' '); $('#previewStatus').textContent=previewState.partial?`Stopped at ${finalPct}%. Partial output is not applicable.`:(hasOutput?`${label} complete.${notes?' '+notes:''}`:`${label} produced no applicable text.${notes?' '+notes:''}`); $('#lmStatus').textContent=$('#previewStatus').textContent; if(!previewState.partial && hasOutput){ renderIntegrityGuardrails(previewState.before,previewState.after); reportPreviewMarkerDrift(); } }
 async function startLMChunked(task, scope, range, promptText){ const maxChars=Math.max(1200, parseInt($('#chunkSize').value,10)||6000); const chunks=makeChunks(range.text,maxChars); openPreview(`${task==='clean'?'AI Clean':'Rewrite'} chunked ${scope}`, range.text, '', range.start, range.end, true); previewState.expectedMarkers=markerSignature(range.text); previewState.sectionSplitNote=chunks.largeParagraphCount?`${chunks.largeParagraphCount} paragraph(s) were larger than Chunk size and were sent whole to avoid cutting a paragraph in half.`:''; setPreviewProgress(0,chunks.length); for(let i=0;i<chunks.length;i++){ if(!previewState.running) break; const pct=progressPercent(i,chunks.length); $('#streamState').textContent=`${pct}% · chunk ${i+1}/${chunks.length}`; $('#previewStatus').textContent=`Generating chunk ${i+1} of ${chunks.length} (${pct}% done)...`; if(i>0) previewState.after += '\n\n'; const prep=prepareTextForLm(chunks[i]); const info=await streamOne(promptText, buildLmUserContent(prep.text, prep, task), txt=>{ previewState.after += txt; updatePreview(); }, `${task} chunk ${i+1}/${chunks.length}`); noteStreamFinish(info); setPreviewProgress(i+1,chunks.length); }
  previewState.after=sanitizeLmFinalText(previewState.after); updatePreview(); previewState.finished=!previewState.partial && previewState.running; previewState.running=false; setStopButtons(false); setLmBusy(false); const hasOutput=!!previewState.after.trim(); const finalPct=previewState.progress?.percent ?? 0; const notes=[previewState.sectionSplitNote, finishWarningText()].filter(Boolean).join(' '); $('#streamState').textContent=previewState.partial?`stopped · ${finalPct}%`:'done · 100%'; $('#applyPreviewBtn').disabled=!!previewState.partial || !hasOutput; $('#previewStatus').textContent=previewState.partial?`Stopped at ${finalPct}%. Partial output is not applicable.`:(hasOutput?`Chunked generation complete.${notes?' '+notes:''}`:`Chunked generation produced no applicable text.${notes?' '+notes:''}`); $('#lmStatus').textContent=$('#previewStatus').textContent; if(!previewState.partial && hasOutput){ renderIntegrityGuardrails(previewState.before,previewState.after); reportPreviewMarkerDrift(); } }
-function extractStreamMeta(text){ const reasons=[]; const clean=String(text||'').replace(/<<MW_FINISH_REASON:([^>]+)>>/g,(_,reason)=>{ reasons.push(reason); return ''; }); return {text:clean,reasons}; }
-async function streamOne(promptText, inputText, onText, label){ const provider=currentAiProvider(); lmAbort=new AbortController(); setStopButtons(true); $('#showPreviewBtn').disabled=false; const info={finishReasons:[]}; const res=await fetch('/api/lm_stream',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({base_url:$('#lmBase').value,provider:$('#lmProvider').value,api_key:$('#lmApiKey').value,model:$('#lmModel').value,prompt:promptText,input:inputText,options:advancedOptions()}),signal:lmAbort.signal}); if(!res.ok){ const msg=await res.text(); throw new Error(msg||`${provider.label} request failed`); } const reader=res.body.getReader(); const decoder=new TextDecoder(); while(true){ const {value,done}=await reader.read(); if(done) break; const chunk=decoder.decode(value,{stream:true}); if(chunk){ const meta=extractStreamMeta(chunk); info.finishReasons.push(...meta.reasons); if(meta.text) onText(meta.text); } } return info; }
+function createNdjsonParser(onEvent){ let buf=''; const dispatch=line=>{ const text=line.trim(); if(!text) return; let event; try{ event=JSON.parse(text); }catch(e){ return; } onEvent(event); }; return { push(chunk){ buf+=chunk; let at; while((at=buf.indexOf('\n'))>=0){ const line=buf.slice(0,at); buf=buf.slice(at+1); dispatch(line); } }, end(){ const rest=buf; buf=''; dispatch(rest); } }; }
+function isLocalEndpointHost(host){ const h=String(host||'').trim().toLowerCase().replace(/^\[|\]$/g,''); if(!h) return false; if(h==='localhost'||h.endsWith('.localhost')||h.endsWith('.local')||h==='::1') return true; if(/^f[cd][0-9a-f]{2}:/.test(h)||/^fe80:/.test(h)) return true; const m=h.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/); if(!m) return false; const a=Number(m[1]), b=Number(m[2]); return a===127||a===10||a===0||(a===192&&b===168)||(a===172&&b>=16&&b<=31)||(a===169&&b===254); }
+const confirmedRemoteHosts=new Set();
+function aiEndpointHost(){ const raw=($('#lmBase').value||'').trim()||currentAiProvider().base; try{ return new URL(raw.includes('://')?raw:`http://${raw}`).hostname; }catch(e){ return ''; } }
+function confirmRemoteEndpoint(){ const host=aiEndpointHost(); if(!host||isLocalEndpointHost(host)||confirmedRemoteHosts.has(host)) return; if(!confirm(`The AI endpoint "${host}" is not a local address. Your manuscript text will be sent to that server. Continue?`)) throw new Error('Cancelled: the remote AI endpoint was not confirmed.'); confirmedRemoteHosts.add(host); }
+async function streamOne(promptText, inputText, onText, label){ const provider=currentAiProvider(); confirmRemoteEndpoint(); lmAbort=new AbortController(); setStopButtons(true); $('#showPreviewBtn').disabled=false; const info={finishReasons:[],done:false,error:''}; const res=await fetch('/api/lm_stream',{method:'POST',headers:apiHeaders(),body:JSON.stringify({base_url:$('#lmBase').value,provider:$('#lmProvider').value,api_key:$('#lmApiKey').value,model:$('#lmModel').value,prompt:promptText,input:inputText,options:advancedOptions()}),signal:lmAbort.signal}); if(!res.ok){ let msg=await res.text(); try{ msg=JSON.parse(msg).error||msg; }catch(e){} throw new Error(msg||`${provider.label} request failed`); } let thinking=false, shownState=''; const parser=createNdjsonParser(ev=>{ if(ev.t==='delta'){ if(thinking){ thinking=false; $('#streamState').textContent=shownState; } if(ev.text) onText(ev.text); } else if(ev.t==='reasoning'){ if(!thinking){ thinking=true; shownState=$('#streamState').textContent; $('#streamState').textContent=`${shownState} · thinking...`; } } else if(ev.t==='finish'){ info.finishReasons.push(ev.reason); } else if(ev.t==='error'){ info.error=ev.message||'The AI provider reported an error.'; } else if(ev.t==='done'){ info.done=true; } }); const reader=res.body.getReader(); const decoder=new TextDecoder(); while(true){ const {value,done}=await reader.read(); if(done) break; parser.push(decoder.decode(value,{stream:true})); } parser.end(); if(!info.done) throw new Error(info.error||'The AI stream ended before the provider finished. The output is incomplete and cannot be applied.'); return info; }
 function previewSubText(){ const base=`${previewState.before.length.toLocaleString()} chars → ${previewState.after.length.toLocaleString()} chars`; return previewState.progress ? `${base} · ${previewState.progress.percent}% done` : base; }
 function progressPercent(done,total){ return total ? Math.max(0,Math.min(100,Math.round((done/total)*100))) : 0; }
 function setPreviewProgress(done,total){ previewState.progress={done,total,percent:progressPercent(done,total)}; $('#previewSub').textContent=previewSubText(); }
@@ -2144,12 +2333,13 @@ document.querySelectorAll('.viewBtn').forEach(b=>b.addEventListener('click',()=>
 function setPreviewView(view){ if(!['split','after-only','before-only'].includes(view)) view='split'; const modal=$('#previewModal'), card=$('#modalCard'); [modal,card].forEach(el=>{ el.classList.remove('after-only','before-only'); if(view==='after-only') el.classList.add('after-only'); if(view==='before-only') el.classList.add('before-only'); }); document.querySelectorAll('.viewBtn').forEach(btn=>btn.classList.toggle('active',btn.dataset.view===view)); localStorage.setItem('vp.py.previewView',view); }
 
 function scheduleAutosave(){ if(recoveryPending && !editor.value){ return; } clearTimeout(autosaveTimer); autosaveTimer=setTimeout(()=>{ if(recoveryPending && !editor.value) return; try{ const settings=getSettings(); delete settings.lmApiKey; const data={version:1,text:editor.value,metadata:getMetadata(),settings,savedAt:new Date().toISOString()}; localStorage.setItem('vp.py.autosave', JSON.stringify(data)); }catch(err){ if(!autosaveWarningShown){ autosaveWarningShown=true; toast('Autosave failed: browser storage is full. Export your work to disk.'); } } },700); }
-function getSettings(){ return {wrap:$('#wrapToggle').checked, previewOn:document.querySelector('.editor-card')?.classList.contains('preview-on')||false, scope:getScope(), vellumCollapsed:$('#vellumToolbar').classList.contains('collapsed'), sideTab:document.querySelector('[data-side-tab].active')?.dataset.sideTab||'check', lmProvider:$('#lmProvider')?.value||'lmstudio', lmBase:$('#lmBase').value, lmApiKey:$('#lmApiKey').value, lmModel:$('#lmModel').value, lmStrength:$('#lmStrength')?.value||'medium', chunkSize:$('#chunkSize').value, guidedContext:$('#guidedContext')?.value||'', translateTarget:$('#translateTarget')?.value||'English', advTemperature:$('#advTemperature')?.value||'', advTopP:$('#advTopP')?.value||'', advTopK:$('#advTopK')?.value||'', advRepeatPenalty:$('#advRepeatPenalty')?.value||'', advMaxTokens:$('#advMaxTokens')?.value||''}; }
-function saveSettings(){ if(settingsLoading) return; const settings=getSettings(); try{ localStorage.setItem('vp.py.settings', JSON.stringify(settings)); }catch(err){} clearTimeout(settingsSaveTimer); settingsSaveTimer=setTimeout(()=>{ api('/api/settings',{settings}).catch(()=>{}); },350); scheduleAutosave(); }
-async function loadSettings(){ settingsLoading=true; let s={}; try{s=JSON.parse(localStorage.getItem('vp.py.settings')||'{}');}catch(e){} try{ const res=await apiGet('/api/settings'); if(res.ok){ const data=await res.json(); if(data && data.settings) s={...s,...data.settings}; } }catch(e){} try{ localStorage.setItem('vp.py.settings', JSON.stringify(s)); }catch(e){} $('#wrapToggle').checked=!!s.wrap; $('#wrapToggle').dispatchEvent(new Event('change')); const card=document.querySelector('.editor-card'); card.classList.toggle('preview-on',!!s.previewOn); $('#togglePreview').classList.toggle('active',!!s.previewOn); const scopeInput=document.querySelector(`input[name="scope"][value="${s.scope==='selection'?'selection':'all'}"]`); if(scopeInput) scopeInput.checked=true; const tb=$('#vellumToolbar'); const collapsed=s.vellumCollapsed!==false; tb.classList.toggle('collapsed',collapsed); $('#toggleVellum').textContent=collapsed?'Expand':'Collapse'; const savedTab=s.sideTab||localStorage.getItem('vp.py.sideTab')||'check'; activateSideTab(document.querySelector(`[data-side-tab="${savedTab}"]`)?savedTab:'check'); if(s.lmProvider && AI_PROVIDERS[s.lmProvider]) $('#lmProvider').value=s.lmProvider; if(s.lmBase) $('#lmBase').value=s.lmBase; else $('#lmBase').value=currentAiProvider().base; if(s.lmApiKey) $('#lmApiKey').value=s.lmApiKey; updateProviderUi(); if(s.lmModel){ const sel=$('#lmModel'); if(!Array.from(sel.options).some(o=>o.value===s.lmModel)){ const opt=document.createElement('option'); opt.value=s.lmModel; opt.textContent=s.lmModel; sel.appendChild(opt); } sel.value=s.lmModel; } if(s.lmStrength) $('#lmStrength').value=s.lmStrength; if(s.chunkSize) $('#chunkSize').value=s.chunkSize; if(s.guidedContext) $('#guidedContext').value=s.guidedContext; if(s.translateTarget) $('#translateTarget').value=s.translateTarget; ['advTemperature','advTopP','advTopK','advRepeatPenalty','advMaxTokens'].forEach(id=>{ if(s[id]) $('#'+id).value=s[id]; }); settingsLoading=false; }
+function getSettings(){ return {wrap:$('#wrapToggle').checked, previewOn:document.querySelector('.editor-card')?.classList.contains('preview-on')||false, scope:getScope(), vellumCollapsed:$('#vellumToolbar').classList.contains('collapsed'), sideTab:document.querySelector('[data-side-tab].active')?.dataset.sideTab||'check', lmProvider:$('#lmProvider')?.value||'lmstudio', lmBase:$('#lmBase').value, lmApiKey:$('#lmApiKey').value, lmModel:$('#lmModel').value, lmStrength:$('#lmStrength')?.value||'medium', chunkSize:$('#chunkSize').value, guidedContext:$('#guidedContext')?.value||'', translateTarget:$('#translateTarget')?.value||'English', advTemperature:$('#advTemperature')?.value||'', advTopP:$('#advTopP')?.value||'', advTopK:$('#advTopK')?.value||'', advRepeatPenalty:$('#advRepeatPenalty')?.value||'', advMaxTokens:$('#advMaxTokens')?.value||'', allowRemoteImages:$('#allowRemoteImages')?.checked||false}; }
+function saveSettings(){ if(settingsLoading) return; const settings=getSettings(); try{ localStorage.setItem('vp.py.settings', JSON.stringify(settings)); }catch(err){} clearTimeout(settingsSaveTimer); settingsSaveTimer=setTimeout(()=>{ const {lmApiKey,...serverSettings}=settings; api('/api/settings',{settings:serverSettings}).catch(()=>{}); },350); scheduleAutosave(); }
+async function loadSettings(){ settingsLoading=true; let s={}; try{s=JSON.parse(localStorage.getItem('vp.py.settings')||'{}');}catch(e){} try{ const res=await apiGet('/api/settings'); if(res.ok){ const data=await res.json(); if(data && data.settings) s={...s,...data.settings}; } }catch(e){} try{ localStorage.setItem('vp.py.settings', JSON.stringify(s)); }catch(e){} $('#wrapToggle').checked=!!s.wrap; $('#wrapToggle').dispatchEvent(new Event('change')); const card=document.querySelector('.editor-card'); card.classList.toggle('preview-on',!!s.previewOn); $('#togglePreview').classList.toggle('active',!!s.previewOn); const scopeInput=document.querySelector(`input[name="scope"][value="${s.scope==='selection'?'selection':'all'}"]`); if(scopeInput) scopeInput.checked=true; const tb=$('#vellumToolbar'); const collapsed=s.vellumCollapsed!==false; tb.classList.toggle('collapsed',collapsed); $('#toggleVellum').textContent=collapsed?'Expand':'Collapse'; const savedTab=s.sideTab||localStorage.getItem('vp.py.sideTab')||'check'; activateSideTab(document.querySelector(`[data-side-tab="${savedTab}"]`)?savedTab:'check'); if(s.lmProvider && AI_PROVIDERS[s.lmProvider]) $('#lmProvider').value=s.lmProvider; if(s.lmBase) $('#lmBase').value=s.lmBase; else $('#lmBase').value=currentAiProvider().base; if(s.lmApiKey) $('#lmApiKey').value=s.lmApiKey; updateProviderUi(); if(s.lmModel){ const sel=$('#lmModel'); if(!Array.from(sel.options).some(o=>o.value===s.lmModel)){ const opt=document.createElement('option'); opt.value=s.lmModel; opt.textContent=s.lmModel; sel.appendChild(opt); } sel.value=s.lmModel; } if(s.lmStrength) $('#lmStrength').value=s.lmStrength; if(s.chunkSize) $('#chunkSize').value=s.chunkSize; if(s.guidedContext) $('#guidedContext').value=s.guidedContext; if(s.translateTarget) $('#translateTarget').value=s.translateTarget; $('#allowRemoteImages').checked=!!s.allowRemoteImages; ['advTemperature','advTopP','advTopK','advRepeatPenalty','advMaxTokens'].forEach(id=>{ if(s[id]) $('#'+id).value=s[id]; }); settingsLoading=false; }
 ['metaTitle','metaSubtitle','metaAuthor','metaLanguage','metaSeries','metaBookNumber','metaPublisher','metaFilename','lmBase','lmApiKey','lmModel','chunkSize','guidedContext','translateTarget','advTemperature','advTopP','advTopK','advRepeatPenalty','advMaxTokens'].forEach(id=>$('#'+id).addEventListener('input',()=>{ saveSettings(); updateStats(); }));
 $('#lmProvider').addEventListener('change',()=>{ const base=$('#lmBase').value.trim(); const provider=currentAiProvider(); if(!base || isKnownProviderBase(base)) $('#lmBase').value=provider.base; updateProviderUi(); saveSettings(); });
 $('#lmStrength').addEventListener('change',saveSettings);
+$('#allowRemoteImages').addEventListener('change',()=>{ saveSettings(); toast('Reload the page to apply the image setting.'); });
 $('#lmModel').addEventListener('change',saveSettings);
 function showRecoveryIfNeeded(){ const raw=localStorage.getItem('vp.py.autosave'); if(!raw) return; try{ const data=JSON.parse(raw); if(data.text && !editor.value){ recoveryData=data; recoveryPending=true; $('#recovery').classList.add('show'); } }catch(e){} }
 $('#restoreBtn').addEventListener('click',()=>{ const data=recoveryData||JSON.parse(localStorage.getItem('vp.py.autosave')||'{}'); recoveryPending=false; editor.value=data.text||''; setMetadata(data.metadata||{}); if(data.settings){ try{ localStorage.setItem('vp.py.settings',JSON.stringify(data.settings)); loadSettings(); }catch(e){} } $('#recovery').classList.remove('show'); updateStats(); toast(`Autosave restored: ${(editor.value.match(/\S+/g)||[]).length.toLocaleString()} words`); });
@@ -2165,6 +2355,21 @@ loadPrompts(); loadSettings().then(()=>{ showRecoveryIfNeeded(); updateStats(); 
 class ReusableThreadingHTTPServer(ThreadingHTTPServer):
     allow_reuse_address = True
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        # Required on every /api request (except /api/health). It is only handed out through the index page,
+        # which browsers on other origins cannot read, so a foreign web page cannot drive the API.
+        self.session_token = secrets.token_urlsafe(32)
+
+    def handle_error(self, request: Any, client_address: Any) -> None:
+        # Browsers reset connections all the time (closed tab, Stop button); that is not worth a traceback.
+        if isinstance(sys.exc_info()[1], (ConnectionResetError, BrokenPipeError, ConnectionAbortedError)):
+            return
+        super().handle_error(request, client_address)
+
+
+LOCAL_HOST_NAMES = ("127.0.0.1", "localhost", "[::1]")
+
 
 class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
     server_version = "ManuscriptWorkbenchHTTP/1.0"
@@ -2172,25 +2377,96 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
     def log_message(self, fmt: str, *args: Any) -> None:
         sys.stderr.write("[%s] %s\n" % (_dt.datetime.now().strftime("%H:%M:%S"), fmt % args))
 
+    # ---- request guards -------------------------------------------------------------------------
+
+    def _host_allowed(self) -> bool:
+        """Only accept our own loopback names and port: this defeats DNS-rebinding attacks."""
+        raw = (self.headers.get("Host") or "").strip().lower()
+        if raw.startswith("["):
+            end = raw.find("]")
+            if end == -1:
+                return False
+            host, rest = raw[:end + 1], raw[end + 1:]
+            if rest and not rest.startswith(":"):
+                return False
+            port_text = rest[1:]
+        else:
+            host, _sep, port_text = raw.partition(":")
+        try:
+            port = int(port_text) if port_text else 80
+        except ValueError:
+            return False
+        return host in LOCAL_HOST_NAMES and port == self.server.server_address[1]
+
+    def _origin_allowed(self, origin: str) -> bool:
+        try:
+            parsed = urllib.parse.urlparse(origin)
+            port = parsed.port or 80
+        except ValueError:
+            return False
+        host = (parsed.hostname or "").lower()
+        return parsed.scheme == "http" and host in ("127.0.0.1", "localhost", "::1") and port == self.server.server_address[1]
+
+    def _guard(self, path: str) -> None:
+        if not self._host_allowed():
+            raise HttpError(403, "Forbidden: unexpected Host header.")
+        origin = self.headers.get("Origin")
+        if origin is not None and not self._origin_allowed(origin):
+            raise HttpError(403, "Forbidden: cross-origin requests are not allowed.")
+        if path.startswith("/api/") and path != "/api/health":
+            supplied = (self.headers.get("X-MW-Token") or "").encode("utf-8")
+            if not hmac.compare_digest(supplied, self.server.session_token.encode("utf-8")):
+                raise HttpError(403, "Missing or invalid session token. Reload the page.")
+
+    def _send_http_error(self, exc: HttpError) -> None:
+        json_response(self, {"error": exc.message}, status=exc.status)
+
+    # ---- verbs ----------------------------------------------------------------------------------
+
     def do_OPTIONS(self) -> None:
+        # The app never makes cross-origin requests, so no CORS headers are ever sent.
+        try:
+            self._guard("/")
+        except HttpError as exc:
+            self._send_http_error(exc)
+            return
         self.send_response(204)
+        self.send_header("Content-Length", "0")
+        _send_security_headers(self)
         self.end_headers()
 
     def do_GET(self) -> None:
         parsed = urllib.parse.urlparse(self.path)
-        if parsed.path in ("/", "/index.html"):
-            text_response(self, HTML, content_type="text/html; charset=utf-8")
-        elif parsed.path == "/api/health":
+        try:
+            self._guard(parsed.path)
+            self._route_get(parsed.path)
+        except HttpError as exc:
+            self._send_http_error(exc)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+        except Exception as exc:
+            traceback.print_exc()
+            json_response(self, {"error": str(exc)}, status=500)
+
+    def _route_get(self, path: str) -> None:
+        if path in ("/", "/index.html"):
+            stored = read_app_settings().get("settings")
+            allow_images = bool(stored.get("allowRemoteImages")) if isinstance(stored, dict) else False
+            page = HTML.replace('name="mw-token" content=""', f'name="mw-token" content="{self.server.session_token}"', 1)
+            text_response(self, page, content_type="text/html; charset=utf-8",
+                          headers={"Content-Security-Policy": content_security_policy(allow_images), "X-Frame-Options": "DENY"})
+        elif path == "/api/health":
             json_response(self, {"ok": True, "app": APP_NAME, "version": APP_VERSION, "python_docx": Document is not None, "requests": requests is not None, "markdown": markdown_lib is not None, "lxml": lxml_html is not None, "trafilatura": trafilatura is not None})
-        elif parsed.path == "/api/settings":
+        elif path == "/api/settings":
             json_response(self, read_app_settings())
-        elif parsed.path == "/help":
+        elif path == "/help":
             guide = Path(__file__).with_name("USER_GUIDE.md")
             if guide.exists():
-                text_response(self, render_help_page(guide.read_text(encoding="utf-8")), content_type="text/html; charset=utf-8")
+                text_response(self, render_help_page(guide.read_text(encoding="utf-8")), content_type="text/html; charset=utf-8",
+                              headers={"Content-Security-Policy": HELP_CSP, "X-Frame-Options": "DENY"})
             else:
                 text_response(self, "User guide not found.", HTTPStatus.NOT_FOUND)
-        elif parsed.path == "/USER_GUIDE.md":
+        elif path == "/USER_GUIDE.md":
             guide = Path(__file__).with_name("USER_GUIDE.md")
             if guide.exists():
                 text_response(self, guide.read_text(encoding="utf-8"), content_type="text/markdown; charset=utf-8")
@@ -2203,105 +2479,130 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
         parsed = urllib.parse.urlparse(self.path)
         self._streaming_response_started = False
         try:
-            if parsed.path == "/api/import":
-                payload = get_json_body(self)
-                filename = payload.get("filename") or "untitled.txt"
-                data_b64 = payload.get("data_b64") or ""
-                data = base64.b64decode(data_b64)
-                json_response(self, import_file(filename, data, payload.get("html_mode") or "simple"))
-            elif parsed.path == "/api/import_html_options":
-                payload = get_json_body(self)
-                filename = payload.get("filename") or "import.html"
-                data_b64 = payload.get("data_b64") or ""
-                data = base64.b64decode(data_b64)
-                decoded, notes = decode_text_bytes(data)
-                result = html_import_options(decoded, filename=filename)
-                result["notes"] = notes + result.get("notes", [])
-                json_response(self, result)
-            elif parsed.path == "/api/import_url":
-                payload = get_json_body(self)
-                data, final_url, content_type = fetch_url_bytes(payload.get("url") or "")
-                decoded, notes = decode_text_bytes(data)
-                parsed_url = urllib.parse.urlparse(final_url)
-                path_name = Path(urllib.parse.unquote(parsed_url.path or "")).name or (parsed_url.hostname or "import")
-                filename = safe_filename(path_name.rsplit(".", 1)[0] or parsed_url.hostname or "url-import") + ".md"
-                if "html" in content_type.lower() or re.search(r"<(?:!doctype\s+html|html|head|body|article|main)\b", decoded, re.I):
-                    result = html_import_options(decoded, filename=filename, url=final_url)
-                else:
-                    text = normalize_imported_text(decoded)
-                    result = {
-                        "filename": filename,
-                        "url": final_url,
-                        "simple": {"text": text, "chars": len(text)},
-                        "main": {"text": "", "chars": 0, "error": "URL did not look like HTML."},
-                        "notes": ["Imported URL as text"],
-                        "engine": "text",
-                    }
-                result["content_type"] = content_type
-                result["notes"] = notes + result.get("notes", [])
-                json_response(self, result)
-            elif parsed.path == "/api/render_markdown":
-                payload = get_json_body(self)
-                json_response(self, {"html": render_markdown_html(payload.get("text") or ""), "engine": "python-markdown"})
-            elif parsed.path == "/api/settings":
-                payload = get_json_body(self)
-                settings = payload.get("settings") if isinstance(payload.get("settings"), dict) else payload
-                write_app_settings(settings)
-                json_response(self, {"ok": True, "path": str(SETTINGS_PATH)})
-            elif parsed.path == "/api/export_docx":
-                payload = get_json_body(self)
-                text = payload.get("text") or ""
-                metadata = payload.get("metadata") or {}
-                docx_bytes = create_manuscript_docx(text, metadata)
-                filename = safe_filename(payload.get("filename") or metadata.get("filename") or "manuscript") + "-formatted.docx"
-                self.send_response(200)
-                self.send_header("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-                self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
-                self.send_header("Content-Length", str(len(docx_bytes)))
-                self.end_headers()
-                self.wfile.write(docx_bytes)
-            elif parsed.path == "/api/preflight":
-                payload = get_json_body(self)
-                json_response(self, preflight(payload.get("text") or "", payload.get("metadata") or {}))
-            elif parsed.path == "/api/lm_models":
-                self.handle_lm_models()
-            elif parsed.path == "/api/lm_stream":
-                self.handle_lm_stream()
-            else:
-                text_response(self, "Not found", HTTPStatus.NOT_FOUND)
+            self._guard(parsed.path)
+            self._route_post(parsed.path)
+        except HttpError as exc:
+            if not self._streaming_response_started:
+                self._send_http_error(exc)
+        except ValueError as exc:
+            # ValueError is how the helpers report bad user input (unsupported file, blocked URL, ...).
+            if not self._streaming_response_started:
+                json_response(self, {"error": str(exc)}, status=400)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
         except Exception as exc:
             traceback.print_exc()
-            if getattr(self, "_streaming_response_started", False):
+            if self._streaming_response_started:
                 return
             json_response(self, {"error": str(exc)}, status=500)
+
+    def _route_post(self, path: str) -> None:
+        if path == "/api/import":
+            payload = get_json_body(self)
+            filename = payload.get("filename") or "untitled.txt"
+            data = base64.b64decode(payload.get("data_b64") or "")
+            json_response(self, import_file(filename, data, payload.get("html_mode") or "simple"))
+        elif path == "/api/import_html_options":
+            payload = get_json_body(self)
+            filename = payload.get("filename") or "import.html"
+            data = base64.b64decode(payload.get("data_b64") or "")
+            decoded, notes = decode_text_bytes(data)
+            result = html_import_options(decoded, filename=filename)
+            result["notes"] = notes + result.get("notes", [])
+            json_response(self, result)
+        elif path == "/api/import_url":
+            payload = get_json_body(self)
+            data, final_url, content_type = fetch_url_bytes(payload.get("url") or "")
+            decoded, notes = decode_text_bytes(data)
+            parsed_url = urllib.parse.urlparse(final_url)
+            path_name = Path(urllib.parse.unquote(parsed_url.path or "")).name or (parsed_url.hostname or "import")
+            filename = safe_filename(path_name.rsplit(".", 1)[0] or parsed_url.hostname or "url-import") + ".md"
+            if "html" in content_type.lower() or re.search(r"<(?:!doctype\s+html|html|head|body|article|main)\b", decoded, re.I):
+                result = html_import_options(decoded, filename=filename, url=final_url)
+            else:
+                text = normalize_imported_text(decoded)
+                result = {
+                    "filename": filename,
+                    "url": final_url,
+                    "simple": {"text": text, "chars": len(text)},
+                    "main": {"text": "", "chars": 0, "error": "URL did not look like HTML."},
+                    "notes": ["Imported URL as text"],
+                    "engine": "text",
+                }
+            result["content_type"] = content_type
+            result["notes"] = notes + result.get("notes", [])
+            json_response(self, result)
+        elif path == "/api/render_markdown":
+            payload = get_json_body(self)
+            json_response(self, {"html": render_markdown_html(payload.get("text") or ""), "engine": "python-markdown"})
+        elif path == "/api/settings":
+            payload = get_json_body(self)
+            settings = payload.get("settings") if isinstance(payload.get("settings"), dict) else payload
+            write_app_settings(settings)
+            json_response(self, {"ok": True, "path": str(SETTINGS_PATH)})
+        elif path == "/api/export_docx":
+            payload = get_json_body(self)
+            text = payload.get("text") or ""
+            metadata = payload.get("metadata") or {}
+            docx_bytes = create_manuscript_docx(text, metadata)
+            filename = safe_filename(payload.get("filename") or metadata.get("filename") or "manuscript") + "-formatted.docx"
+            self.send_response(200)
+            self.send_header("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+            self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
+            self.send_header("Content-Length", str(len(docx_bytes)))
+            _send_security_headers(self)
+            self.end_headers()
+            self.wfile.write(docx_bytes)
+        elif path == "/api/preflight":
+            payload = get_json_body(self)
+            json_response(self, preflight(payload.get("text") or "", payload.get("metadata") or {}))
+        elif path == "/api/lm_models":
+            self.handle_lm_models()
+        elif path == "/api/lm_stream":
+            self.handle_lm_stream()
+        else:
+            text_response(self, "Not found", HTTPStatus.NOT_FOUND)
+
+    # ---- AI provider proxy ----------------------------------------------------------------------
 
     def handle_lm_models(self) -> None:
         if requests is None:
             raise RuntimeError("requests is not installed. Run: pip install -r requirements.txt")
         payload = get_json_body(self)
-        base_url = normalize_base_url(payload.get("base_url") or "", payload.get("provider") or "lmstudio")
+        base_url = validate_ai_base_url(normalize_base_url(payload.get("base_url") or "", payload.get("provider") or "lmstudio"))
         resp = requests.get(f"{base_url}/models", headers=ai_request_headers(payload.get("api_key") or ""), timeout=8)
         resp.raise_for_status()
         data = resp.json()
         models = [m.get("id") for m in data.get("data", []) if m.get("id")]
         json_response(self, {"models": models, "base_url": base_url})
 
+    def _emit(self, event: Dict[str, Any]) -> None:
+        self.wfile.write((json.dumps(event, ensure_ascii=False) + "\n").encode("utf-8"))
+        self.wfile.flush()
+
     def handle_lm_stream(self) -> None:
+        """Proxy a chat completion and re-frame it as newline-delimited JSON events:
+
+        {"t":"delta","text":...}  visible text            {"t":"reasoning"} / {"t":"ping"}  keep-alive while waiting
+        {"t":"finish","reason":...}  provider finish_reason   {"t":"done"}  the stream ended cleanly
+        {"t":"error","message":...}  the stream failed. A stream without "done" is always incomplete.
+        """
         if requests is None:
             raise RuntimeError("requests is not installed. Run: pip install -r requirements.txt")
         payload = get_json_body(self)
-        base_url = normalize_base_url(payload.get("base_url") or "", payload.get("provider") or "lmstudio")
-        model = payload.get("model") or ""
-        if not model.strip():
+        base_url = validate_ai_base_url(normalize_base_url(payload.get("base_url") or "", payload.get("provider") or "lmstudio"))
+        headers = ai_request_headers(payload.get("api_key") or "")
+        model = (payload.get("model") or "").strip()
+        if not model:
             try:
-                resp = requests.get(f"{base_url}/models", headers=ai_request_headers(payload.get("api_key") or ""), timeout=6)
+                resp = requests.get(f"{base_url}/models", headers=headers, timeout=6)
                 resp.raise_for_status()
                 models = resp.json().get("data") or []
                 if models:
-                    model = models[0].get("id") or ""
+                    model = (models[0].get("id") or "").strip()
             except Exception:
                 pass
-        model = model.strip() or "local-model"
+        model = model or "local-model"
         system_prompt = payload.get("prompt") or "Rewrite the text. Output only the result."
         input_text = payload.get("input") or ""
         body = {
@@ -2318,65 +2619,82 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
                 value = options.get(key)
                 if value is not None and value != "":
                     body[key] = value
-        with requests.post(f"{base_url}/chat/completions", json=body, headers=ai_request_headers(payload.get("api_key") or ""), stream=True, timeout=(10, 300)) as resp:
+
+        stripper = ThinkStripper()
+        finished = False
+        done = False
+        last_write = time.monotonic()
+        with requests.post(f"{base_url}/chat/completions", json=body, headers=headers, stream=True, timeout=(10, 300)) as resp:
             if resp.status_code >= 400:
                 raise RuntimeError(resp.text[:4000])
             self.send_response(200)
-            self.send_header("Content-Type", "text/plain; charset=utf-8")
-            self.send_header("Cache-Control", "no-cache")
+            self.send_header("Content-Type", "application/x-ndjson; charset=utf-8")
+            _send_security_headers(self)
             self.end_headers()
             self._streaming_response_started = True
-            in_think = False
-            def strip_think_chunk(content: str) -> str:
-                nonlocal in_think
-                out: List[str] = []
-                i = 0
-                lower = content.lower()
-                while i < len(content):
-                    if in_think:
-                        end = lower.find("</think>", i)
-                        if end < 0:
-                            return "".join(out)
-                        i = end + len("</think>")
-                        in_think = False
-                    else:
-                        start = lower.find("<think>", i)
-                        if start < 0:
-                            out.append(content[i:])
-                            break
-                        out.append(content[i:start])
-                        i = start + len("<think>")
-                        in_think = True
-                return "".join(out)
-            for raw in resp.iter_lines(decode_unicode=False):
-                if not raw:
-                    continue
-                line = raw.decode("utf-8", errors="replace").strip()
-                if line.startswith("data:"):
-                    line = line[5:].strip()
-                if line == "[DONE]":
-                    break
-                try:
-                    data = json.loads(line)
-                    choice = (data.get("choices") or [{}])[0]
+            try:
+                for raw in resp.iter_lines(decode_unicode=False):
+                    now = time.monotonic()
+                    line = raw.decode("utf-8", errors="replace").strip() if raw else ""
+                    if not line or line.startswith(":"):
+                        continue
+                    if line.startswith("data:"):
+                        line = line[5:].strip()
+                    if line == "[DONE]":
+                        done = True
+                        break
+                    try:
+                        data = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    if not isinstance(data, dict):
+                        continue
+                    if data.get("error"):
+                        err = data["error"]
+                        message = err.get("message") if isinstance(err, dict) else str(err)
+                        self._emit({"t": "error", "message": message or "The AI provider reported an error."})
+                        return
+                    choice = (data.get("choices") or [{}])[0] or {}
                     delta = choice.get("delta") or {}
-                    finish_reason = choice.get("finish_reason")
                     content = delta.get("content")
                     if content is None:
-                        msg = choice.get("message") or {}
-                        content = msg.get("content")
-                    if content:
-                        content = strip_think_chunk(content)
-                    if content:
-                        self.wfile.write(content.encode("utf-8"))
-                        self.wfile.flush()
+                        content = (choice.get("message") or {}).get("content")
+                    wrote = False
+                    if isinstance(content, str) and content:
+                        visible = stripper.feed(content)
+                        if visible:
+                            self._emit({"t": "delta", "text": visible})
+                            wrote = True
+                    finish_reason = choice.get("finish_reason")
                     if finish_reason:
-                        self.wfile.write(f"<<MW_FINISH_REASON:{finish_reason}>>".encode("utf-8"))
-                        self.wfile.flush()
-                except (json.JSONDecodeError, BrokenPipeError):
-                    if isinstance(sys.exc_info()[1], BrokenPipeError):
-                        break
-                    continue
+                        rest = stripper.flush()
+                        if rest:
+                            self._emit({"t": "delta", "text": rest})
+                        self._emit({"t": "finish", "reason": str(finish_reason)})
+                        finished = True
+                        wrote = True
+                    if wrote:
+                        last_write = now
+                    elif now - last_write >= 1.0:
+                        # Nothing visible for a while (a reasoning model is thinking). Writing a line also lets us
+                        # notice a closed browser connection, so leaving this block stops the provider's generation.
+                        kind = "reasoning" if (delta.get("reasoning_content") or delta.get("reasoning")) else "ping"
+                        self._emit({"t": kind})
+                        last_write = now
+                rest = stripper.flush()
+                if rest:
+                    self._emit({"t": "delta", "text": rest})
+                if done or finished:
+                    self._emit({"t": "done"})
+                else:
+                    self._emit({"t": "error", "message": "The AI provider closed the stream before it finished. The output is incomplete."})
+            except (BrokenPipeError, ConnectionResetError):
+                return  # the browser went away; closing the provider connection (end of `with`) stops generation
+            except requests.RequestException as exc:
+                try:
+                    self._emit({"t": "error", "message": f"The connection to the AI provider was lost: {exc}"})
+                except (BrokenPipeError, ConnectionResetError):
+                    pass
 
 
 def main() -> int:
@@ -2391,6 +2709,8 @@ def main() -> int:
         print("Missing dependencies:", ", ".join(missing))
         print("Run: pip install -r requirements.txt")
         return 2
+    if scrub_stored_secrets():
+        print("Note: an API key saved by an older version was removed from the settings file. It now stays in the browser only.")
     url = f"http://{APP_HOST}:{APP_PORT}"
     try:
         server = ReusableThreadingHTTPServer((APP_HOST, APP_PORT), ManuscriptWorkbenchHandler)

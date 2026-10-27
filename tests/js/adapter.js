@@ -12,7 +12,7 @@ const EXPORTS = [
   'FIXES', 'SAFE_FIX_SEQUENCE', 'DESTRUCTIVE_FIXES', 'safeCleanup',
   'diagnose', 'markdownLineInfo', 'stripStructureLine', 'stripInlineMarkup', 'stripMarkers',
   'canonicalStructureMarker', 'headingOutline', 'structureSignature', 'markerCount',
-  'analyzeIntegrity', 'sanitizeLmFinalText', 'extractStreamMeta',
+  'analyzeIntegrity', 'sanitizeLmFinalText', 'createNdjsonParser', 'isLocalEndpointHost', 'isDashProtectedLine',
   'makeChunks', 'makeHeadingSections', 'splitParagraphBlocks', 'makeParagraphChunks',
   'isSceneBreak', 'shouldJoinLines', 'isLikelyPageNumberLine', 'repeatedLineCandidates',
   'escapeHtml', 'cleanFilename', 'listItemInfo', 'unwrapInlineText', 'inlineWrapper',

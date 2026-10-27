@@ -184,7 +184,8 @@ Pick the version that preserves your text best. For unusual manuscript exports, 
 Built-in safety limits:
 
 - only `http` and `https` URLs;
-- localhost, private, and internal network addresses are blocked;
+- localhost, private, and internal network addresses are blocked. This includes alternative spellings such as `127.1` or `2130706433`, and host names that resolve to a private address;
+- every redirect is checked *before* it is followed, so a public page cannot bounce the fetch to an internal address;
 - URLs with embedded usernames/passwords are rejected;
 - responses larger than 12 MB are refused;
 - the fetch times out if the site is slow (about 8 s to connect, 25 s to read).
@@ -435,7 +436,7 @@ For chapter rows (`#` level) you can:
 - **AI** — select the chapter's text and start an AI rewrite;
 - **Clean** — select the chapter's text and start an AI clean.
 
-Chapter actions select the text from the chapter heading to the next heading of the same or higher level. Very long outlines show the first 120 headings.
+Chapter actions select the text from the chapter heading to the next heading of the same or higher level. The outline lists every heading; use the `+`/`-` button on a row to collapse or expand its sub-headings.
 
 ## 11. Clean Tab
 
@@ -457,10 +458,11 @@ Operations that can change structure show a **before/after preview** first (`App
 8. trim trailing spaces;
 9. collapse multiple spaces;
 10. remove space before punctuation;
-11. add missing space after punctuation;
-12. trim document edges.
+11. trim document edges.
 
-It intentionally does **not** join lines, remove blank lines, delete page numbers, or change quotes/dashes — those are separate, previewed operations.
+Mojibake is repaired per damaged sequence, so a broken `Ã©` right next to a no-break space is fixed in the same pass.
+
+It intentionally does **not** join lines, remove blank lines, delete page numbers, add spaces after punctuation, or change quotes/dashes — those are separate, previewed operations.
 
 ### Strip Markers Preview
 
@@ -495,13 +497,15 @@ Shows what the document looks like with all Markdown structure and inline marker
 
 Tabs to spaces · Collapse multiple spaces · Remove space before punctuation · Add missing space after punctuation.
 
+`Add missing space after punctuation` is previewed first. It only acts on a clear sentence join such as `etc.Dit` (two lowercase letters, a sentence mark, then a capitalised word) and on `word,word`; it leaves `Node.JS`, `a.b` and numbers like `3,5` alone.
+
 ### Typography (previewed)
 
 | Operation | Notes |
 |---|---|
-| Quotes to curly | converts straight quotes to typographic quotes; handles leading apostrophes ('em, 'cause, '90s) |
+| Quotes to curly | converts straight quotes to typographic quotes; handles leading apostrophes in English (`'em`, `'cause`, `'90s`) and Dutch (`'s avonds`, `'t huis`, `'k`, `'m`, `'s-Hertogenbosch`), which get a closing apostrophe `’` rather than an opening quote |
 | Quotes to straight | the reverse |
-| `--` to em dash | converts `--` and `---` between words to `—`. Note: a line consisting only of `---` (a Markdown divider) is also converted — check the preview if you use `---` as a scene break; prefer `***` |
+| `--` to em dash | converts `--` and `---` between words to `—`. Lines that consist only of dashes (`---`, a scene break or Markdown divider) and Markdown table separator rows (`\|---\|---\|`) are left alone |
 | `...` to ellipsis | converts three dots (also spaced `. . .`) to `…` |
 
 ### File
@@ -528,11 +532,13 @@ Each request contains the model name, a system prompt (the selected preset), you
 Steps:
 
 1. Start the provider and load/serve a model there.
-2. Choose the provider in `Provider setup`. The endpoint fills in automatically (editing the endpoint switches the provider to Custom).
+2. Choose the provider in `Provider setup`. The endpoint fills in automatically when it is empty or still a provider default; an endpoint you typed yourself is kept.
 3. If the provider needs authentication, paste the key into `API Key`.
 4. Click `Detect Model` and pick a model from the dropdown. `Test` checks the connection without changing anything.
 
 If no model is selected, the app asks the provider for its model list and uses the first available model.
+
+**Remote endpoints.** The endpoint normally points at your own machine or LAN. If it points anywhere else, the app asks you to confirm (once per host per session) before it sends any manuscript text, because that text would leave your network. An endpoint must be a plain `http://` or `https://` URL without embedded credentials; use the API Key field instead.
 
 **LM Studio**: open LM Studio → load a model → start the Local Server → Detect Model here.
 
@@ -591,7 +597,9 @@ Every AI action opens a before/after preview that streams the output live:
 
 - `Split` / `After only` / `Before only` switch the layout (remembered between sessions);
 - `auto-scroll` follows the generation; `Bottom` jumps to the end;
-- `Stop generation` aborts; partial output stays visible but **cannot** be applied;
+- `Stop generation` aborts; partial output stays visible but **cannot** be applied. Stopping also closes the connection to the provider, so a local model stops generating;
+- if the provider connection drops or the stream ends before the provider says it is finished, the preview shows an error and the incomplete output **cannot** be applied;
+- reasoning models: while the model is thinking the status shows `thinking...`; the reasoning itself is never added to your text;
 - `Apply change` replaces the original text with the result — nothing touches your manuscript until you click it;
 - closing the modal keeps the result available behind the `Show Preview` button in the AI tab.
 
@@ -632,7 +640,7 @@ Preflight warns when Title or Author is empty. Metadata is included in the autos
 
 ## 15. Find / Replace
 
-Open with the `Find` button or `Cmd+F` (Mac) / `Ctrl+F` (Windows/Linux). If text is selected when you open it, short selections pre-fill the search field, and multi-line selections set the scope to `Selection only`.
+Open with the `Find` button or `Cmd+F` (Mac) / `Ctrl+F` (Windows/Linux). If text is selected when you open it, short single-line selections pre-fill the search field. The scope always starts as `Whole text`; switch it to `Selection only` to search just the selection you made before opening Find.
 
 Options:
 
@@ -717,7 +725,7 @@ Note: loading a new file clears the undo history.
 | settings | UI state, provider, endpoint, model, **API key**, advanced options |
 | prompts | your prompt presets |
 
-The AI API key is kept in localStorage so you do not have to re-enter it. On a shared computer, clear site data for `127.0.0.1:8765` (or remove the key from the field) when you are done.
+The AI API key is kept in the browser's localStorage so you do not have to re-enter it. The app **never writes it to disk**: it is not part of `manuscript_workbench_settings.json`, and the server does not return it. If an older version saved a key in that file, it is removed when the app starts. On a shared computer, clear site data for `127.0.0.1:8765` (or remove the key from the field) when you are done.
 
 ## 19. Keyboard Shortcuts
 
@@ -827,6 +835,13 @@ The AI API key is kept in localStorage so you do not have to re-enter it. On a s
 - Loading a file resets the undo history (the app asks for confirmation before replacing existing text).
 - Autosave uses browser localStorage and is not a substitute for exported files.
 - The app binds to `127.0.0.1` only: it is not reachable from other machines, by design.
+
+### Security notes
+
+- Every request to the app's API needs a random session token that is created when the app starts and is only handed to the page the app itself serves. Requests with a foreign `Host` or `Origin` header are refused. A web page open in another tab therefore cannot read or change your settings, or use the app to reach other machines.
+- If you see "Missing or invalid session token", reload the page (the token changes each time the app is restarted).
+- The Markdown preview blocks images from other servers by default, so a manuscript cannot make your browser contact a third party. Turn it on in `Book` → `Preview` and reload the page if you want remote images.
+- The preview removes scripts and other active content. Unknown HTML tags such as `<font>` are dropped but their text stays visible.
 
 ## 23. Recommended Daily Workflow
 

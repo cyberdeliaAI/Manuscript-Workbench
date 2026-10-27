@@ -783,14 +783,14 @@
   },
   "is_blocked_import_host": {
     "0.0.0.0": true,
-    "0177.0.0.1": false,
-    "0x7f.0.0.1": false,
+    "0177.0.0.1": true,
+    "0x7f.0.0.1": true,
     "10.0.0.5": true,
     "127.0.0.1": true,
-    "127.1": false,
+    "127.1": true,
     "169.254.169.254": true,
     "192.168.1.1": true,
-    "2130706433": false,
+    "2130706433": true,
     "::1": true,
     "::ffff:127.0.0.1": true,
     "LOCALHOST.": true,
@@ -1728,14 +1728,14 @@
     "nested_allowed": "<div class=\"block block-verse\"><span class=\"sc\">x</span> <u>u</u></div>",
     "onerror_img": "<img>",
     "protocol_relative": "<a href=\"//evil.example/x\">x</a>",
-    "raw_b_i": "<p>Hello  and  end</p>",
-    "raw_font": "<p>Hello  end</p>",
+    "raw_b_i": "<p>Hello <b>world</b> and <i>there</i> end</p>",
+    "raw_font": "<p>Hello red text end</p>",
     "relative": "<a href=\"../x.md\">rel</a><a href=\"#top\">top</a>",
     "script": "<p>a</p><p>b</p>",
     "style_attr": "<div class=\"block\">x</div>",
-    "svg": "",
-    "void_input": "<p>a</p>",
-    "void_wbr": "<p>before</p>",
+    "svg": "<p>kept?</p>",
+    "void_input": "<p>a</p><p>text AFTER input</p><p>more text</p>",
+    "void_wbr": "<p>before</p><p>after</p>",
     "whitespace_javascript_href": "<a>x</a>"
   },
   "validate_import_url": {
@@ -1752,10 +1752,22 @@
       "error": "ValueError: Local, private, and internal addresses are blocked for URL import."
     },
     "http://127.1:8765/": {
-      "ok": "http://127.1:8765/"
+      "error": "ValueError: Local, private, and internal addresses are blocked for URL import."
     },
     "http://2130706433/": {
-      "ok": "http://2130706433/"
+      "error": "ValueError: Local, private, and internal addresses are blocked for URL import."
+    },
+    "http://[::1]:8765/": {
+      "error": "ValueError: Local, private, and internal addresses are blocked for URL import."
+    },
+    "http://intranet/": {
+      "error": "ValueError: Local, private, and internal addresses are blocked for URL import."
+    },
+    "http://localtest.me/": {
+      "error": "ValueError: Local, private, and internal addresses are blocked for URL import."
+    },
+    "http://nonexistent.invalid/": {
+      "error": "ValueError: Could not resolve host: nonexistent.invalid"
     },
     "http://user:pw@example.com/": {
       "error": "ValueError: URLs with embedded usernames or passwords are not supported."
