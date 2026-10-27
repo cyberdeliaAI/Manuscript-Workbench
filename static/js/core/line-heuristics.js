@@ -43,18 +43,19 @@ export function shouldJoinLines(prev, current) {
   if (a.length < 45 && !/[A-Za-zÀ-ÖØ-öø-ÿ]-$/.test(a)) return false;
   return !endsLikeSentence(a);
 }
+// The same rule as PAGE_NUMBER_RE in manuscript_workbench/preflight.py (tests/fixtures/parity.json keeps them equal).
+export const PAGE_NUMBER_RE =
+  /^\s*(?:[-—–]\s*)?(?:p\.?\s*|page\s+|pagina\s+)?(?:\d{1,4}|[ivxlcdm]{2,})(?:\s*(?:\/|of|van)\s*\d{1,4})?(?:\s*[-—–])?\s*$/i;
 export function isLikelyPageNumberLine(line, idx, lines) {
   const t = line.trim();
-  if (!t) return false;
-  if (/^[-–—]?\s*\d{1,4}\s*[-–—]?$/.test(t)) return true;
-  if (/^(?:p\.?\s*|page\s+|pagina\s+)\d{1,4}(?:\s*(?:of|van|\/|-)\s*\d{1,4})?$/i.test(t)) return true;
-  if (/^\d{1,4}\s*(?:\/|of|van)\s*\d{1,4}$/i.test(t)) return true;
-  if (/^[ivxlcdm]{2,8}$/i.test(t)) {
+  if (!t || !PAGE_NUMBER_RE.test(t)) return false;
+  if (/^[ivxlcdm]{2,}$/i.test(t)) {
+    // a bare roman numeral is a page number only on a line of its own ("civil" and "mild" are words)
     const prevBlank = idx === 0 || lines[idx - 1].trim() === '';
     const nextBlank = idx === lines.length - 1 || lines[idx + 1].trim() === '';
     return prevBlank && nextBlank;
   }
-  return false;
+  return true;
 }
 export function repeatedLineCandidates(lines) {
   const map = new Map();

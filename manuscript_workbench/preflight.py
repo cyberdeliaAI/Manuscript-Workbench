@@ -8,7 +8,7 @@ from .structure import MARKDOWN_CONTAINER_RE, strip_structure_line, structure_ma
 
 
 CHAPTER_CANDIDATE_RE = re.compile(
-    r"^\s*(?:(?:chapter|hoofdstuk|chapitre|cap[ií]tulo)\s+([0-9ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien)\b.*|(?:part|deel)\s+([0-9ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien)\b.*|prologue|epilogue|acknowledg(?:e)?ments|about the author|copyright|dedication|preface|introduction|afterword|also by|inhoud|voorwoord|nawoord|dankwoord)\s*$",
+    r"^\s*(?:(?:chapter|hoofdstuk|chapitre|cap[ií]tulo)\s+([0-9ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|elf|twaalf)\b.*|(?:part|deel)\s+([0-9ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien)\b.*|prologue|epilogue|acknowledg(?:e)?ments|about the author|copyright|dedication|preface|introduction|afterword|also by|inhoud|voorwoord|nawoord|dankwoord)\s*$",
     re.I,
 )
 
@@ -25,8 +25,31 @@ WORD_NUMS = {
     "fourteen": 14, "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18,
     "nineteen": 19, "twenty": 20,
     "een": 1, "twee": 2, "drie": 3, "vier": 4, "vijf": 5, "zes": 6, "zeven": 7,
-    "acht": 8, "negen": 9, "tien": 10,
+    "acht": 8, "negen": 9, "tien": 10, "elf": 11, "twaalf": 12,
 }
+
+ROMAN_ONLY_RE = re.compile(r"^[ivxlcdm]{2,}$", re.I)
+
+
+def is_chapter_candidate(line: str) -> bool:
+    """A line that looks like a chapter or front/back-matter title. static/js/core/structure.js has the same rule."""
+    return bool(CHAPTER_CANDIDATE_RE.match(line.strip()))
+
+
+def is_page_number_line(lines: List[str], index: int) -> bool:
+    """A standalone page number such as `12`, `- 13 -` or `Page 14 of 200`.
+
+    A bare roman numeral ("iv") is only a page number on a line of its own: "civil" or "mild" in a paragraph are words.
+    static/js/core/line-heuristics.js has the same rule.
+    """
+    text = lines[index].strip()
+    if not text or not PAGE_NUMBER_RE.match(text):
+        return False
+    if ROMAN_ONLY_RE.match(text):
+        before_blank = index == 0 or not lines[index - 1].strip()
+        after_blank = index == len(lines) - 1 or not lines[index + 1].strip()
+        return before_blank and after_blank
+    return True
 
 
 def roman_to_int(s: str) -> Optional[int]:
@@ -95,9 +118,9 @@ def preflight(text: str, metadata: Dict[str, str]) -> Dict[str, Any]:
             special += 1
         if marker and not content and marker not in ("scene", "ornament"):
             empty_markers.append((idx, marker))
-        if not marker and CHAPTER_CANDIDATE_RE.match(line.strip()):
+        if not marker and is_chapter_candidate(line):
             candidates.append((idx, line.strip()))
-        if PAGE_NUMBER_RE.match(line.strip()) and not marker and line.strip():
+        if not marker and is_page_number_line(lines, idx - 1):
             page_nums.append((idx, line.strip()))
         tabs += line.count("\t")
         if re.search(r"[ \t]+$", line):
@@ -111,7 +134,7 @@ def preflight(text: str, metadata: Dict[str, str]) -> Dict[str, Any]:
         low = line.strip().lower()
         if low in ("contents", "table of contents", "inhoud", "toc"):
             title_toc_lines.append((idx, line.strip()))
-        if 4 <= len(line.strip()) <= 90 and not marker and not PAGE_NUMBER_RE.match(line.strip()):
+        if 4 <= len(line.strip()) <= 90 and not marker and not is_page_number_line(lines, idx - 1):
             repeated.setdefault(re.sub(r"\s+", " ", line.strip()), []).append(idx)
     if blank_run_len >= 3:
         extra_blank_runs += 1

@@ -1,6 +1,10 @@
 // Markdown structure parsing shared by outline, gutter, preview helpers and AI guardrails.
+// The same rule as CHAPTER_CANDIDATE_RE in manuscript_workbench/preflight.py (tests/fixtures/parity.json keeps them equal).
 export const CHAPTER_CANDIDATE_RE =
-  /^\s*(?:chapter|hoofdstuk)\s+(?:\d+|[ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|elf|twaalf)\b|^\s*(?:prologue|epilogue|acknowledg(?:e)?ments|about the author|copyright|dedication|preface|introduction|afterword|part\s+\w+|deel\s+\w+)\s*$/i;
+  /^\s*(?:(?:chapter|hoofdstuk|chapitre|cap[ií]tulo)\s+([0-9ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|elf|twaalf)\b.*|(?:part|deel)\s+([0-9ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien)\b.*|prologue|epilogue|acknowledg(?:e)?ments|about the author|copyright|dedication|preface|introduction|afterword|also by|inhoud|voorwoord|nawoord|dankwoord)\s*$/i;
+export function isChapterCandidate(line) {
+  return CHAPTER_CANDIDATE_RE.test(String(line || '').trim());
+}
 export const MD_PREFIX_MARKERS = {
   chapter: '# ',
   part: '# ',

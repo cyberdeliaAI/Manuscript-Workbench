@@ -1,5 +1,5 @@
 // Markdown structure panel.
-import { CHAPTER_CANDIDATE_RE, MD_STYLE_INFO, canonicalStructureMarker, markdownLineInfo } from '../core/structure.js';
+import { MD_STYLE_INFO, isChapterCandidate, canonicalStructureMarker, markdownLineInfo } from '../core/structure.js';
 import { escapeHtml } from '../core/text-utils.js';
 import { $, editor } from './dom.js';
 import { jumpToLine } from './editor-ops.js';
@@ -34,7 +34,7 @@ export function renderStructurePanel() {
       else special++;
       return;
     }
-    if (clean && CHAPTER_CANDIDATE_RE.test(clean)) {
+    if (clean && isChapterCandidate(clean)) {
       candidates++;
       rows.push({ line: idx + 1, marker: 'candidate', text: clean, tag: 'CHECK', group: 'warn' });
     }
