@@ -15,3 +15,7 @@ env/
 *.zip
 manuscript_workbench_settings.json
 manuscript_workbench_settings.json.tmp
+
+# Local data and tooling
+projects/
+node_modules/

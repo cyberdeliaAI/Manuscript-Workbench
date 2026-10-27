@@ -1,0 +1,1820 @@
+{
+  "chunks": {
+    "chapter_candidates": {
+      "chunks": [
+        "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter."
+      ],
+      "largeInSections": 0,
+      "original": 1,
+      "oversized": 0,
+      "sections": [
+        "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter."
+      ]
+    },
+    "dutch_nl": {
+      "chunks": [
+        "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud"
+      ],
+      "largeInSections": 0,
+      "original": 1,
+      "oversized": 0,
+      "sections": [
+        "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud"
+      ]
+    },
+    "english_elisions": {
+      "chunks": [
+        "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes."
+      ],
+      "largeInSections": 0,
+      "original": 1,
+      "oversized": 0,
+      "sections": [
+        "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes."
+      ]
+    },
+    "messy_pdf_en": {
+      "chunks": [
+        "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.",
+        "She had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12",
+        "THE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.",
+        "She had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -",
+        "THE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.",
+        "She had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200",
+        "THE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.",
+        "She had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv",
+        "THE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.",
+        "She had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15",
+        "She had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\nCHAPTER TWO\nPrologue\nTable of Contents"
+      ],
+      "largeInSections": 0,
+      "original": 1,
+      "oversized": 1,
+      "sections": [
+        "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.",
+        "She had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12",
+        "THE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.",
+        "She had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -",
+        "THE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.",
+        "She had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200",
+        "THE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.",
+        "She had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv",
+        "THE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.",
+        "She had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15",
+        "She had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\nCHAPTER TWO\nPrologue\nTable of Contents"
+      ]
+    },
+    "mojibake_short": {
+      "chunks": [
+        "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash"
+      ],
+      "largeInSections": 0,
+      "original": 1,
+      "oversized": 0,
+      "sections": [
+        "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash"
+      ]
+    },
+    "plain_prose_short": {
+      "chunks": [
+        "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone."
+      ],
+      "largeInSections": 0,
+      "original": 1,
+      "oversized": 0,
+      "sections": [
+        "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone."
+      ]
+    },
+    "structure_broken": {
+      "chunks": [
+        "# \n\nSome text\n\n::: verse\nNever closed\n",
+        "## Second\n",
+        "# Chapter 3\n",
+        "# Chapter 5\n",
+        "# Chapter 6"
+      ],
+      "largeInSections": 0,
+      "original": 5,
+      "oversized": 0,
+      "sections": [
+        "# \n\nSome text\n\n::: verse\nNever closed\n",
+        "## Second\n",
+        "# Chapter 3\n",
+        "# Chapter 5\n",
+        "# Chapter 6"
+      ]
+    },
+    "structure_en": {
+      "chunks": [
+        "# Part One\n",
+        "# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n",
+        "## A Subhead\n",
+        "### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```",
+        "# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue"
+      ],
+      "largeInSections": 0,
+      "original": 5,
+      "oversized": 0,
+      "sections": [
+        "# Part One\n",
+        "# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n",
+        "## A Subhead\n",
+        "### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```",
+        "# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue"
+      ]
+    }
+  },
+  "diagnose": {
+    "chapter_candidates": {
+      "counts": {
+        "control": 0,
+        "doubleHyphen": 0,
+        "doubleSpace": 0,
+        "extraBlank": 0,
+        "invisible": 0,
+        "ligature": 0,
+        "mojibake": 0,
+        "pageNum": 0,
+        "repeatLine": 0,
+        "spaceBeforePunct": 0,
+        "specialSpace": 0,
+        "tabs": 0,
+        "trailingWs": 0,
+        "tripleDot": 0,
+        "wrap": 0
+      },
+      "curlyQuotes": 0,
+      "flagged": [],
+      "straightQuotes": 0
+    },
+    "dutch_nl": {
+      "counts": {
+        "control": 0,
+        "doubleHyphen": 1,
+        "doubleSpace": 0,
+        "extraBlank": 0,
+        "invisible": 0,
+        "ligature": 0,
+        "mojibake": 0,
+        "pageNum": 0,
+        "repeatLine": 0,
+        "spaceBeforePunct": 0,
+        "specialSpace": 0,
+        "tabs": 0,
+        "trailingWs": 0,
+        "tripleDot": 1,
+        "wrap": 0
+      },
+      "curlyQuotes": 0,
+      "flagged": [],
+      "straightQuotes": 14
+    },
+    "english_elisions": {
+      "counts": {
+        "control": 0,
+        "doubleHyphen": 1,
+        "doubleSpace": 0,
+        "extraBlank": 0,
+        "invisible": 0,
+        "ligature": 0,
+        "mojibake": 0,
+        "pageNum": 0,
+        "repeatLine": 0,
+        "spaceBeforePunct": 0,
+        "specialSpace": 0,
+        "tabs": 0,
+        "trailingWs": 0,
+        "tripleDot": 1,
+        "wrap": 0
+      },
+      "curlyQuotes": 0,
+      "flagged": [],
+      "straightQuotes": 17
+    },
+    "messy_pdf_en": {
+      "counts": {
+        "control": 5,
+        "doubleHyphen": 5,
+        "doubleSpace": 2,
+        "extraBlank": 3,
+        "invisible": 2,
+        "ligature": 2,
+        "mojibake": 2,
+        "pageNum": 5,
+        "repeatLine": 40,
+        "spaceBeforePunct": 2,
+        "specialSpace": 1,
+        "tabs": 1,
+        "trailingWs": 1,
+        "tripleDot": 5,
+        "wrap": 22
+      },
+      "curlyQuotes": 0,
+      "flagged": [
+        [
+          2,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          3,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          4,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          5,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          7,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          8,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          10,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          11,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          13,
+          [
+            "pageNum"
+          ]
+        ],
+        [
+          14,
+          [
+            "control"
+          ]
+        ],
+        [
+          15,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          16,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          17,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          18,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          20,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          21,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          23,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          24,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          26,
+          [
+            "pageNum"
+          ]
+        ],
+        [
+          27,
+          [
+            "control"
+          ]
+        ],
+        [
+          28,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          29,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          30,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          31,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          33,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          34,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          36,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          37,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          39,
+          [
+            "pageNum"
+          ]
+        ],
+        [
+          40,
+          [
+            "control"
+          ]
+        ],
+        [
+          41,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          42,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          43,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          44,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          46,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          47,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          49,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          50,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          52,
+          [
+            "pageNum"
+          ]
+        ],
+        [
+          53,
+          [
+            "control"
+          ]
+        ],
+        [
+          54,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          55,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          56,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          57,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          59,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          60,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          62,
+          [
+            "repeatLine"
+          ]
+        ],
+        [
+          63,
+          [
+            "repeatLine",
+            "wrap"
+          ]
+        ],
+        [
+          65,
+          [
+            "pageNum"
+          ]
+        ],
+        [
+          66,
+          [
+            "control"
+          ]
+        ],
+        [
+          67,
+          [
+            "invisible",
+            "ligature"
+          ]
+        ],
+        [
+          68,
+          [
+            "mojibake",
+            "specialSpace",
+            "wrap"
+          ]
+        ],
+        [
+          69,
+          [
+            "doubleSpace",
+            "invisible",
+            "tabs",
+            "trailingWs"
+          ]
+        ],
+        [
+          70,
+          [
+            "doubleSpace",
+            "spaceBeforePunct",
+            "wrap"
+          ]
+        ],
+        [
+          72,
+          [
+            "extraBlank"
+          ]
+        ],
+        [
+          73,
+          [
+            "extraBlank"
+          ]
+        ],
+        [
+          74,
+          [
+            "extraBlank"
+          ]
+        ]
+      ],
+      "straightQuotes": 10
+    },
+    "mojibake_short": {
+      "counts": {
+        "control": 0,
+        "doubleHyphen": 0,
+        "doubleSpace": 0,
+        "extraBlank": 0,
+        "invisible": 0,
+        "ligature": 0,
+        "mojibake": 5,
+        "pageNum": 0,
+        "repeatLine": 0,
+        "spaceBeforePunct": 0,
+        "specialSpace": 0,
+        "tabs": 0,
+        "trailingWs": 0,
+        "tripleDot": 0,
+        "wrap": 0
+      },
+      "curlyQuotes": 1,
+      "flagged": [
+        [
+          0,
+          [
+            "mojibake"
+          ]
+        ]
+      ],
+      "straightQuotes": 0
+    },
+    "plain_prose_short": {
+      "counts": {
+        "control": 0,
+        "doubleHyphen": 0,
+        "doubleSpace": 0,
+        "extraBlank": 0,
+        "invisible": 0,
+        "ligature": 0,
+        "mojibake": 0,
+        "pageNum": 0,
+        "repeatLine": 0,
+        "spaceBeforePunct": 0,
+        "specialSpace": 0,
+        "tabs": 0,
+        "trailingWs": 0,
+        "tripleDot": 0,
+        "wrap": 1
+      },
+      "curlyQuotes": 0,
+      "flagged": [
+        [
+          1,
+          [
+            "wrap"
+          ]
+        ]
+      ],
+      "straightQuotes": 0
+    },
+    "structure_broken": {
+      "counts": {
+        "control": 0,
+        "doubleHyphen": 0,
+        "doubleSpace": 0,
+        "extraBlank": 0,
+        "invisible": 0,
+        "ligature": 0,
+        "mojibake": 0,
+        "pageNum": 0,
+        "repeatLine": 0,
+        "spaceBeforePunct": 0,
+        "specialSpace": 0,
+        "tabs": 0,
+        "trailingWs": 1,
+        "tripleDot": 0,
+        "wrap": 0
+      },
+      "curlyQuotes": 0,
+      "flagged": [
+        [
+          0,
+          [
+            "trailingWs"
+          ]
+        ]
+      ],
+      "straightQuotes": 0
+    },
+    "structure_en": {
+      "counts": {
+        "control": 0,
+        "doubleHyphen": 0,
+        "doubleSpace": 4,
+        "extraBlank": 0,
+        "invisible": 0,
+        "ligature": 0,
+        "mojibake": 0,
+        "pageNum": 0,
+        "repeatLine": 0,
+        "spaceBeforePunct": 1,
+        "specialSpace": 0,
+        "tabs": 0,
+        "trailingWs": 0,
+        "tripleDot": 0,
+        "wrap": 0
+      },
+      "curlyQuotes": 0,
+      "flagged": [
+        [
+          40,
+          [
+            "doubleSpace"
+          ]
+        ],
+        [
+          41,
+          [
+            "doubleSpace"
+          ]
+        ],
+        [
+          47,
+          [
+            "spaceBeforePunct"
+          ]
+        ]
+      ],
+      "straightQuotes": 0
+    }
+  },
+  "fixes": {
+    "chapter_candidates": {
+      "blankRuns": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "collapseSpaces": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "controlChars": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "dashEm": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "ellipsis": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "indentation": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "invisible": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "join": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "ligatures": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "mojibake": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "pageNumbers": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "quotesCurly": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "quotesStraight": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "repeatLines": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "safeCleanup": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "spaceAfterPunct": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "spaceBeforePunct": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "specialSpaces": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "tabsToSpace": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "trailingSpaces": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "trimDoc": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter.",
+      "unicodeNFC": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter."
+    },
+    "dutch_nl": {
+      "blankRuns": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "collapseSpaces": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "controlChars": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "dashEm": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug \u2014 prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "ellipsis": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig\u2026\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "indentation": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "invisible": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "join": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "ligatures": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "mojibake": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "pageNumbers": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "quotesCurly": "# Hoofdstuk Een\n\n\u2018Wat doe je daar?\u2019 vroeg Anna. \u2018Ik kijk naar \u2018t water,\u2019 zei hij.\n\n\u2018s Avonds liepen ze naar huis. Hij maakte foto\u2019s van zo\u2019n oude brug -- prachtig...\n\n\u201cDat is \u2018m niet,\u201d zei ze. \u201cHet is z\u2019n broer.\u201d\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "quotesStraight": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "repeatLines": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "safeCleanup": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "spaceAfterPunct": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "spaceBeforePunct": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "specialSpaces": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "tabsToSpace": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "trailingSpaces": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "trimDoc": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud",
+      "unicodeNFC": "# Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud"
+    },
+    "english_elisions": {
+      "blankRuns": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "collapseSpaces": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "controlChars": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "dashEm": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what \u2014 really\u2014yes.",
+      "ellipsis": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait\u2026 what -- really---yes.",
+      "indentation": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "invisible": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "join": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "ligatures": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "mojibake": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "pageNumbers": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "quotesCurly": "\u2019Twas the night before, and \u2019cause of the storm they sat by the fire.\nHe played rock \u2019n\u2019 roll in the \u201990s and said \u2019em all were wrong.\n\u201cDon\u2019t go,\u201d she said. \u201cIt\u2019s \u2019bout time we stayed.\u201d\nHe said \u2018hello\u2019 and she said \u201cgoodbye\u201d.\nWait... what -- really---yes.",
+      "quotesStraight": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "repeatLines": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "safeCleanup": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "spaceAfterPunct": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "spaceBeforePunct": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "specialSpaces": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "tabsToSpace": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "trailingSpaces": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "trimDoc": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes.",
+      "unicodeNFC": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes."
+    },
+    "messy_pdf_en": {
+      "blankRuns": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "collapseSpaces": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces \nDouble spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "controlChars": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "dashEm": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular \u2014 and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular \u2014 and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular \u2014 and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular \u2014 and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular \u2014 and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "ellipsis": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself\u2026 The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself\u2026 The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself\u2026 The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself\u2026 The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself\u2026 The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "indentation": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "invisible": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, cooperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hidden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "join": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the village one by one. Marta stood at the window and watched the smoke rise from the chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did, and by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then she laughed at herself... The house answered with silence.\n\n12\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the village one by one. Marta stood at the window and watched the smoke rise from the chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did, and by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then she laughed at herself... The house answered with silence.\n\n- 13 -\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the village one by one. Marta stood at the window and watched the smoke rise from the chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did, and by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then she laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the village one by one. Marta stood at the window and watched the smoke rise from the chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did, and by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then she laughed at herself... The house answered with silence.\n\niv\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the village one by one. Marta stood at the window and watched the smoke rise from the chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did, and by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then she laughed at herself... The house answered with silence.\n\n15\n\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the international staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces Double  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "ligatures": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the office at finally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "mojibake": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00e9 was closed and she didn\u2019t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "pageNumbers": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "quotesCurly": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\u201cWe should leave before noon,\u201d she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\u201cWe should leave before noon,\u201d she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\u201cWe should leave before noon,\u201d she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\u201cWe should leave before noon,\u201d she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\u201cWe should leave before noon,\u201d she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "quotesStraight": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "repeatLines": "Chapter 1\n\n\n\n\n12\n\f\n\n\n\n- 13 -\n\f\n\n\n\nPage 14 of 200\n\f\n\n\n\niv\n\f\n\n\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "safeCleanup": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\nShe had made it to the office at finally last, cooperating with the inter-\nnational staff. The caf\u00e9 was closed and she didn\u2019t mind.\nA hidden zero-width space, a tab inside, trailing spaces\nDouble spaces here, and a space before punctuation!\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "spaceAfterPunct": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "spaceBeforePunct": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here, and a space before punctuation!\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "specialSpaces": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff. The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "tabsToSpace": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab inside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "trailingSpaces": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces\nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "trimDoc": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents",
+      "unicodeNFC": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\f\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\f\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces   \nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents"
+    },
+    "mojibake_short": {
+      "blankRuns": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "collapseSpaces": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "controlChars": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "dashEm": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "ellipsis": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "indentation": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "invisible": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "join": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "ligatures": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "mojibake": "caf\u00e9 and \u201cquoted\u201d and na\u00efve \u2013 dash",
+      "pageNumbers": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "quotesCurly": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "quotesStraight": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\" dash",
+      "repeatLines": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "safeCleanup": "caf\u00e9 and \u201cquoted\u201d and na\u00efve \u2013 dash",
+      "spaceAfterPunct": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "spaceBeforePunct": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "specialSpaces": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "tabsToSpace": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "trailingSpaces": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "trimDoc": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash",
+      "unicodeNFC": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash"
+    },
+    "plain_prose_short": {
+      "blankRuns": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "collapseSpaces": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "controlChars": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "dashEm": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "ellipsis": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "indentation": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "invisible": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "join": "It was a quiet evening, and the lamps were lit along the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "ligatures": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "mojibake": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "pageNumbers": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "quotesCurly": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "quotesStraight": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "repeatLines": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "safeCleanup": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "spaceAfterPunct": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "spaceBeforePunct": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "specialSpaces": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "tabsToSpace": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "trailingSpaces": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "trimDoc": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone.",
+      "unicodeNFC": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone."
+    },
+    "structure_broken": {
+      "blankRuns": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "collapseSpaces": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "controlChars": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "dashEm": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "ellipsis": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "indentation": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "invisible": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "join": "#\n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "ligatures": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "mojibake": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "pageNumbers": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "quotesCurly": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "quotesStraight": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "repeatLines": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "safeCleanup": "#\n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "spaceAfterPunct": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "spaceBeforePunct": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "specialSpaces": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "tabsToSpace": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "trailingSpaces": "#\n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "trimDoc": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6",
+      "unicodeNFC": "# \n\nSome text\n\n::: verse\nNever closed\n\n## Second\n\n# Chapter 3\n\n# Chapter 5\n\n# Chapter 6"
+    },
+    "structure_en": {
+      "blankRuns": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "collapseSpaces": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a | 1 |\n| b | 2 |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "controlChars": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "dashEm": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n\u2014\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "ellipsis": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "indentation": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n- nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "invisible": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "join": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n- nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "ligatures": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "mojibake": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "pageNumbers": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "quotesCurly": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "quotesStraight": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "repeatLines": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "safeCleanup": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a | 1 |\n| b | 2 |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and![image](https://example.com/x.png).\n\nEpilogue",
+      "spaceAfterPunct": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "spaceBeforePunct": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and![image](https://example.com/x.png).\n\nEpilogue",
+      "specialSpaces": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "tabsToSpace": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "trailingSpaces": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "trimDoc": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue",
+      "unicodeNFC": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with `code`.\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\nViolets are blue\n:::\n\n::: note\nA note written by a character.\n:::\n\n---\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue"
+    }
+  },
+  "integrity": {
+    "chapter_candidates": {
+      "vs_half": {
+        "facts": [
+          "28 \u2192 15 words",
+          "1 \u2192 1 paragraphs"
+        ],
+        "issues": [
+          "length changed -46%",
+          "names missing: Copyright\nDedication\nVoorwoord, Nawoord\nJust, Prologue\nEpilogue\nAcknowledgments"
+        ]
+      },
+      "vs_safe_cleanup": {
+        "facts": [
+          "28 \u2192 28 words",
+          "1 \u2192 1 paragraphs"
+        ],
+        "issues": []
+      },
+      "vs_upper": {
+        "facts": [
+          "28 \u2192 28 words",
+          "1 \u2192 1 paragraphs"
+        ],
+        "issues": [
+          "names missing: Copyright\nDedication\nVoorwoord, Hoofdstuk Vier\nPart, III\nDeel Twee, Nawoord\nJust, Prologue\nEpilogue\nAcknowledgments",
+          "new names: CHAPTER, CHAPTER TWO\nHOOFDSTUK, COPYRIGHT\nDEDICATION\nVOORWOORD, HOOFDSTUK VIER\nPART, III\nDEEL TWEE, NAWOORD\nJUST..."
+        ]
+      }
+    },
+    "dutch_nl": {
+      "vs_half": {
+        "facts": [
+          "46 \u2192 24 words",
+          "7 \u2192 3 paragraphs"
+        ],
+        "issues": [
+          "length changed -48%",
+          "paragraph count changed 7 \u2192 3",
+          "names missing: Hoofdstuk Twee\n\nHoofdstuk, Vier\n\nProloog\nInhoud"
+        ]
+      },
+      "vs_safe_cleanup": {
+        "facts": [
+          "46 \u2192 46 words",
+          "7 \u2192 7 paragraphs"
+        ],
+        "issues": []
+      },
+      "vs_upper": {
+        "facts": [
+          "46 \u2192 46 words",
+          "7 \u2192 7 paragraphs"
+        ],
+        "issues": [
+          "names missing: Anna, Avonds, Hoofdstuk Een, Hoofdstuk Twee\n\nHoofdstuk, Vier\n\nProloog\nInhoud, Wat",
+          "new names: AVONDS LIEPEN, BRUG, DAAR, DAT, HET, HIJ MAAKTE FOTO'S..."
+        ]
+      }
+    },
+    "english_elisions": {
+      "vs_half": {
+        "facts": [
+          "48 \u2192 27 words",
+          "1 \u2192 1 paragraphs"
+        ],
+        "issues": [
+          "length changed -44%",
+          "names missing: Don't, It's, Wait"
+        ]
+      },
+      "vs_safe_cleanup": {
+        "facts": [
+          "48 \u2192 48 words",
+          "1 \u2192 1 paragraphs"
+        ],
+        "issues": []
+      },
+      "vs_upper": {
+        "facts": [
+          "48 \u2192 48 words",
+          "1 \u2192 1 paragraphs"
+        ],
+        "issues": [
+          "names missing: Don't, It's, Twas, Wait",
+          "new names: ALL WERE WRONG, AND, AND SAID, BEFORE, BOUT TIME, CAUSE..."
+        ]
+      }
+    },
+    "messy_pdf_en": {
+      "vs_half": {
+        "facts": [
+          "551 \u2192 280 words",
+          "23 \u2192 12 paragraphs"
+        ],
+        "issues": [
+          "length changed -49%",
+          "paragraph count changed 23 \u2192 12",
+          "names missing: CHAPTER TWO\nPrologue, Contents, Double, Page, Table",
+          "numbers/dates missing: 14, 15, 200"
+        ]
+      },
+      "vs_safe_cleanup": {
+        "facts": [
+          "551 \u2192 549 words",
+          "23 \u2192 23 paragraphs"
+        ],
+        "issues": []
+      },
+      "vs_upper": {
+        "facts": [
+          "551 \u2192 551 words",
+          "23 \u2192 23 paragraphs"
+        ],
+        "issues": [
+          "names missing: CHAPTER TWO\nPrologue, Contents, Double, HOME\nThe, Marta, Page...",
+          "new names: ACROSS THE VALLEY, AND, AND THEN\nSHE, ARRIVED THE NIGHT, BEFORE, BUT THE MEANING..."
+        ]
+      }
+    },
+    "mojibake_short": {
+      "vs_half": {
+        "facts": [
+          "7 \u2192 3 words",
+          "1 \u2192 1 paragraphs"
+        ],
+        "issues": [
+          "length changed -57%"
+        ]
+      },
+      "vs_safe_cleanup": {
+        "facts": [
+          "7 \u2192 7 words",
+          "1 \u2192 1 paragraphs"
+        ],
+        "issues": []
+      },
+      "vs_upper": {
+        "facts": [
+          "7 \u2192 7 words",
+          "1 \u2192 1 paragraphs"
+        ],
+        "issues": [
+          "new names: AND, CAF, DASH, QUOTED"
+        ]
+      }
+    },
+    "plain_prose_short": {
+      "vs_half": {
+        "facts": [
+          "23 \u2192 13 words",
+          "2 \u2192 1 paragraphs"
+        ],
+        "issues": [
+          "length changed -43%",
+          "names missing: Nobody"
+        ]
+      },
+      "vs_safe_cleanup": {
+        "facts": [
+          "23 \u2192 23 words",
+          "2 \u2192 2 paragraphs"
+        ],
+        "issues": []
+      },
+      "vs_upper": {
+        "facts": [
+          "23 \u2192 23 words",
+          "2 \u2192 2 paragraphs"
+        ],
+        "issues": [
+          "names missing: Nobody",
+          "new names: AND THE LAMPS, BOATS WERE GONE, NOBODY SPOKE, QUIET EVENING, THE HARBOUR ROAD, THE MORNING THE..."
+        ]
+      }
+    },
+    "structure_broken": {
+      "vs_half": {
+        "facts": [
+          "13 \u2192 7 words",
+          "7 \u2192 4 paragraphs"
+        ],
+        "issues": [
+          "length changed -46%",
+          "paragraph count changed 7 \u2192 4",
+          "names missing: Second\n\nChapter",
+          "numbers/dates missing: 3, 5, 6"
+        ]
+      },
+      "vs_safe_cleanup": {
+        "facts": [
+          "13 \u2192 13 words",
+          "7 \u2192 7 paragraphs"
+        ],
+        "issues": []
+      },
+      "vs_upper": {
+        "facts": [
+          "13 \u2192 13 words",
+          "7 \u2192 7 paragraphs"
+        ],
+        "issues": [
+          "names missing: Never, Second\n\nChapter, Some",
+          "new names: CHAPTER, SECOND\n\nCHAPTER, SOME TEXT, VERSE\nNEVER CLOSED"
+        ]
+      }
+    },
+    "structure_en": {
+      "vs_half": {
+        "facts": [
+          "84 \u2192 41 words",
+          "17 \u2192 9 paragraphs"
+        ],
+        "issues": [
+          "length changed -51%",
+          "paragraph count changed 17 \u2192 9",
+          "dialogue lines changed 6 \u2192 0",
+          "names missing: Epilogue, Name   Value",
+          "numbers/dates missing: 1, 2"
+        ]
+      },
+      "vs_safe_cleanup": {
+        "facts": [
+          "84 \u2192 83 words",
+          "17 \u2192 17 paragraphs"
+        ],
+        "issues": []
+      },
+      "vs_upper": {
+        "facts": [
+          "84 \u2192 85 words",
+          "17 \u2192 17 paragraphs"
+        ],
+        "issues": [
+          "names missing: Epilogue, Inline, Name   Value, One\n\nRegular, Part One\n\nChapter, Roses...",
+          "new names: AND BOLD AND, BLUE, BOTH TEXT WITH, BULLET ONE, BULLET TWO, CHARACTER..."
+        ]
+      }
+    }
+  },
+  "misc": {
+    "canonical": [
+      [
+        "note",
+        "written-note"
+      ],
+      [
+        "text",
+        "text-conversation"
+      ],
+      [
+        "image",
+        "inline-image"
+      ],
+      [
+        "Verse",
+        "verse"
+      ],
+      [
+        "",
+        ""
+      ],
+      [
+        "caption",
+        "caption"
+      ]
+    ],
+    "cleanFilename": [
+      [
+        "My Book: Part 1!",
+        "My-Book-Part-1"
+      ],
+      [
+        "",
+        "manuscript"
+      ],
+      [
+        "../x",
+        "x"
+      ],
+      [
+        "ok-name_1.2",
+        "ok-name_1.2"
+      ]
+    ],
+    "destructiveFixes": [
+      "blankRuns",
+      "dashEm",
+      "ellipsis",
+      "htmlText",
+      "indentation",
+      "join",
+      "pageNumbers",
+      "quotesCurly",
+      "quotesStraight",
+      "repeatLines"
+    ],
+    "escapeHtml": "&lt;a href=&quot;x&quot;&gt;&amp;&#39;&lt;/a&gt;",
+    "extractStreamMeta": [
+      [
+        "abc<<MW_FINISH_REASON:stop>>",
+        {
+          "reasons": [
+            "stop"
+          ],
+          "text": "abc"
+        }
+      ],
+      [
+        "a<<MW_FINISH_REASON:length>>b<<MW_FINISH_REASON:stop>>",
+        {
+          "reasons": [
+            "length",
+            "stop"
+          ],
+          "text": "ab"
+        }
+      ],
+      [
+        "none",
+        {
+          "reasons": [],
+          "text": "none"
+        }
+      ]
+    ],
+    "isSceneBreak": [
+      [
+        "***",
+        true
+      ],
+      [
+        "* * *",
+        true
+      ],
+      [
+        "---",
+        true
+      ],
+      [
+        "- - -",
+        true
+      ],
+      [
+        "~~~",
+        true
+      ],
+      [
+        "###",
+        true
+      ],
+      [
+        "#",
+        true
+      ],
+      [
+        "###a",
+        false
+      ],
+      [
+        "\u2022\u2022\u2022",
+        true
+      ],
+      [
+        "text",
+        false
+      ],
+      [
+        "",
+        false
+      ]
+    ],
+    "listItemInfo": [
+      [
+        "- item",
+        {
+          "indent": 0,
+          "task": "",
+          "text": "item",
+          "type": "ul"
+        }
+      ],
+      [
+        "  * nested",
+        {
+          "indent": 2,
+          "task": "",
+          "text": "nested",
+          "type": "ul"
+        }
+      ],
+      [
+        "1. one",
+        {
+          "indent": 0,
+          "task": "",
+          "text": "one",
+          "type": "ol"
+        }
+      ],
+      [
+        "2) two",
+        {
+          "indent": 0,
+          "task": "",
+          "text": "two",
+          "type": "ol"
+        }
+      ],
+      [
+        "- [x] done",
+        {
+          "indent": 0,
+          "task": "checked",
+          "text": "done",
+          "type": "ul"
+        }
+      ],
+      [
+        "- [ ] open",
+        {
+          "indent": 0,
+          "task": "unchecked",
+          "text": "open",
+          "type": "ul"
+        }
+      ],
+      [
+        "not a list",
+        null
+      ]
+    ],
+    "safeFixSequence": [
+      "mojibake",
+      "invisible",
+      "specialSpaces",
+      "controlChars",
+      "unicodeNFC",
+      "ligatures",
+      "tabsToSpace",
+      "trailingSpaces",
+      "collapseSpaces",
+      "spaceBeforePunct",
+      "spaceAfterPunct",
+      "trimDoc"
+    ],
+    "sanitizeLmFinalText": [
+      [
+        "<think>x</think>Answer",
+        "Answer"
+      ],
+      [
+        "```markdown\n# T\ntext\n```",
+        "# T\ntext"
+      ],
+      [
+        "Here is the rewritten text:\n\nBody",
+        "Body"
+      ],
+      [
+        "Plain output",
+        "Plain output"
+      ],
+      [
+        "Hier is de herschreven tekst:\n\nInhoud",
+        "Inhoud"
+      ]
+    ],
+    "shouldJoinLines": [
+      [
+        "The sentence continues here and goes on",
+        "with the next line of the text.",
+        false
+      ],
+      [
+        "A complete sentence.",
+        "Next sentence begins.",
+        false
+      ],
+      [
+        "CHAPTER ONE",
+        "text that follows",
+        false
+      ],
+      [
+        "short",
+        "line",
+        false
+      ],
+      [
+        "This line ends with a hyphen inter-",
+        "national and continues.",
+        true
+      ],
+      [
+        "A long line that is not finished and keeps going on and on",
+        "- list item",
+        false
+      ]
+    ],
+    "unwrapInlineText": [
+      [
+        "*it*",
+        "italic",
+        "it"
+      ],
+      [
+        "**bo**",
+        "bold",
+        "bo"
+      ],
+      [
+        "***bi***",
+        "italic",
+        "**bi**"
+      ],
+      [
+        "[[u:x]]",
+        "u",
+        "x"
+      ],
+      [
+        "`m`",
+        "mono",
+        "m"
+      ],
+      [
+        "plain",
+        "bold",
+        null
+      ]
+    ]
+  },
+  "structure": {
+    "chapter_candidates": {
+      "lineInfo": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "outline": [],
+      "signature": "",
+      "stripped": "Chapter 1\nChapter Two\nHoofdstuk 3\nHoofdstuk Vier\nPart III\nDeel Twee\nPrologue\nEpilogue\nAcknowledgments\nCopyright\nDedication\nVoorwoord\nNawoord\nJust an ordinary sentence that is not a chapter."
+    },
+    "dutch_nl": {
+      "lineInfo": [
+        {
+          "content": "Hoofdstuk Een",
+          "marker": "chapter"
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "outline": [
+        {
+          "end": 260,
+          "level": 1,
+          "line": 1,
+          "lineEnd": 15,
+          "start": 0,
+          "title": "Hoofdstuk Een",
+          "words": 44
+        }
+      ],
+      "signature": "chapter",
+      "stripped": "Hoofdstuk Een\n\n'Wat doe je daar?' vroeg Anna. 'Ik kijk naar 't water,' zei hij.\n\n's Avonds liepen ze naar huis. Hij maakte foto's van zo'n oude brug -- prachtig...\n\n\"Dat is 'm niet,\" zei ze. \"Het is z'n broer.\"\n\nHoofdstuk Twee\n\nHoofdstuk Vier\n\nProloog\nInhoud"
+    },
+    "english_elisions": {
+      "lineInfo": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "outline": [],
+      "signature": "",
+      "stripped": "'Twas the night before, and 'cause of the storm they sat by the fire.\nHe played rock 'n' roll in the '90s and said 'em all were wrong.\n\"Don't go,\" she said. \"It's 'bout time we stayed.\"\nHe said 'hello' and she said \"goodbye\".\nWait... what -- really---yes."
+    },
+    "messy_pdf_en": {
+      "lineInfo": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "outline": [],
+      "signature": "",
+      "stripped": "Chapter 1\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n12\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n- 13 -\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\nPage 14 of 200\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\niv\n\nTHE LONG ROAD HOME\nThe morning light came slowly across the valley, touching the roofs of the\nvillage one by one. Marta stood at the window and watched the smoke rise from\nthe chimneys, thinking about the letter that had arrived the night before.\n\nShe had read it three times. The words did not change, but the meaning did,\nand by the time the kettle began to sing she knew what she had to do.\n\n\"We should leave before noon,\" she said to nobody in particular -- and then\nshe laughed at herself... The house answered with silence.\n\n15\n\nShe had made it to the o\ufb03ce at \ufb01nally last, co\u00adoperating with the inter-\nnational staff.\u00a0The caf\u00c3\u00a9 was closed and she didn\u00e2\u20ac\u2122t mind.\nA hid\u200bden zero-width space, a tab\tinside, trailing spaces\nDouble  spaces here , and a space before punctuation !\n\n\n\n\nCHAPTER TWO\nPrologue\nTable of Contents"
+    },
+    "mojibake_short": {
+      "lineInfo": [
+        null
+      ],
+      "outline": [],
+      "signature": "",
+      "stripped": "caf\u00c3\u00a9 and \u00e2\u20ac\u0153quoted\u00e2\u20ac\u009d and na\u00c3\u00afve \u00e2\u20ac\u201c dash"
+    },
+    "plain_prose_short": {
+      "lineInfo": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "outline": [],
+      "signature": "",
+      "stripped": "It was a quiet evening, and the lamps were lit\nalong the harbour road. Nobody spoke.\n\nIn the morning the boats were gone."
+    },
+    "structure_broken": {
+      "lineInfo": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "content": "Second",
+          "marker": "subhead1"
+        },
+        null,
+        {
+          "content": "Chapter 3",
+          "marker": "chapter"
+        },
+        null,
+        {
+          "content": "Chapter 5",
+          "marker": "chapter"
+        },
+        null,
+        {
+          "content": "Chapter 6",
+          "marker": "chapter"
+        }
+      ],
+      "outline": [
+        {
+          "end": 49,
+          "level": 2,
+          "line": 8,
+          "lineEnd": 48,
+          "start": 39,
+          "title": "Second",
+          "words": 0
+        },
+        {
+          "end": 62,
+          "level": 1,
+          "line": 10,
+          "lineEnd": 61,
+          "start": 50,
+          "title": "Chapter 3",
+          "words": 0
+        },
+        {
+          "end": 75,
+          "level": 1,
+          "line": 12,
+          "lineEnd": 74,
+          "start": 63,
+          "title": "Chapter 5",
+          "words": 0
+        },
+        {
+          "end": 87,
+          "level": 1,
+          "line": 14,
+          "lineEnd": 87,
+          "start": 76,
+          "title": "Chapter 6",
+          "words": 0
+        }
+      ],
+      "signature": "block:verse|subhead1|chapter|chapter|chapter",
+      "stripped": "#\n\nSome text\n\nNever closed\n\nSecond\n\nChapter 3\n\nChapter 5\n\nChapter 6"
+    },
+    "structure_en": {
+      "lineInfo": [
+        {
+          "content": "Part One",
+          "marker": "part"
+        },
+        null,
+        {
+          "content": "Chapter One",
+          "marker": "chapter"
+        },
+        null,
+        null,
+        null,
+        null,
+        {
+          "content": "A Subhead",
+          "marker": "subhead1"
+        },
+        null,
+        {
+          "content": "Lower subhead",
+          "marker": "subhead2"
+        },
+        null,
+        {
+          "content": "A quoted paragraph.",
+          "marker": "quote"
+        },
+        {
+          "content": "",
+          "marker": "quote"
+        },
+        {
+          "content": "Second quoted paragraph.",
+          "marker": "quote"
+        },
+        null,
+        {
+          "content": "",
+          "marker": "scene"
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "content": "",
+          "marker": "scene"
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "content": "not a heading",
+          "marker": "chapter"
+        },
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "outline": [
+        {
+          "end": 11,
+          "level": 1,
+          "line": 1,
+          "lineEnd": 10,
+          "start": 0,
+          "title": "Part One",
+          "words": 0
+        },
+        {
+          "end": 527,
+          "level": 1,
+          "line": 3,
+          "lineEnd": 25,
+          "start": 12,
+          "title": "Chapter One",
+          "words": 90
+        },
+        {
+          "end": 527,
+          "level": 2,
+          "line": 8,
+          "lineEnd": 183,
+          "start": 171,
+          "title": "A Subhead",
+          "words": 71
+        },
+        {
+          "end": 527,
+          "level": 3,
+          "line": 10,
+          "lineEnd": 202,
+          "start": 185,
+          "title": "Lower subhead",
+          "words": 68
+        },
+        {
+          "end": 629,
+          "level": 1,
+          "line": 45,
+          "lineEnd": 543,
+          "start": 528,
+          "title": "not a heading",
+          "words": 6
+        }
+      ],
+      "signature": "part|chapter|subhead1|subhead2|quote|quote|quote|scene|block:verse|block:end|block:written-note|block:end|scene|chapter",
+      "stripped": "Part One\n\nChapter One\n\nRegular italic and bold and both text with code.\nInline markers: underlined small caps mono sans.\n\nA Subhead\n\nLower subhead\n\nA quoted paragraph.\n\nSecond quoted paragraph.\n\n* * *\n\nRoses are red\nViolets are blue\n\nA note written by a character.\n\n* * *\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\nnot a heading\n```\n\nA link and image.\n\nEpilogue"
+    }
+  }
+}
