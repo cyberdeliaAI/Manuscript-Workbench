@@ -40,7 +40,6 @@ const JOIN_CASES = [
   ['A long line that is not finished and keeps going on and on', '- list item'],
 ];
 const INLINE_CASES = [['*it*', 'italic'], ['**bo**', 'bold'], ['***bi***', 'italic'], ['[[u:x]]', 'u'], ['`m`', 'mono'], ['plain', 'bold']];
-const LIST_CASES = ['- item', '  * nested', '1. one', '2) two', '- [x] done', '- [ ] open', 'not a list'];
 
 function computeSnapshot(api, corpus) {
   const snap = { fixes: {}, diagnose: {}, structure: {}, chunks: {}, integrity: {}, misc: {} };
@@ -84,7 +83,6 @@ function computeSnapshot(api, corpus) {
     isSceneBreak: SCENE_CASES.map((s) => [s, api.isSceneBreak(s)]),
     shouldJoinLines: JOIN_CASES.map(([a, b]) => [a, b, api.shouldJoinLines(a, b)]),
     unwrapInlineText: INLINE_CASES.map(([s, k]) => [s, k, api.unwrapInlineText(s, k)]),
-    listItemInfo: LIST_CASES.map((s) => [s, plain(api.listItemInfo(s))]),
     escapeHtml: api.escapeHtml('<a href="x">&\'</a>'),
     cleanFilename: ['My Book: Part 1!', '', '../x', 'ok-name_1.2'].map((s) => [s, api.cleanFilename(s)]),
     safeFixSequence: [...api.SAFE_FIX_SEQUENCE],

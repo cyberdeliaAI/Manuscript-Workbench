@@ -84,3 +84,37 @@ test('local endpoint detection', () => {
     assert.equal(api.isLocalEndpointHost(host), false, host);
   }
 });
+
+test('storage layer: new keys, migration from the old vp.py.* keys, and failures never throw', () => {
+  const store = new Map();
+  const backend = { getItem: (k) => (store.has(k) ? store.get(k) : null), setItem: (k, v) => store.set(k, v), removeItem: (k) => store.delete(k) };
+  const storage = api.createStorage(backend);
+  assert.equal(storage.get('prompts'), null);
+  store.set('vp.py.prompts', '["old"]'); // written by an older version
+  assert.equal(storage.get('prompts'), '["old"]');
+  assert.equal(store.get('mwb.prompts'), '["old"]', 'migrated to the new key');
+  assert.equal(storage.set('prompts', ['new']), true);
+  assert.equal(storage.get('prompts'), 'new');
+  storage.remove('prompts');
+  assert.equal(storage.get('prompts'), null);
+  assert.equal(store.has('vp.py.prompts'), false, 'the old key is removed as well');
+});
+
+test('storage layer survives an unavailable or full backend', () => {
+  const broken = { getItem() { throw new Error('denied'); }, setItem() { throw new Error('quota'); }, removeItem() { throw new Error('denied'); } };
+  const storage = api.createStorage(broken);
+  assert.equal(storage.get('x'), null);
+  assert.equal(storage.set('x', '1'), false, 'callers can detect a full store');
+  assert.doesNotThrow(() => storage.remove('x'));
+  assert.equal(api.createStorage(null).get('x'), null);
+});
+
+test('prompt builders take their inputs as arguments (no DOM access)', () => {
+  const prep = { text: 'T', preserveStructure: true };
+  const rewrite = api.buildLmUserContent('Body', prep, 'rewrite', 'strong');
+  assert.ok(rewrite.includes('Rewrite strength for this task: strong.') && rewrite.includes('<<<BEGIN TEXT>>>\nBody\n<<<END TEXT>>>'));
+  assert.ok(!api.buildLmUserContent('Body', prep, 'clean', 'strong').includes('Rewrite strength'));
+  const guided = api.guidedUserContent('translate', 'Body', { guidance: ' keep names ', target: ' Dutch ' });
+  assert.ok(guided.includes('Target language: Dutch') && guided.includes('keep names'));
+  assert.ok(api.guidedUserContent('translate', 'Body').includes('Target language: English'));
+});

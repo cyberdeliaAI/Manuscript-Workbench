@@ -15,7 +15,7 @@ const EXPORTS = [
   'analyzeIntegrity', 'sanitizeLmFinalText', 'createNdjsonParser', 'isLocalEndpointHost', 'isDashProtectedLine',
   'makeChunks', 'makeHeadingSections', 'splitParagraphBlocks', 'makeParagraphChunks',
   'isSceneBreak', 'shouldJoinLines', 'isLikelyPageNumberLine', 'repeatedLineCandidates',
-  'escapeHtml', 'cleanFilename', 'listItemInfo', 'unwrapInlineText', 'inlineWrapper',
+  'escapeHtml', 'cleanFilename', 'createStorage', 'unwrapInlineText', 'inlineWrapper', 'buildLmUserContent', 'guidedUserContent',
 ];
 
 function makeStub() {

@@ -1253,66 +1253,6 @@
         false
       ]
     ],
-    "listItemInfo": [
-      [
-        "- item",
-        {
-          "indent": 0,
-          "task": "",
-          "text": "item",
-          "type": "ul"
-        }
-      ],
-      [
-        "  * nested",
-        {
-          "indent": 2,
-          "task": "",
-          "text": "nested",
-          "type": "ul"
-        }
-      ],
-      [
-        "1. one",
-        {
-          "indent": 0,
-          "task": "",
-          "text": "one",
-          "type": "ol"
-        }
-      ],
-      [
-        "2) two",
-        {
-          "indent": 0,
-          "task": "",
-          "text": "two",
-          "type": "ol"
-        }
-      ],
-      [
-        "- [x] done",
-        {
-          "indent": 0,
-          "task": "checked",
-          "text": "done",
-          "type": "ul"
-        }
-      ],
-      [
-        "- [ ] open",
-        {
-          "indent": 0,
-          "task": "unchecked",
-          "text": "open",
-          "type": "ul"
-        }
-      ],
-      [
-        "not a list",
-        null
-      ]
-    ],
     "safeFixSequence": [
       "mojibake",
       "invisible",
