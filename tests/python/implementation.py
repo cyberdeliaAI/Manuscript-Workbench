@@ -15,7 +15,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 # Leaf modules first: the defining module of a name must come before modules that merely import it.
 MODULE_ORDER = [
     "config", "deps", "http_util", "settings", "textio", "htmlimport", "netsafe", "structure",
-    "mdrender", "docx_import", "importers", "docx_export", "preflight", "ai", "project", "server",
+    "mdrender", "docx_import", "importers", "docx_export", "preflight", "epub_export", "ai", "project", "server",
 ]
 
 

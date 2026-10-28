@@ -136,7 +136,7 @@ Replace `<PID>` with the number shown by `lsof`. Or simply start a second copy o
 
 From top to bottom:
 
-- **Header bar** — the project status and filename display, and the `☰ Menu` with the project actions (`New`, `Open`, `Save`, `Save as`, `Snapshots`, `Export`/`Import project file`, see [section 18](#18-projects-snapshots-autosave-and-undo)) and the main file actions: `Load File`, `Import URL`, `Merge Folder`, `Undo`, `Clear`, `Export TXT`, `Export Markdown`, `Export DOCX`.
+- **Header bar** — the project status and filename display, and the `☰ Menu` with the project actions (`New`, `Open`, `Save`, `Save as`, `Snapshots`, `Export`/`Import project file`, see [section 18](#18-projects-snapshots-autosave-and-undo)) and the main file actions: `Load File`, `Import URL`, `Merge Folder`, `Undo`, `Clear`, `Export TXT`, `Export Markdown`, `Export DOCX`, `Export EPUB`.
 - **Recovery bar** — appears only when a previous autosave is found (see [section 18](#18-projects-snapshots-autosave-and-undo)).
 - **Stats bar** — live counts: characters, words, lines, chapters (`#` headings), subheads (`##`–`######` headings).
 - **Quick formatting bar** — text style dropdown, inline formatting buttons (B, I, U, SC, Mono, Sans), `Find`, `Preview`, `AI`, `Clean`, `Clear`.
@@ -784,9 +784,19 @@ Details:
 - Special manuscript blocks use clear named Word styles such as `Manuscript Verse`, `Manuscript Written Note`, and `Manuscript Block Quote`. In Word, you can restyle those centrally.
 - **Lists.** Lines that start with `- `, `* `, `+ ` or `1. ` / `1) ` become real Word lists, using Word's `List Bullet` / `List Number` styles (and `List Bullet 2`, `List Bullet 3`... for nested lists; indent a nested item by two spaces, four spaces or a tab). Every numbered list starts again at its own number, also when it starts at 5, and a sub-list starts again under every item. A blank line between items does not end a list. Lists nested deeper than three levels use the third level. Inside a `:::` block, list-looking lines stay ordinary text.
 - **Tables.** A pipe table (a header row, a `|---|---|` separator row, then the rows) becomes a real Word table in the `Table Grid` style: the header row is bold and repeats on every page, `:---:` / `---:` set the alignment of a column, inline markup works inside cells, `\|` is a pipe inside a cell, `<br>` is a line break inside a cell, and shorter rows are padded with empty cells.
-- If your dialogue lines start with a hyphen (`- Hello`), switch off `Book` → `Export` → `Turn Markdown lists into Word lists`; those lines then stay ordinary paragraphs. The setting is saved with the project.
+- If your dialogue lines start with a hyphen (`- Hello`), switch off `Book` → `Export` → `Turn Markdown lists into real lists`; those lines then stay ordinary paragraphs (in the EPUB too). The setting is saved with the project.
+- **Links.** `[text](https://example.org)` becomes a real Word hyperlink (also `mailto:`); other text in square brackets stays as it is.
 
-The DOCX round-trips: importing an exported DOCX back into the app restores the Markdown structure, including lists and tables.
+The DOCX round-trips: importing an exported DOCX back into the app restores the Markdown structure, including lists, tables and links.
+
+### Export EPUB
+
+`☰ Menu` → `Export EPUB` creates `<base>.epub`, an EPUB 3 e-book that opens in Apple Books, Kobo, Calibre and most other readers, and that publishing platforms accept for upload. It is built from the same Markdown as the DOCX, with the same rules: every line of text is a paragraph, and lists, tables, quotes, `***` scene breaks, links and the inline markers work as in the DOCX.
+
+- **Chapters.** Every `#` heading starts a new chapter file. Text before the first heading becomes a `Front matter` section (`Voorwerk` for Dutch books). `##` headings are listed under their chapter in the table of contents, which is generated for you (`Contents` / `Inhoud`).
+- **Metadata** comes from the `Book` tab: title and subtitle, author, language (`en`, `nl`, or any language code; `und` when it is empty), publisher, and series with its book number. With a title there is a title page. The book identifier is derived from title and author, so a new export of the same book keeps its identity.
+- **Special blocks.** `::: verse`, `::: note`, `::: text` and the other blocks become styled sections (indented verse, a bar next to written notes, sans-serif text conversations), centered text and attribution lines get their own style. The look is in a small stylesheet; readers let the reader choose the font.
+- **Not included:** images (a book with images needs them embedded; add them in a tool such as Calibre or Sigil), a cover, and custom fonts. The export has not been run through the official `epubcheck` validator; if a store rejects a file, open it in Calibre first.
 
 ## 18. Projects, Snapshots, Autosave, and Undo
 

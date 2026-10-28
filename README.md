@@ -87,7 +87,9 @@ Use **Export TXT** for clean plain text without Markdown structure characters.
 
 Use **Export Markdown** to keep the editable Markdown manuscript.
 
-Use **Export DOCX** for a formatted Word document.
+Use **Export DOCX** for a formatted Word document (Markdown lists and tables become real Word lists and tables).
+
+Use **Export EPUB** for an e-book (EPUB 3, chapters at `#` headings, built with the standard library only).
 
 Use **Save project as…** (in the `☰ Menu`) to keep the manuscript with its book details, ignored chapter candidates and
 prompts on disk. Projects autosave, keep a `.bak` of the previous version, and have snapshots that are taken before AI
@@ -104,7 +106,7 @@ manuscript_workbench/       the Python backend
   importers.py  docx_import.py  htmlimport.py  textio.py   file and URL import
   netsafe.py                  safe URL fetching for Import URL
   mdrender.py  structure.py   Markdown preview (sanitizer) and structure vocabulary
-  docx_export.py  preflight.py  export and preflight checks
+  docx_export.py  epub_export.py  preflight.py  export and preflight checks
   ai.py                       helpers for OpenAI-compatible providers
   project.py                  project files (.mwb.json), snapshots, atomic writes
 static/                     the frontend (served from /static/, no build step)

@@ -627,12 +627,20 @@
             "i": null,
             "sc": null,
             "style": "Default Paragraph Font",
-            "t": "A [link](https://example.com) and ![image](https://example.com/x.png).",
+            "t": "A ",
+            "u": null
+          },
+          {
+            "b": null,
+            "i": null,
+            "sc": null,
+            "style": "Default Paragraph Font",
+            "t": " and ![image](https://example.com/x.png).",
             "u": null
           }
         ],
         "style": "Normal",
-        "text": "A [link](https://example.com) and ![image](https://example.com/x.png)."
+        "text": "A link and ![image](https://example.com/x.png)."
       },
       {
         "align": null,

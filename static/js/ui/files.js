@@ -271,10 +271,10 @@ $('#exportMarkedTxtBtn').addEventListener('click', () => {
   const base = cleanFilename($('#metaFilename').value || state.currentFilename.replace(/\.[^.]+$/, ''));
   downloadBlob(new Blob([editor.value], { type: 'text/markdown;charset=utf-8' }), `${base}-markdown.md`);
 });
-$('#exportDocxBtn').addEventListener('click', async () => {
+async function exportBook(endpoint, fileName, doneMessage) {
   try {
     const base = cleanFilename($('#metaFilename').value || state.currentFilename.replace(/\.[^.]+$/, ''));
-    const res = await api('/api/export_docx', {
+    const res = await api(endpoint, {
       text: editor.value,
       metadata: getMetadata(),
       filename: base,
@@ -285,10 +285,16 @@ $('#exportDocxBtn').addEventListener('click', async () => {
       throw new Error(data.error || 'Export failed');
     }
     const blob = await res.blob();
-    downloadBlob(blob, `${base}-formatted.docx`);
-    toast('DOCX exported');
+    downloadBlob(blob, fileName(base));
+    toast(doneMessage);
   } catch (err) {
     alert(err.message);
     toast(err.message);
   }
-});
+}
+$('#exportDocxBtn').addEventListener('click', () =>
+  exportBook('/api/export_docx', (base) => `${base}-formatted.docx`, 'DOCX exported'),
+);
+$('#exportEpubBtn').addEventListener('click', () =>
+  exportBook('/api/export_epub', (base) => `${base}.epub`, 'EPUB exported'),
+);

@@ -32,7 +32,7 @@ try:
     from docx.enum.text import WD_ALIGN_PARAGRAPH
     from docx.oxml import OxmlElement
     from docx.oxml.ns import qn
-    from docx.shared import Pt
+    from docx.shared import Pt, RGBColor
 except Exception:  # pragma: no cover
     Document = None
     WD_STYLE_TYPE = None
@@ -40,3 +40,4 @@ except Exception:  # pragma: no cover
     OxmlElement = None
     qn = None
     Pt = None
+    RGBColor = None

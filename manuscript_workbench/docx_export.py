@@ -5,7 +5,7 @@ import io
 import re
 from typing import Any, Dict, List, Optional
 
-from .deps import Document, OxmlElement, Pt, WD_ALIGN_PARAGRAPH, WD_STYLE_TYPE, qn
+from .deps import Document, OxmlElement, Pt, RGBColor, WD_ALIGN_PARAGRAPH, WD_STYLE_TYPE, qn
 from .structure import (
     MARKDOWN_CONTAINER_RE,
     PARAGRAPH_STYLE_MAP,
@@ -159,11 +159,52 @@ INLINE_TOKEN_RE = re.compile(
 )
 
 
+LINK_RE = re.compile(r"(?<!!)\[([^\]\n]+)\]\(((?:https?://|mailto:)[^\s)]+)\)")  # not ![image](...)
+
+
+def add_hyperlink(paragraph: Any, label: str, url: str, doc: Any) -> None:
+    """A real Word hyperlink (an external relationship plus a w:hyperlink with the "Hyperlink" character style)."""
+    from docx.opc.constants import RELATIONSHIP_TYPE
+
+    try:
+        doc.styles["Hyperlink"]
+    except KeyError:
+        style = doc.styles.add_style("Hyperlink", WD_STYLE_TYPE.CHARACTER)
+        style.font.underline = True
+        style.font.color.rgb = RGBColor(0x05, 0x63, 0xC1)
+    link = OxmlElement("w:hyperlink")
+    link.set(qn("r:id"), paragraph.part.relate_to(url, RELATIONSHIP_TYPE.HYPERLINK, is_external=True))
+    run = OxmlElement("w:r")
+    properties = OxmlElement("w:rPr")
+    style_reference = OxmlElement("w:rStyle")
+    style_reference.set(qn("w:val"), doc.styles["Hyperlink"].style_id)
+    properties.append(style_reference)
+    run.append(properties)
+    text = OxmlElement("w:t")
+    text.set(qn("xml:space"), "preserve")
+    text.text = label
+    run.append(text)
+    link.append(run)
+    paragraph._p.append(link)
+
+
+def add_plain_runs(paragraph: Any, text: str, doc: Any) -> None:
+    """Text without markers: [label](http...) becomes a hyperlink, the rest ordinary runs."""
+    pos = 0
+    for match in LINK_RE.finditer(text):
+        if match.start() > pos:
+            paragraph.add_run(text[pos:match.start()])
+        add_hyperlink(paragraph, match.group(1), match.group(2), doc)
+        pos = match.end()
+    if pos < len(text):
+        paragraph.add_run(text[pos:])
+
+
 def add_marked_runs(paragraph: Any, text: str, doc: Any) -> None:
     pos = 0
     for m in INLINE_TOKEN_RE.finditer(text):
         if m.start() > pos:
-            paragraph.add_run(text[pos:m.start()])
+            add_plain_runs(paragraph, text[pos:m.start()], doc)
         token = m.group(0)
         if m.group(2):
             kind = m.group(2)
@@ -195,7 +236,7 @@ def add_marked_runs(paragraph: Any, text: str, doc: Any) -> None:
             paragraph.add_run(token)
         pos = m.end()
     if pos < len(text):
-        paragraph.add_run(text[pos:])
+        add_plain_runs(paragraph, text[pos:], doc)
 
 
 # ---- lists ----------------------------------------------------------------------------------------------

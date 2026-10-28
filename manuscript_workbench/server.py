@@ -29,6 +29,7 @@ from .ai import (
 from .config import APP_HOST, APP_NAME, APP_PORT, APP_VERSION, INDEX_PATH, STATIC_DIR, USER_GUIDE_PATH
 from .deps import Document, lxml_html, markdown_lib, requests, trafilatura
 from .docx_export import create_manuscript_docx
+from .epub_export import create_manuscript_epub
 from .htmlimport import html_import_options
 from .http_util import HELP_CSP, HttpError, _send_security_headers, bytes_response, content_security_policy, get_json_body, json_response, text_response
 from .importers import import_file
@@ -255,20 +256,25 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
             settings = payload.get("settings") if isinstance(payload.get("settings"), dict) else payload
             write_app_settings(settings)
             json_response(self, {"ok": True, "path": str(settings_path())})
-        elif path == "/api/export_docx":
+        elif path in ("/api/export_docx", "/api/export_epub"):
             payload = get_json_body(self)
             text = payload.get("text") or ""
             metadata = payload.get("metadata") or {}
             options = payload.get("options") if isinstance(payload.get("options"), dict) else {}
-            docx_bytes = create_manuscript_docx(text, metadata, options)
-            filename = safe_filename(payload.get("filename") or metadata.get("filename") or "manuscript") + "-formatted.docx"
+            base = safe_filename(payload.get("filename") or metadata.get("filename") or "manuscript")
+            if path == "/api/export_docx":
+                data = create_manuscript_docx(text, metadata, options)
+                content_type, filename = "application/vnd.openxmlformats-officedocument.wordprocessingml.document", f"{base}-formatted.docx"
+            else:
+                data = create_manuscript_epub(text, metadata, options)
+                content_type, filename = "application/epub+zip", f"{base}.epub"
             self.send_response(200)
-            self.send_header("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+            self.send_header("Content-Type", content_type)
             self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
-            self.send_header("Content-Length", str(len(docx_bytes)))
+            self.send_header("Content-Length", str(len(data)))
             _send_security_headers(self)
             self.end_headers()
-            self.wfile.write(docx_bytes)
+            self.wfile.write(data)
         elif path == "/api/preflight":
             payload = get_json_body(self)
             json_response(self, preflight(payload.get("text") or "", payload.get("metadata") or {}, payload.get("ignored_candidates")))

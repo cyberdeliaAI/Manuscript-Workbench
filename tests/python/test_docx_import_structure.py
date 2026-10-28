@@ -193,3 +193,31 @@ def test_round_trip_of_lists_and_tables(mw):
 def test_round_trip_with_lists_switched_off_keeps_literal_markers(mw):
     text, notes = mw.import_docx_bytes(mw.create_manuscript_docx("- a\n- b", {}, {"lists": False}))
     assert text.strip() == "- a\n- b" and not any("list items" in n for n in notes)
+
+
+def test_markdown_links_become_real_word_hyperlinks_and_come_back(mw):
+    source = "See [the page](https://example.org/a?x=1&y=2), **bold** and [mail](mailto:a@b.c); [not a link](ftp://x) stays text."
+    data = mw.create_manuscript_docx(source, {})
+    from docx import Document
+    from docx.opc.constants import RELATIONSHIP_TYPE as RT
+
+    doc = Document(io.BytesIO(data))
+    targets = sorted(r.target_ref for r in doc.part.rels.values() if r.reltype == RT.HYPERLINK)
+    assert targets == ["https://example.org/a?x=1&y=2", "mailto:a@b.c"]
+    assert doc.paragraphs[0].text == "See the page, bold and mail; [not a link](ftp://x) stays text."
+    text, _ = mw.import_docx_bytes(data)
+    assert text.strip() == source
+
+
+def test_links_work_inside_list_items_and_table_cells(mw):
+    source = "- item with [a link](https://a.example)\n\n| h | k |\n|---|---|\n| [cell](https://c.example) | x |"
+    text, _ = mw.import_docx_bytes(mw.create_manuscript_docx(source, {}))
+    assert "- item with [a link](https://a.example)" in text and "| [cell](https://c.example) | x |" in text
+
+
+def test_markdown_images_are_not_mistaken_for_links(mw):
+    source = "A [link](https://example.com) and ![image](https://example.com/x.png)."
+    from docx import Document
+
+    doc = Document(io.BytesIO(mw.create_manuscript_docx(source, {})))
+    assert doc.paragraphs[0].text == "A link and ![image](https://example.com/x.png)."
