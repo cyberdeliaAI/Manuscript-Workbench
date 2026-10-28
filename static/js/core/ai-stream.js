@@ -84,3 +84,34 @@ export function isLocalEndpointHost(host) {
     (a === 169 && b === 254)
   );
 }
+
+function formatTokens(n) {
+  return n >= 1000 ? `${+(n / 1024).toFixed(1)}k` : String(n);
+}
+/** The text of a model in the model list: its id and what the provider told us about it. */
+export function modelLabel(id, info = {}) {
+  const parts = [id];
+  if (info.loaded === true) parts.push('loaded');
+  else if (info.loaded === false) parts.push('not loaded');
+  const context = info.contextLength || info.maxContextLength;
+  if (context) parts.push(`${formatTokens(context)} context`);
+  if (info.quantization) parts.push(info.quantization);
+  return parts.join(' · ');
+}
+/** A sentence about the selected model, and the chunk size that fits its context ({ text, chunkSize }). */
+export function modelHint(info, suggest) {
+  if (!info) return { text: '', chunkSize: 0 };
+  const number = (n) => n.toLocaleString('en-US');
+  if (info.loaded === false)
+    return {
+      text: `Not loaded yet: the provider loads it on the first request, which can take a while.${info.maxContextLength ? ` Maximum context ${number(info.maxContextLength)} tokens.` : ''}`,
+      chunkSize: 0,
+    };
+  const context = info.contextLength;
+  if (!context) return { text: '', chunkSize: 0 };
+  const chunkSize = suggest(context);
+  return {
+    text: `Context window ${number(context)} tokens. A chunk size of about ${number(chunkSize)} characters fits.`,
+    chunkSize,
+  };
+}

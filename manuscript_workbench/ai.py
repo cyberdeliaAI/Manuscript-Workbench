@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 import urllib.parse
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from .http_util import HttpError
 
@@ -88,3 +88,83 @@ def ai_request_headers(api_key: str = "") -> Dict[str, str]:
     if key:
         headers["Authorization"] = f"Bearer {key}"
     return headers
+
+
+# ---- what the provider says about its models -----------------------------------------------------------------
+
+# Names under which providers report how much context a model has (vLLM-style servers, OpenRouter, llama.cpp, LM Studio).
+CONTEXT_KEYS = ("max_model_len", "context_length", "context_window", "max_context_length", "n_ctx", "max_context")
+
+
+def _positive_int(value: Any) -> int:
+    try:
+        number = int(value)
+    except (TypeError, ValueError):
+        return 0
+    return number if number > 0 else 0
+
+
+def provider_root_url(base_url: str) -> str:
+    """The server address without the trailing /v1 (where LM Studio keeps its own /api/... endpoints)."""
+    base = base_url.rstrip("/")
+    return base[:-3] if base.endswith("/v1") else base
+
+
+def parse_openai_models(data: Any) -> List[Dict[str, Any]]:
+    """The entries of GET /v1/models as [{"id": ..., "contextLength": n}]; contextLength only when the provider says."""
+    items = data.get("data") if isinstance(data, dict) else None
+    models: List[Dict[str, Any]] = []
+    for item in items if isinstance(items, list) else []:
+        if not isinstance(item, dict) or not item.get("id"):
+            continue
+        entry: Dict[str, Any] = {"id": str(item["id"])}
+        for key in CONTEXT_KEYS:
+            number = _positive_int(item.get(key))
+            if number:
+                entry["contextLength"] = number
+                break
+        models.append(entry)
+    return models
+
+
+def parse_lmstudio_models(payload: Any) -> Dict[str, Dict[str, Any]]:
+    """Details from LM Studio's own model list (GET /api/v0/models, or the newer /api/v1/models), by model id.
+
+    Both shapes are read leniently, because what a given LM Studio version offers is not guaranteed:
+    {"type": "llm" | "vlm" | "embeddings", "loaded": bool, "contextLength": loaded context, "maxContextLength": n,
+     "quantization": "Q4_K_M"} with the keys left out when the server does not say.
+    """
+    items = None
+    if isinstance(payload, dict):
+        items = payload.get("data") if isinstance(payload.get("data"), list) else payload.get("models")
+    details: Dict[str, Dict[str, Any]] = {}
+    for item in items if isinstance(items, list) else []:
+        if not isinstance(item, dict):
+            continue
+        model_id = item.get("id") or item.get("key") or item.get("model_key")
+        if not model_id:
+            continue
+        info: Dict[str, Any] = {}
+        if isinstance(item.get("type"), str):
+            info["type"] = item["type"]
+        instances = item.get("loaded_instances")
+        if item.get("state") in ("loaded", "not-loaded"):
+            info["loaded"] = item["state"] == "loaded"
+        elif isinstance(instances, list):
+            info["loaded"] = bool(instances)
+        loaded_context = _positive_int(item.get("loaded_context_length"))
+        if not loaded_context and isinstance(instances, list) and instances and isinstance(instances[0], dict):
+            config = instances[0].get("config")
+            loaded_context = _positive_int(config.get("context_length")) if isinstance(config, dict) else 0
+        if loaded_context:
+            info["contextLength"] = loaded_context
+        maximum = _positive_int(item.get("max_context_length"))
+        if maximum:
+            info["maxContextLength"] = maximum
+        quantization = item.get("quantization")
+        if isinstance(quantization, dict):
+            quantization = quantization.get("name")
+        if isinstance(quantization, str) and quantization:
+            info["quantization"] = quantization
+        details[str(model_id)] = info
+    return details

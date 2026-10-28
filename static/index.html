@@ -177,7 +177,7 @@
                 <div class="lm-field"><label for="lmProvider">Provider</label><select id="lmProvider"><option value="lmstudio">LM Studio (easy GUI)</option><option value="omlx">oMLX (Mac MLX)</option><option value="ollama">Ollama (cross-platform)</option><option value="custom">Custom OpenAI-compatible</option></select></div>
                 <div class="lm-field"><label for="lmBase">Endpoint</label><input id="lmBase" type="text" value="http://localhost:1234/v1" spellcheck="false"></div>
                 <div class="lm-field"><label for="lmApiKey">API Key</label><input id="lmApiKey" type="password" placeholder="optional; required by some providers such as oMLX" spellcheck="false" autocomplete="off"></div>
-                <div class="lm-field"><label for="lmModel">Model</label><select id="lmModel"><option value="">Detect first available model</option></select></div>
+                <div class="lm-field"><label for="lmModel">Model</label><select id="lmModel"><option value="">Detect first available model</option></select><div class="hint" id="modelHint"></div><button id="useChunkSizeBtn" class="mini" hidden>Use this chunk size</button></div>
                 <div class="lm-grid"><button id="detectModelBtn">Detect Model</button><button id="lmTestBtn">Test</button></div>
               </div>
             </div>

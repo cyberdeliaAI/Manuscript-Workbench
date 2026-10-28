@@ -14,6 +14,9 @@ The requested model name selects the scenario:
                (two paragraphs out of three are reworded, the third is returned unchanged)
   flaky        like rewrite, but the first attempt for each input fails with HTTP 500
   fail-marked  like rewrite, but an input that contains FAILME always fails with HTTP 500
+
+GET /v1/models can carry extra fields per model (model_info) and GET /api/v0/models can answer like LM Studio's
+own model list (lmstudio_models).
 """
 from __future__ import annotations
 
@@ -58,10 +61,18 @@ def text_of_request(body: Dict[str, Any]) -> str:
 
 
 class MockOpenAI:
-    def __init__(self, api_key: Optional[str] = None, models: Optional[List[str]] = None) -> None:
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        models: Optional[List[str]] = None,
+        model_info: Optional[Dict[str, Dict[str, Any]]] = None,
+        lmstudio_models: Optional[List[Dict[str, Any]]] = None,
+    ) -> None:
         self.requests: List[Dict[str, Any]] = []
         self.api_key = api_key
         self.models = models or ["normal"]
+        self.model_info = model_info or {}  # extra fields per model id in GET /v1/models (e.g. context_length)
+        self.lmstudio_models = lmstudio_models  # when set, GET /api/v0/models answers like LM Studio's own list
         self.slow_client_gone = threading.Event()
         self.slow_started = threading.Event()
         self.attempts: Dict[str, int] = {}  # how often each input was requested (for the flaky scenario)
@@ -91,7 +102,9 @@ class MockOpenAI:
                     self._send(401, b'{"error":"API key required"}')
                     return
                 if self.path.rstrip("/") == "/v1/models":
-                    self._send(200, json.dumps({"data": [{"id": m} for m in outer.models]}).encode())
+                    self._send(200, json.dumps({"data": [{"id": m, **outer.model_info.get(m, {})} for m in outer.models]}).encode())
+                elif self.path.rstrip("/") == "/api/v0/models" and outer.lmstudio_models is not None:
+                    self._send(200, json.dumps({"object": "list", "data": outer.lmstudio_models}).encode())
                 else:
                     self._send(404, b"not found", "text/plain")
 

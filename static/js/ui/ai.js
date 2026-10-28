@@ -1,7 +1,8 @@
 // AI tab: provider setup and the entry points for rewrite/clean/guided/translate runs. The runs themselves are in
 // ai-run.js, the request to the provider in ai-request.js.
 import { state } from './state.js';
-import { headingSplitNote, makeChunks, makeHeadingSections } from '../core/chunking.js';
+import { modelHint, modelLabel } from '../core/ai-stream.js';
+import { headingSplitNote, makeChunks, makeHeadingSections, suggestChunkSize } from '../core/chunking.js';
 import { withGlossary } from '../core/glossary.js';
 import {
   DEFAULT_PROMPTS,
@@ -30,32 +31,65 @@ export function updateProviderUi() {
   $('#lmStatus').textContent = `${provider.label} idle.`;
 }
 $('#detectModelBtn').addEventListener('click', detectModels);
+let modelDetails = {}; // what the provider told us about each model on the last Detect (context, loaded, ...)
+
+async function fetchModels(action) {
+  const res = await api('/api/lm_models', {
+    base_url: $('#lmBase').value,
+    provider: $('#lmProvider').value,
+    api_key: $('#lmApiKey').value,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `${action} failed`);
+  const details = data.details || {};
+  const ids = data.models || [];
+  // Embedding models cannot write text. Models that are loaded come first.
+  const chat = ids.filter((id) => details[id]?.type !== 'embeddings');
+  chat.sort((a, b) => Number(details[b]?.loaded === true) - Number(details[a]?.loaded === true));
+  return { data, details, chat, skipped: ids.length - chat.length };
+}
+function modelSummary(provider, found) {
+  const loaded = found.chat.filter((id) => found.details[id]?.loaded === true).length;
+  const parts = [`${found.chat.length} model${found.chat.length === 1 ? '' : 's'}`];
+  if (loaded) parts.push(`${loaded} loaded`);
+  if (found.skipped) parts.push(`${found.skipped} embedding model${found.skipped === 1 ? '' : 's'} left out`);
+  return `${provider.label}: ${parts.join(', ')}.`;
+}
+export function updateModelHint() {
+  const hint = modelHint(modelDetails[$('#lmModel').value], suggestChunkSize);
+  $('#modelHint').textContent = hint.text;
+  const btn = $('#useChunkSizeBtn');
+  btn.hidden = !hint.chunkSize;
+  btn.dataset.size = String(hint.chunkSize || '');
+}
+$('#lmModel').addEventListener('change', updateModelHint);
+$('#useChunkSizeBtn').addEventListener('click', () => {
+  $('#chunkSize').value = $('#useChunkSizeBtn').dataset.size;
+  saveSettings();
+  toast(`Chunk size set to ${$('#chunkSize').value} characters`);
+});
 async function detectModels() {
   const provider = currentAiProvider();
   try {
     $('#lmStatus').textContent = `Detecting ${provider.label} models...`;
-    const res = await api('/api/lm_models', {
-      base_url: $('#lmBase').value,
-      provider: $('#lmProvider').value,
-      api_key: $('#lmApiKey').value,
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Detect failed');
+    const found = await fetchModels('Detect');
     const sel = $('#lmModel');
     const previous = sel.value;
     resetModelSelect();
-    (data.models || []).forEach((id) => {
+    modelDetails = found.details;
+    found.chat.forEach((id) => {
       const opt = document.createElement('option');
       opt.value = id;
-      opt.textContent = id;
+      opt.textContent = modelLabel(id, found.details[id]);
       sel.appendChild(opt);
     });
-    if ((data.models || []).length) {
-      sel.value = previous && (data.models || []).includes(previous) ? previous : data.models[0];
-      $('#lmBase').value = data.base_url || $('#lmBase').value;
-      $('#lmStatus').textContent = `${provider.label}: detected ${(data.models || []).length} model(s).`;
+    if (found.chat.length) {
+      sel.value = previous && found.chat.includes(previous) ? previous : found.chat[0];
+      $('#lmBase').value = found.data.base_url || $('#lmBase').value;
+      $('#lmStatus').textContent = modelSummary(provider, found);
       saveSettings();
     } else $('#lmStatus').textContent = `${provider.label}: connection OK, but no models returned.`;
+    updateModelHint();
   } catch (err) {
     $('#lmStatus').textContent = err.message;
     toast(`${provider.label} detect failed`);
@@ -65,15 +99,9 @@ $('#lmTestBtn').addEventListener('click', async () => {
   const provider = currentAiProvider();
   try {
     $('#lmStatus').textContent = `Testing ${provider.label} connection...`;
-    const res = await api('/api/lm_models', {
-      base_url: $('#lmBase').value,
-      provider: $('#lmProvider').value,
-      api_key: $('#lmApiKey').value,
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Test failed');
-    $('#lmStatus').textContent = (data.models || []).length
-      ? `${provider.label} connection OK. ${(data.models || []).length} model(s) available.`
+    const found = await fetchModels('Test');
+    $('#lmStatus').textContent = found.chat.length
+      ? `Connection OK. ${modelSummary(provider, found)}`
       : `${provider.label} connection OK, but no models returned.`;
     toast(`${provider.label} connection OK`);
   } catch (err) {

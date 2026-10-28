@@ -89,6 +89,7 @@ export async function streamOne(promptText, inputText, onText) {
     throw new Error(msg || `${provider.label} request failed`);
   }
   let thinking = false,
+    thinkingSince = 0,
     shownState = '';
   const parser = createNdjsonParser((ev) => {
     if (ev.t === 'delta') {
@@ -100,9 +101,11 @@ export async function streamOne(promptText, inputText, onText) {
     } else if (ev.t === 'reasoning') {
       if (!thinking) {
         thinking = true;
+        thinkingSince = Date.now();
         shownState = $('#streamState').textContent;
-        $('#streamState').textContent = `${shownState} · thinking...`;
       }
+      const seconds = Math.round((Date.now() - thinkingSince) / 1000);
+      $('#streamState').textContent = `${shownState} · thinking${seconds ? ` ${seconds} s` : '...'}`;
     } else if (ev.t === 'finish') {
       info.finishReasons.push(ev.reason);
     } else if (ev.t === 'error') {

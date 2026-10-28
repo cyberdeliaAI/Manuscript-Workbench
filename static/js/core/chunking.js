@@ -113,3 +113,14 @@ export function headingSplitNote(sections) {
     );
   return notes.join(' ');
 }
+
+/**
+ * A chunk size (in characters) that a model with this context window (in tokens) can rewrite in one go: the answer
+ * is about as long as the text, and part of the window goes to the prompt. 0 when the window is not known.
+ */
+export function suggestChunkSize(contextTokens) {
+  const tokens = Number(contextTokens);
+  if (!Number.isFinite(tokens) || tokens <= 0) return 0;
+  const chars = Math.floor((((tokens - 1500) / 2) * 3.5) / 100) * 100;
+  return Math.min(12000, Math.max(1200, chars));
+}

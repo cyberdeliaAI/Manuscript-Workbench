@@ -17,7 +17,15 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Dict
 
-from .ai import ThinkStripper, ai_request_headers, normalize_base_url, validate_ai_base_url
+from .ai import (
+    ThinkStripper,
+    ai_request_headers,
+    normalize_base_url,
+    parse_lmstudio_models,
+    parse_openai_models,
+    provider_root_url,
+    validate_ai_base_url,
+)
 from .config import APP_HOST, APP_NAME, APP_PORT, APP_VERSION, INDEX_PATH, STATIC_DIR, USER_GUIDE_PATH
 from .deps import Document, lxml_html, markdown_lib, requests, trafilatura
 from .docx_export import create_manuscript_docx
@@ -318,11 +326,29 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
             raise RuntimeError("requests is not installed. Run: pip install -r requirements.txt")
         payload = get_json_body(self)
         base_url = validate_ai_base_url(normalize_base_url(payload.get("base_url") or "", payload.get("provider") or "lmstudio"))
-        resp = requests.get(f"{base_url}/models", headers=ai_request_headers(payload.get("api_key") or ""), timeout=8)
-        resp.raise_for_status()
-        data = resp.json()
-        models = [m.get("id") for m in data.get("data", []) if m.get("id")]
-        json_response(self, {"models": models, "base_url": base_url})
+        headers = ai_request_headers(payload.get("api_key") or "")
+        try:
+            resp = requests.get(f"{base_url}/models", headers=headers, timeout=8)
+            resp.raise_for_status()
+            listed = parse_openai_models(resp.json())
+        except (requests.RequestException, ValueError) as exc:
+            raise _provider_failure(exc, base_url) from None
+        details: Dict[str, Dict[str, Any]] = {m["id"]: {"contextLength": m["contextLength"]} for m in listed if "contextLength" in m}
+        lmstudio = False
+        if (payload.get("provider") or "lmstudio").lower() == "lmstudio":
+            for path in ("/api/v0/models", "/api/v1/models"):
+                try:
+                    extra = requests.get(provider_root_url(base_url) + path, headers=headers, timeout=4)
+                    extra.raise_for_status()
+                    found = parse_lmstudio_models(extra.json())
+                except (requests.RequestException, ValueError):
+                    continue
+                if found:
+                    lmstudio = True
+                    for model_id, info in found.items():
+                        details.setdefault(model_id, {}).update(info)
+                    break
+        json_response(self, {"models": [m["id"] for m in listed], "base_url": base_url, "details": details, "lmstudioApi": lmstudio})
 
     def _emit(self, event: Dict[str, Any]) -> None:
         self.wfile.write((json.dumps(event, ensure_ascii=False) + "\n").encode("utf-8"))
@@ -331,8 +357,9 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
     def handle_lm_stream(self) -> None:
         """Proxy a chat completion and re-frame it as newline-delimited JSON events:
 
-        {"t":"delta","text":...}  visible text            {"t":"reasoning"} / {"t":"ping"}  keep-alive while waiting
-        {"t":"finish","reason":...}  provider finish_reason   {"t":"done"}  the stream ended cleanly
+        {"t":"delta","text":...}  visible text            {"t":"finish","reason":...}  provider finish_reason
+        {"t":"reasoning","chars":n}  the model is thinking (its reasoning is never sent, only how much of it there is)
+        {"t":"ping"}  keep-alive while waiting             {"t":"done"}  the stream ended cleanly
         {"t":"error","message":...}  the stream failed. A stream without "done" is always incomplete.
         """
         if requests is None:
@@ -372,9 +399,18 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
         finished = False
         done = False
         last_write = time.monotonic()
-        with requests.post(f"{base_url}/chat/completions", json=body, headers=headers, stream=True, timeout=(10, 300)) as resp:
+        last_reasoning = None  # when the last "reasoning" event went out
+        reasoning_chars = 0
+        thinking = False
+        try:
+            upstream = requests.post(f"{base_url}/chat/completions", json=body, headers=headers, stream=True, timeout=(10, 300))
+        except requests.RequestException as exc:
+            raise _provider_failure(exc, base_url) from None
+        with upstream as resp:
+            if resp.status_code in (401, 403):
+                raise HttpError(502, f"The provider refused the request (HTTP {resp.status_code}). Check the API Key field.")
             if resp.status_code >= 400:
-                raise RuntimeError(resp.text[:4000])
+                raise RuntimeError(f"The provider answered with HTTP {resp.status_code}: {resp.text[:4000]}")
             self.send_response(200)
             self.send_header("Content-Type", "application/x-ndjson; charset=utf-8")
             _send_security_headers(self)
@@ -408,11 +444,15 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
                     if content is None:
                         content = (choice.get("message") or {}).get("content")
                     wrote = False
+                    reasoning = delta.get("reasoning_content") or delta.get("reasoning")
+                    if isinstance(reasoning, str):
+                        reasoning_chars += len(reasoning)
                     if isinstance(content, str) and content:
                         visible = stripper.feed(content)
                         if visible:
                             self._emit({"t": "delta", "text": visible})
                             wrote = True
+                    thinking = bool(reasoning) or stripper.in_think
                     finish_reason = choice.get("finish_reason")
                     if finish_reason:
                         rest = stripper.flush()
@@ -423,11 +463,14 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
                         wrote = True
                     if wrote:
                         last_write = now
+                    elif thinking and (last_reasoning is None or now - last_reasoning >= 0.5):
+                        # A reasoning model is thinking: tell the browser at once (never what it thinks) so it can say so.
+                        self._emit({"t": "reasoning", "chars": reasoning_chars})
+                        last_reasoning = last_write = now
                     elif now - last_write >= 1.0:
-                        # Nothing visible for a while (a reasoning model is thinking). Writing a line also lets us
-                        # notice a closed browser connection, so leaving this block stops the provider's generation.
-                        kind = "reasoning" if (delta.get("reasoning_content") or delta.get("reasoning")) else "ping"
-                        self._emit({"t": kind})
+                        # Nothing for a while. Writing a line also lets us notice a closed browser connection, so
+                        # leaving this block stops the provider's generation.
+                        self._emit({"t": "reasoning", "chars": reasoning_chars} if thinking else {"t": "ping"})
                         last_write = now
                 rest = stripper.flush()
                 if rest:
@@ -443,6 +486,25 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
                     self._emit({"t": "error", "message": f"The connection to the AI provider was lost: {exc}"})
                 except (BrokenPipeError, ConnectionResetError):
                     pass
+
+
+def _provider_failure(exc: Exception, base_url: str) -> HttpError:
+    """A short, actionable message for a failed call to the AI provider."""
+    response = getattr(exc, "response", None)
+    if response is not None:
+        code = response.status_code
+        if code in (401, 403):
+            return HttpError(502, f"The provider refused the request (HTTP {code}). Check the API Key field.")
+        if code == 404:
+            return HttpError(502, f"The provider has no model list at {base_url}/models (HTTP 404). The endpoint should end in /v1.")
+        return HttpError(502, f"The provider answered with HTTP {code}.")
+    if isinstance(exc, requests.exceptions.ConnectionError):
+        return HttpError(502, f"Cannot connect to the AI provider at {base_url}. Is it running, with its server enabled?")
+    if isinstance(exc, requests.exceptions.Timeout):
+        return HttpError(502, f"The AI provider at {base_url} did not answer in time.")
+    if isinstance(exc, ValueError):
+        return HttpError(502, f"The AI provider at {base_url} did not return a model list. Is the endpoint right (it should end in /v1)?")
+    return HttpError(502, f"The AI provider could not be reached: {exc}")
 
 
 def main() -> int:

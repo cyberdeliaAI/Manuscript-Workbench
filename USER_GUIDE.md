@@ -564,11 +564,17 @@ If no model is selected, the app asks the provider for its model list and uses t
 
 **Remote endpoints.** The endpoint normally points at your own machine or LAN. If it points anywhere else, the app asks you to confirm (once per host per session) before it sends any manuscript text, because that text would leave your network. An endpoint must be a plain `http://` or `https://` URL without embedded credentials; use the API Key field instead.
 
-**LM Studio**: open LM Studio → load a model → start the Local Server → Detect Model here.
+**LM Studio**: open LM Studio → load a model → start the Local Server → Detect Model here. For LM Studio the app also asks LM Studio's own model list (`/api/v0/models`, or `/api/v1/models` in newer versions) what it knows: models that are loaded come first in the dropdown, each entry shows `loaded` / `not loaded`, the context size and the quantization, and embedding models (which cannot write text) are left out. If your LM Studio version does not offer that list the app silently falls back to the plain model list.
 
 **oMLX**: start oMLX and its OpenAI-compatible server → choose oMLX here → paste the oMLX API key if required → Detect Model. If the oMLX log shows `GET /v1/models -> 401: API key required`, the endpoint is reachable but the key is missing or wrong.
 
 **Ollama**: `ollama pull <model>` and make sure Ollama is running → Detect Model.
+
+### What the app learns about a model
+
+`Detect Model` and `Test` read the provider's model list. When the provider reports how much context a model has (LM Studio does; some other servers do under names such as `context_length` or `max_model_len`), the line under `Model` says so and suggests a `Chunk size` that fits: the answer is about as long as the text, so roughly half of what is left of the window after the prompt, between 1,200 and 12,000 characters. `Use this chunk size` copies the suggestion into the field; it never changes by itself. oMLX and Ollama are asked only for the standard `/v1/models`, so they show no context information unless they include it there.
+
+When a call to the provider fails the message says what to do: `Cannot connect ... Is it running, with its server enabled?`, `The provider refused the request (HTTP 401). Check the API Key field.`, or a hint about the `/v1` in the endpoint.
 
 ### Prompt presets
 
@@ -623,7 +629,7 @@ Every AI action opens a before/after preview that streams the output live:
 - `auto-scroll` follows the generation; `Bottom` jumps to the end;
 - `Stop generation` aborts the request in flight. Stopping also closes the connection to the provider, so a local model stops generating. The text of the section that was being written is thrown away, because it is incomplete; sections that were already finished stay (see [Sections, resuming and retrying](#sections-resuming-and-retrying));
 - if the provider connection drops or the stream ends before the provider says it is finished, that request counts as failed and its incomplete output **cannot** be applied;
-- reasoning models: while the model is thinking the status shows `thinking...`; the reasoning itself is never added to your text;
+- reasoning models: while the model is thinking the status shows `thinking... 12 s` (this works both for models that send their reasoning separately and for models that put it in `<think>` tags); the reasoning itself is never shown and never added to your text;
 - `Apply change` replaces the original text with the result — nothing touches your manuscript until you click it. If some sections did not finish, the button reads `Apply finished sections`;
 - closing the modal keeps the result available behind the `Show Preview` button in the AI tab.
 

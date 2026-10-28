@@ -195,6 +195,6 @@ def test_http_lm_models_with_api_key(server):
         ok = server.request("POST", "/api/lm_models", body={"base_url": provider.base_url, "api_key": "secret"})
         assert ok[0] == 200
         bad = server.request("POST", "/api/lm_models", body={"base_url": provider.base_url, "api_key": "wrong"})
-        assert bad[0] == 500 and "401" in json.loads(bad[2])["error"]
+        assert bad[0] == 502 and "401" in json.loads(bad[2])["error"] and "API Key" in json.loads(bad[2])["error"]
     finally:
         provider.stop()

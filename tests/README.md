@@ -43,8 +43,9 @@ conflict detection, retention, path safety, the HTTP routes and the project file
 ## Mock provider
 
 `tests/python/mock_openai.py` is a stdlib OpenAI-compatible server. The requested *model name* selects the scenario
-(`normal`, `think`, `think-split`, `reasoning`, `length`, `abort`, `slow`, `error500`), so streaming code can be tested
-without LM Studio or oMLX.
+(`normal`, `think`, `think-split`, `reasoning`, `length`, `abort`, `slow`, `error500`, and for review and resumable runs
+`rewrite`, `flaky`, `fail-marked`), so streaming code can be tested without LM Studio or oMLX. It can also report model
+details (`model_info`) and answer like LM Studio's own model list (`lmstudio_models`).
 
 ## Writing test sources
 
