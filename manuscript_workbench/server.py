@@ -26,6 +26,7 @@ from .http_util import HELP_CSP, HttpError, _send_security_headers, bytes_respon
 from .importers import import_file
 from .mdrender import render_help_page, render_markdown_html
 from .netsafe import fetch_url_bytes
+from . import project
 from .preflight import preflight
 from .settings import read_app_settings, scrub_stored_secrets, settings_path, write_app_settings
 from .textio import decode_text_bytes, normalize_imported_text, safe_filename
@@ -108,7 +109,10 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
                 raise HttpError(403, "Missing or invalid session token. Reload the page.")
 
     def _send_http_error(self, exc: HttpError) -> None:
-        json_response(self, {"error": exc.message}, status=exc.status)
+        body = {"error": exc.message}
+        if exc.code:
+            body["code"] = exc.code
+        json_response(self, body, status=exc.status)
 
     # ---- verbs ----------------------------------------------------------------------------------
 
@@ -259,10 +263,51 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
         elif path == "/api/preflight":
             payload = get_json_body(self)
             json_response(self, preflight(payload.get("text") or "", payload.get("metadata") or {}, payload.get("ignored_candidates")))
+        elif path.startswith("/api/projects/"):
+            self._route_projects(path[len("/api/projects/"):])
         elif path == "/api/lm_models":
             self.handle_lm_models()
         elif path == "/api/lm_stream":
             self.handle_lm_stream()
+        else:
+            text_response(self, "Not found", HTTPStatus.NOT_FOUND)
+
+    # ---- projects and snapshots -------------------------------------------------------------------
+
+    def _route_projects(self, action: str) -> None:
+        payload = get_json_body(self)
+        pid = payload.get("id")
+        if action == "list":
+            json_response(self, {"projects": project.list_projects(), "dir": str(project.projects_dir())})
+        elif action == "open":
+            json_response(self, {"project": project.read_project(pid)})
+        elif action == "save":
+            saved = project.save_project(
+                payload.get("name") or "",
+                payload.get("project"),
+                project_id=pid or None,
+                base_updated_at=payload.get("baseUpdatedAt"),
+                create_only=bool(payload.get("createOnly")),
+                force=bool(payload.get("force")),
+                periodic_snapshot=bool(payload.get("periodicSnapshot")),
+            )
+            json_response(self, {"saved": saved})
+        elif action == "delete":
+            project.delete_project(pid)
+            json_response(self, {"ok": True})
+        elif action == "snapshots/list":
+            json_response(self, {"snapshots": project.list_snapshots(pid)})
+        elif action == "snapshots/create":
+            snapshot = project.create_snapshot(pid, payload.get("text"), kind=payload.get("kind") or "manual",
+                                               label=payload.get("label") or "", reason=payload.get("reason") or "")
+            json_response(self, {"snapshot": snapshot})
+        elif action == "snapshots/get":
+            json_response(self, {"snapshot": project.get_snapshot(pid, payload.get("snapshotId"))})
+        elif action == "snapshots/restore":
+            json_response(self, project.restore_snapshot(pid, payload.get("snapshotId"), payload.get("currentText")))
+        elif action == "snapshots/delete":
+            project.delete_snapshot(pid, payload.get("snapshotId"))
+            json_response(self, {"ok": True})
         else:
             text_response(self, "Not found", HTTPStatus.NOT_FOUND)
 

@@ -11,10 +11,11 @@ from .config import MAX_JSON_BYTES
 class HttpError(Exception):
     """An error with a specific HTTP status that is safe to show to the client."""
 
-    def __init__(self, status: int, message: str) -> None:
+    def __init__(self, status: int, message: str, code: str = "") -> None:
         super().__init__(message)
         self.status = status
         self.message = message
+        self.code = code  # a short machine-readable reason (e.g. "conflict") the client can act on
 
 
 def content_security_policy(allow_remote_images: bool = False) -> str:

@@ -37,6 +37,7 @@ class LiveServer:
         self.port = port
         self.settings_path = settings_path
         self.token = token
+        self.projects_dir = settings_path.parent / "projects"
 
     def request(
         self,
@@ -68,6 +69,7 @@ def server(mw, tmp_path, monkeypatch):
     """The real request handler on an ephemeral loopback port; settings go to tmp_path."""
     settings_path = tmp_path / "manuscript_workbench_settings.json"
     monkeypatch.setattr(mw, "SETTINGS_PATH", settings_path)
+    monkeypatch.setattr(mw, "PROJECTS_DIR", tmp_path / "projects")  # tests never write into the real projects folder
     srv = mw.ReusableThreadingHTTPServer(("127.0.0.1", 0), mw.ManuscriptWorkbenchHandler)
     thread = threading.Thread(target=srv.serve_forever, daemon=True)
     thread.start()
@@ -86,3 +88,11 @@ def mock_provider():
         yield provider
     finally:
         provider.stop()
+
+
+@pytest.fixture
+def projects(mw, tmp_path, monkeypatch):
+    """An empty projects folder for unit tests of manuscript_workbench.project."""
+    folder = tmp_path / "projects"
+    monkeypatch.setattr(mw, "PROJECTS_DIR", folder)
+    return folder

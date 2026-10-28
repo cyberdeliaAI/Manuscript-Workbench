@@ -14,6 +14,11 @@ STATIC_DIR = ROOT_DIR / "static"
 INDEX_PATH = STATIC_DIR / "index.html"
 USER_GUIDE_PATH = ROOT_DIR / "USER_GUIDE.md"
 
+# Projects (.mwb.json) and their snapshots live in <data dir>/projects. The data dir is next to the app unless
+# MANUSCRIPT_WORKBENCH_DATA_DIR says otherwise.
+DATA_DIR = Path(os.environ.get("MANUSCRIPT_WORKBENCH_DATA_DIR") or ROOT_DIR).expanduser()
+PROJECTS_DIR = DATA_DIR / "projects"
+
 MAX_JSON_BYTES = 80 * 1024 * 1024
 MAX_URL_IMPORT_BYTES = 12 * 1024 * 1024
 MAX_IMPORT_REDIRECTS = 5
