@@ -5,6 +5,7 @@ import { analyzeIntegrity } from '../core/integrity.js';
 import { markerCount, markerSignature } from '../core/structure.js';
 import { escapeHtml, progressPercent } from '../core/text-utils.js';
 import { setLmBusy } from './ai.js';
+import { renderRunPanel, requestRunStop } from './ai-run.js';
 import { openCompare } from './compare.js';
 import { $, toast } from './dom.js';
 import { nothingAccepted, refreshReview, renderReview, resetReview, reviewedText } from './ai-review.js';
@@ -71,16 +72,17 @@ export function openPreview(title, before, after, start, end, running, applyMode
     end,
     finished: !running,
     running,
-    partial: false,
     expectedMarkers: null,
     applyMode,
     progress: null,
     review: null,
+    run: null, // the sections of an AI run and their status (see ai-run.js)
     task: '',
     glossary: [],
     ...extra,
   };
   resetReview();
+  renderRunPanel();
   clearIntegrityGuardrails();
   $('#previewTitle').textContent = title;
   $('#previewSub').textContent = previewSubText();
@@ -109,13 +111,6 @@ export function updatePreview() {
     b.scrollTop = b.scrollHeight;
   }
 }
-export function finishPreviewError(msg) {
-  state.previewState.running = false;
-  setStopButtons(false);
-  setLmBusy(false);
-  $('#streamState').textContent = 'error';
-  $('#previewStatus').textContent = msg;
-}
 function syncPreviewScroll(source, target) {
   if (state.previewScrollSyncing || !$('#previewLinked').checked || !target) return;
   state.previewScrollSyncing = true;
@@ -139,7 +134,7 @@ $('#applyPreviewBtn').addEventListener('click', () => {
     toast('This preview is review-only.');
     return;
   }
-  if (!state.previewState.finished || state.previewState.partial) return;
+  if (!state.previewState.finished) return;
   reportPreviewMarkerDrift();
   if (nothingAccepted()) {
     toast('No change is accepted. Accept at least one change, or close the preview.');
@@ -156,19 +151,8 @@ export function setStopButtons(enabled) {
   $('#stopBtn').disabled = !enabled;
   $('#lmStopBtn').disabled = !enabled;
 }
-export function markLmStopped() {
-  state.previewState.partial = true;
-  state.previewState.running = false;
-  setStopButtons(false);
-  setLmBusy(false);
-  $('#applyPreviewBtn').disabled = true;
-  $('#streamState').textContent = 'stopped';
-  $('#previewStatus').textContent = 'Stopped. Partial output is viewable but not applicable.';
-  $('#lmStatus').textContent = 'Stopped; partial preview available.';
-}
 function stopLmGeneration() {
-  markLmStopped();
-  if (state.lmAbort) state.lmAbort.abort();
+  requestRunStop();
 }
 $('#stopBtn').addEventListener('click', stopLmGeneration);
 $('#lmStopBtn').addEventListener('click', stopLmGeneration);

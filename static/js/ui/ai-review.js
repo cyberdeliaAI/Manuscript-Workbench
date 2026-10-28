@@ -2,6 +2,7 @@
 import { state } from './state.js';
 import { composeFromHunks, diffDocuments, reviewableIds } from '../core/diff.js';
 import { glossaryIssues } from '../core/glossary.js';
+import { isComplete, runCounts } from '../core/run.js';
 import { $ } from './dom.js';
 
 const PAGE_SIZE = 250; // rows rendered at once, so a book-sized review stays light
@@ -55,8 +56,11 @@ function syncApplyButton() {
   const total = r ? reviewableIds(r.diff).length : 0;
   const rejected = r && total ? r.rejected.size : 0;
   const kept = total - rejected;
-  btn.textContent = rejected ? (kept ? `Apply ${kept} of ${total} changes` : 'Nothing accepted') : 'Apply change';
-  btn.disabled = !(p.finished && !p.partial && p.after && p.applyMode !== 'none') || (rejected > 0 && !kept);
+  const unfinished = !!p.run && !isComplete(p.run); // some sections were not generated: Apply keeps those as they were
+  const plain = unfinished ? 'Apply finished sections' : 'Apply change';
+  btn.textContent = rejected ? (kept ? `Apply ${kept} of ${total} changes` : 'Nothing accepted') : plain;
+  const hasOutput = p.run ? runCounts(p.run).done > 0 && !!p.after : !!p.after;
+  btn.disabled = !(p.finished && hasOutput && p.applyMode !== 'none') || (rejected > 0 && !kept);
 }
 
 function el(tag, className, text) {

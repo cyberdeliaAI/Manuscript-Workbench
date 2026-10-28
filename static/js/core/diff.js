@@ -182,6 +182,7 @@ export function splitBlocks(text) {
   for (let i = 0; i < parts.length; i += 2) {
     const raw = parts[i];
     const body = raw.replace(/\s+$/, '');
+    if (!body && i > 0) continue; // text that ends in a blank line: that whitespace already belongs to the last block
     const trail = raw.slice(body.length);
     blocks.push({ text: body, sep: i + 1 < parts.length ? parts[i + 1] : trail });
   }

@@ -1,7 +1,8 @@
-// AI tab: provider setup and rewrite/clean/guided/translate runs.
+// AI tab: provider setup and the entry points for rewrite/clean/guided/translate runs. The runs themselves are in
+// ai-run.js, the request to the provider in ai-request.js.
 import { state } from './state.js';
-import { AI_PROVIDERS, createNdjsonParser, isLocalEndpointHost, sanitizeLmFinalText } from '../core/ai-stream.js';
 import { headingSplitNote, makeChunks, makeHeadingSections } from '../core/chunking.js';
+import { withGlossary } from '../core/glossary.js';
 import {
   DEFAULT_PROMPTS,
   buildLmUserContent,
@@ -9,27 +10,15 @@ import {
   guidedUserContent,
   prepareTextForLm,
 } from '../core/prompts.js';
-import { withGlossary } from '../core/glossary.js';
-import { markerSignature } from '../core/structure.js';
-import { escapeHtml, progressPercent } from '../core/text-utils.js';
-import {
-  finishPreviewError,
-  markLmStopped,
-  openPreview,
-  setPreviewProgress,
-  setStopButtons,
-  showRunOutcome,
-  updatePreview,
-} from './ai-preview.js';
-import { api, apiHeaders } from './api.js';
+import { escapeHtml } from '../core/text-utils.js';
+import { startRun } from './ai-run.js';
+import { currentAiProvider } from './ai-request.js';
+import { api } from './api.js';
 import { $, editor, toast } from './dom.js';
 import { currentParagraphRange, selectedTextLength } from './editor-ops.js';
-import { glossaryEntries } from './glossary.js';
 import { saveSettings } from './settings.js';
 
-export function currentAiProvider() {
-  return AI_PROVIDERS[$('#lmProvider')?.value] || AI_PROVIDERS.custom;
-}
+export { currentAiProvider };
 function resetModelSelect(placeholder = 'Detect first available model') {
   const sel = $('#lmModel');
   if (!sel) return;
@@ -119,32 +108,6 @@ function promptForTask(task) {
 function rewriteStrength() {
   return $('#lmStrength')?.value || 'medium';
 }
-function optionalNumber(id) {
-  const raw = $('#' + id)?.value.trim();
-  if (!raw) return null;
-  const n = Number(raw.replace(',', '.'));
-  return Number.isFinite(n) ? n : null;
-}
-function optionalInteger(id) {
-  const raw = $('#' + id)?.value.trim();
-  if (!raw) return null;
-  const n = parseInt(raw, 10);
-  return Number.isFinite(n) ? n : null;
-}
-function advancedOptions() {
-  const opts = {};
-  const temperature = optionalNumber('advTemperature'),
-    top_p = optionalNumber('advTopP'),
-    top_k = optionalInteger('advTopK'),
-    repeat_penalty = optionalNumber('advRepeatPenalty'),
-    max_tokens = optionalInteger('advMaxTokens');
-  if (temperature !== null) opts.temperature = temperature;
-  if (top_p !== null) opts.top_p = top_p;
-  if (top_k !== null) opts.top_k = top_k;
-  if (repeat_penalty !== null) opts.repeat_penalty = repeat_penalty;
-  if (max_tokens !== null) opts.max_tokens = max_tokens;
-  return opts;
-}
 function guidedContext() {
   return { guidance: $('#guidedContext')?.value || '', target: $('#translateTarget')?.value || '' };
 }
@@ -185,415 +148,131 @@ export function setLmBusy(on) {
     $('#' + id).disabled = on;
   });
 }
-/** What a run knows about the glossary: its task and a snapshot of the entries, so editing mid-run changes nothing. */
-function runContext(task) {
-  const reviewOnly = task === 'questions' || task === 'feedback';
-  return { task, glossary: reviewOnly ? [] : glossaryEntries() };
+function maxChunkChars() {
+  return Math.max(1200, parseInt($('#chunkSize').value, 10) || 6000);
 }
+/** The glossary part of a request: the entries and task that the preview was opened with. */
 function withProjectGlossary(prompt, text) {
   return withGlossary(prompt, state.previewState.glossary, state.previewState.task, text);
 }
-function noteStreamFinish(info) {
-  (info?.finishReasons || []).forEach((reason) => {
-    if (!state.previewState.finishReasons) state.previewState.finishReasons = [];
-    state.previewState.finishReasons.push(reason);
+function rewriteRequest(task, promptText) {
+  const strength = rewriteStrength();
+  return (source) => {
+    const prep = prepareTextForLm(source);
+    return {
+      prompt: withProjectGlossary(promptText, prep.text),
+      input: buildLmUserContent(prep.text, prep, task, strength),
+    };
+  };
+}
+function guidedRequest(kind) {
+  const ctx = guidedContext();
+  return (source) => ({
+    prompt: withProjectGlossary(guidedSystemPrompt(kind), source),
+    input: guidedUserContent(kind, source, ctx),
   });
 }
-function finishWarningText() {
-  const reasons = state.previewState.finishReasons || [];
-  if (reasons.includes('length'))
-    return 'Warning: the provider stopped because the output hit a length limit; the last section may be incomplete.';
-  if (reasons.includes('content_filter')) return 'Warning: the provider stopped because of a content filter.';
-  return '';
+function busy() {
+  if (!state.previewState.running) return false;
+  toast('Generation is already running. Stop it first.');
+  return true;
+}
+function reportStartError(err) {
+  toast(err.message);
+  $('#lmStatus').textContent = err.message;
 }
 export async function startLM(task, scope, chunked) {
-  if (state.previewState.running) {
-    toast('Generation is already running. Stop it first.');
-    return;
-  }
+  if (busy()) return;
   try {
     const range = getScopeRange(scope);
     const promptText = promptForTask(task);
     if (!range.text.trim()) throw new Error('No text to send.');
-    if (chunked) {
-      await startLMChunked(task, scope, range, promptText);
+    const name = task === 'clean' ? 'AI Clean' : 'Rewrite';
+    const buildRequest = rewriteRequest(task, promptText);
+    if (!chunked) {
+      await startRun({ title: `${name} ${scope}`, range, sources: [range.text], task, noun: 'text', buildRequest });
       return;
     }
-    const prep = prepareTextForLm(range.text);
-    openPreview(
-      `${task === 'clean' ? 'AI Clean' : 'Rewrite'} ${scope}`,
-      range.text,
-      '',
-      range.start,
-      range.end,
-      true,
-      'replace',
-      runContext(task),
-    );
-    state.previewState.expectedMarkers = markerSignature(range.text);
-    noteStreamFinish(
-      await streamOne(
-        withProjectGlossary(promptText, prep.text),
-        buildLmUserContent(prep.text, prep, task, rewriteStrength()),
-        (txt) => {
-          state.previewState.after += txt;
-          updatePreview();
-        },
-        `${task} ${scope}`,
-      ),
-    );
-    state.previewState.after = sanitizeLmFinalText(state.previewState.after);
-    updatePreview();
-    state.previewState.finished = true;
-    state.previewState.running = false;
-    const hasOutput = !!state.previewState.after.trim();
-    $('#applyPreviewBtn').disabled = !hasOutput;
-    setStopButtons(false);
-    setLmBusy(false);
-    $('#streamState').textContent = 'done';
-    $('#previewStatus').textContent = hasOutput
-      ? 'Generation complete.' + (finishWarningText() ? ' ' + finishWarningText() : '')
-      : 'Generation produced no applicable text.';
-    $('#lmStatus').textContent = $('#previewStatus').textContent;
-    if (hasOutput) {
-      showRunOutcome();
-    }
+    const chunks = makeChunks(range.text, maxChunkChars());
+    await startRun({
+      title: `${name} chunked ${scope}`,
+      range,
+      sources: chunks,
+      task,
+      noun: 'chunk',
+      label: 'Chunked generation',
+      note: chunks.largeParagraphCount
+        ? `${chunks.largeParagraphCount} paragraph(s) were larger than Chunk size and were sent whole to avoid cutting a paragraph in half.`
+        : '',
+      buildRequest,
+    });
   } catch (err) {
-    if (err?.name === 'AbortError' || state.previewState.partial) {
-      markLmStopped();
-      return;
-    }
-    toast(err.message);
-    $('#lmStatus').textContent = err.message;
-    finishPreviewError(err.message);
+    reportStartError(err);
+  }
+}
+async function startLMSectioned(task, scope) {
+  if (busy()) return;
+  try {
+    const range = getScopeRange(scope);
+    const promptText = promptForTask(task);
+    if (!range.text.trim()) throw new Error('No text to send.');
+    const sections = makeHeadingSections(range.text, maxChunkChars());
+    await startRun({
+      title: `${task === 'clean' ? 'AI Clean' : 'Rewrite'} by heading ${scope}`,
+      range,
+      sources: sections,
+      task,
+      noun: 'section',
+      label: 'Heading-based generation',
+      note: headingSplitNote(sections),
+      buildRequest: rewriteRequest(task, promptText),
+    });
+  } catch (err) {
+    reportStartError(err);
   }
 }
 async function startGuidedAI(kind, scope) {
-  if (state.previewState.running) {
-    toast('Generation is already running. Stop it first.');
-    return;
-  }
+  if (busy()) return;
   try {
     const range = getScopeRange(scope);
     if (!range.text.trim()) throw new Error('No text to send.');
-    const applyMode = kind === 'questions' || kind === 'feedback' ? 'none' : 'replace';
     const titles = {
       questions: 'Improve Questions',
       feedback: 'Feedback Only',
       'guided-rewrite': 'Rewrite with Guidance',
       translate: 'Translate Selection',
     };
-    openPreview(titles[kind] || 'AI Tool', range.text, '', range.start, range.end, true, applyMode, runContext(kind));
-    state.previewState.expectedMarkers = applyMode === 'replace' ? markerSignature(range.text) : null;
-    noteStreamFinish(
-      await streamOne(
-        withProjectGlossary(guidedSystemPrompt(kind), range.text),
-        guidedUserContent(kind, range.text, guidedContext()),
-        (txt) => {
-          state.previewState.after += txt;
-          updatePreview();
-        },
-        kind,
-      ),
-    );
-    state.previewState.after = sanitizeLmFinalText(state.previewState.after);
-    updatePreview();
-    state.previewState.finished = true;
-    state.previewState.running = false;
-    const hasOutput = !!state.previewState.after.trim();
-    $('#applyPreviewBtn').disabled = applyMode === 'none' || !hasOutput;
-    setStopButtons(false);
-    setLmBusy(false);
-    $('#streamState').textContent = 'done';
-    $('#previewStatus').textContent =
-      applyMode === 'none'
-        ? 'Guidance complete. Review only; not applicable.'
-        : hasOutput
-          ? 'Generation complete.' + (finishWarningText() ? ' ' + finishWarningText() : '')
-          : 'Generation produced no applicable text.';
-    $('#lmStatus').textContent = $('#previewStatus').textContent;
-    if (applyMode === 'replace' && hasOutput) {
-      showRunOutcome();
-    }
+    await startRun({
+      title: titles[kind] || 'AI Tool',
+      range,
+      sources: [range.text],
+      task: kind,
+      applyMode: kind === 'questions' || kind === 'feedback' ? 'none' : 'replace',
+      noun: 'text',
+      buildRequest: guidedRequest(kind),
+    });
   } catch (err) {
-    if (err?.name === 'AbortError' || state.previewState.partial) {
-      markLmStopped();
-      return;
-    }
-    toast(err.message);
-    $('#lmStatus').textContent = err.message;
-    finishPreviewError(err.message);
-  }
-}
-async function startLMSectioned(task, scope) {
-  if (state.previewState.running) {
-    toast('Generation is already running. Stop it first.');
-    return;
-  }
-  try {
-    const range = getScopeRange(scope);
-    const promptText = promptForTask(task);
-    if (!range.text.trim()) throw new Error('No text to send.');
-    const maxChars = Math.max(1200, parseInt($('#chunkSize').value, 10) || 6000);
-    const sections = makeHeadingSections(range.text, maxChars);
-    openPreview(
-      `${task === 'clean' ? 'AI Clean' : 'Rewrite'} by heading ${scope}`,
-      range.text,
-      '',
-      range.start,
-      range.end,
-      true,
-      'replace',
-      runContext(task),
-    );
-    state.previewState.expectedMarkers = markerSignature(range.text);
-    state.previewState.sectionSplitNote = headingSplitNote(sections);
-    setPreviewProgress(0, sections.length);
-    for (let i = 0; i < sections.length; i++) {
-      if (!state.previewState.running) break;
-      const pct = progressPercent(i, sections.length);
-      $('#streamState').textContent = `${pct}% · section ${i + 1}/${sections.length}`;
-      $('#previewStatus').textContent = `Generating heading section ${i + 1} of ${sections.length} (${pct}% done)...`;
-      if (i > 0) state.previewState.after += '\n\n';
-      const prep = prepareTextForLm(sections[i]);
-      const info = await streamOne(
-        withProjectGlossary(promptText, prep.text),
-        buildLmUserContent(prep.text, prep, task, rewriteStrength()),
-        (txt) => {
-          state.previewState.after += txt;
-          updatePreview();
-        },
-        `${task} heading section ${i + 1}/${sections.length}`,
-      );
-      noteStreamFinish(info);
-      setPreviewProgress(i + 1, sections.length);
-    }
-    finishSectionedPreview('Heading-based generation');
-  } catch (err) {
-    if (err?.name === 'AbortError' || state.previewState.partial) {
-      markLmStopped();
-      return;
-    }
-    toast(err.message);
-    $('#lmStatus').textContent = err.message;
-    finishPreviewError(err.message);
+    reportStartError(err);
   }
 }
 async function startGuidedSectioned(kind, scope) {
-  if (state.previewState.running) {
-    toast('Generation is already running. Stop it first.');
-    return;
-  }
+  if (busy()) return;
   try {
     const range = getScopeRange(scope);
     if (!range.text.trim()) throw new Error('No text to send.');
-    const maxChars = Math.max(1200, parseInt($('#chunkSize').value, 10) || 6000);
-    const sections = makeHeadingSections(range.text, maxChars);
+    const sections = makeHeadingSections(range.text, maxChunkChars());
     const titles = { translate: 'Translate by Heading', 'guided-rewrite': 'Rewrite with Guidance by Heading' };
-    openPreview(
-      titles[kind] || 'AI by Heading',
-      range.text,
-      '',
-      range.start,
-      range.end,
-      true,
-      'replace',
-      runContext(kind),
-    );
-    state.previewState.expectedMarkers = markerSignature(range.text);
-    state.previewState.sectionSplitNote = headingSplitNote(sections);
-    setPreviewProgress(0, sections.length);
-    for (let i = 0; i < sections.length; i++) {
-      if (!state.previewState.running) break;
-      const pct = progressPercent(i, sections.length);
-      $('#streamState').textContent = `${pct}% · section ${i + 1}/${sections.length}`;
-      $('#previewStatus').textContent = `Generating heading section ${i + 1} of ${sections.length} (${pct}% done)...`;
-      if (i > 0) state.previewState.after += '\n\n';
-      const info = await streamOne(
-        withProjectGlossary(guidedSystemPrompt(kind), sections[i]),
-        guidedUserContent(kind, sections[i], guidedContext()),
-        (txt) => {
-          state.previewState.after += txt;
-          updatePreview();
-        },
-        `${kind} heading section ${i + 1}/${sections.length}`,
-      );
-      noteStreamFinish(info);
-      setPreviewProgress(i + 1, sections.length);
-    }
-    finishSectionedPreview('Heading-based generation');
+    await startRun({
+      title: titles[kind] || 'AI by Heading',
+      range,
+      sources: sections,
+      task: kind,
+      noun: 'section',
+      label: 'Heading-based generation',
+      note: headingSplitNote(sections),
+      buildRequest: guidedRequest(kind),
+    });
   } catch (err) {
-    if (err?.name === 'AbortError' || state.previewState.partial) {
-      markLmStopped();
-      return;
-    }
-    toast(err.message);
-    $('#lmStatus').textContent = err.message;
-    finishPreviewError(err.message);
+    reportStartError(err);
   }
-}
-function finishSectionedPreview(label) {
-  state.previewState.after = sanitizeLmFinalText(state.previewState.after);
-  updatePreview();
-  state.previewState.finished = !state.previewState.partial && state.previewState.running;
-  state.previewState.running = false;
-  setStopButtons(false);
-  setLmBusy(false);
-  const hasOutput = !!state.previewState.after.trim();
-  const finalPct = state.previewState.progress?.percent ?? 0;
-  $('#streamState').textContent = state.previewState.partial ? `stopped · ${finalPct}%` : 'done · 100%';
-  $('#applyPreviewBtn').disabled = !!state.previewState.partial || !hasOutput;
-  const notes = [state.previewState.sectionSplitNote, finishWarningText()].filter(Boolean).join(' ');
-  $('#previewStatus').textContent = state.previewState.partial
-    ? `Stopped at ${finalPct}%. Partial output is not applicable.`
-    : hasOutput
-      ? `${label} complete.${notes ? ' ' + notes : ''}`
-      : `${label} produced no applicable text.${notes ? ' ' + notes : ''}`;
-  $('#lmStatus').textContent = $('#previewStatus').textContent;
-  if (!state.previewState.partial && hasOutput) {
-    showRunOutcome();
-  }
-}
-async function startLMChunked(task, scope, range, promptText) {
-  const maxChars = Math.max(1200, parseInt($('#chunkSize').value, 10) || 6000);
-  const chunks = makeChunks(range.text, maxChars);
-  openPreview(
-    `${task === 'clean' ? 'AI Clean' : 'Rewrite'} chunked ${scope}`,
-    range.text,
-    '',
-    range.start,
-    range.end,
-    true,
-    'replace',
-    runContext(task),
-  );
-  state.previewState.expectedMarkers = markerSignature(range.text);
-  state.previewState.sectionSplitNote = chunks.largeParagraphCount
-    ? `${chunks.largeParagraphCount} paragraph(s) were larger than Chunk size and were sent whole to avoid cutting a paragraph in half.`
-    : '';
-  setPreviewProgress(0, chunks.length);
-  for (let i = 0; i < chunks.length; i++) {
-    if (!state.previewState.running) break;
-    const pct = progressPercent(i, chunks.length);
-    $('#streamState').textContent = `${pct}% · chunk ${i + 1}/${chunks.length}`;
-    $('#previewStatus').textContent = `Generating chunk ${i + 1} of ${chunks.length} (${pct}% done)...`;
-    if (i > 0) state.previewState.after += '\n\n';
-    const prep = prepareTextForLm(chunks[i]);
-    const info = await streamOne(
-      withProjectGlossary(promptText, prep.text),
-      buildLmUserContent(prep.text, prep, task, rewriteStrength()),
-      (txt) => {
-        state.previewState.after += txt;
-        updatePreview();
-      },
-      `${task} chunk ${i + 1}/${chunks.length}`,
-    );
-    noteStreamFinish(info);
-    setPreviewProgress(i + 1, chunks.length);
-  }
-  state.previewState.after = sanitizeLmFinalText(state.previewState.after);
-  updatePreview();
-  state.previewState.finished = !state.previewState.partial && state.previewState.running;
-  state.previewState.running = false;
-  setStopButtons(false);
-  setLmBusy(false);
-  const hasOutput = !!state.previewState.after.trim();
-  const finalPct = state.previewState.progress?.percent ?? 0;
-  const notes = [state.previewState.sectionSplitNote, finishWarningText()].filter(Boolean).join(' ');
-  $('#streamState').textContent = state.previewState.partial ? `stopped · ${finalPct}%` : 'done · 100%';
-  $('#applyPreviewBtn').disabled = !!state.previewState.partial || !hasOutput;
-  $('#previewStatus').textContent = state.previewState.partial
-    ? `Stopped at ${finalPct}%. Partial output is not applicable.`
-    : hasOutput
-      ? `Chunked generation complete.${notes ? ' ' + notes : ''}`
-      : `Chunked generation produced no applicable text.${notes ? ' ' + notes : ''}`;
-  $('#lmStatus').textContent = $('#previewStatus').textContent;
-  if (!state.previewState.partial && hasOutput) {
-    showRunOutcome();
-  }
-}
-const confirmedRemoteHosts = new Set();
-function aiEndpointHost() {
-  const raw = ($('#lmBase').value || '').trim() || currentAiProvider().base;
-  try {
-    return new URL(raw.includes('://') ? raw : `http://${raw}`).hostname;
-  } catch (e) {
-    return '';
-  }
-}
-function confirmRemoteEndpoint() {
-  const host = aiEndpointHost();
-  if (!host || isLocalEndpointHost(host) || confirmedRemoteHosts.has(host)) return;
-  if (
-    !confirm(
-      `The AI endpoint "${host}" is not a local address. Your manuscript text will be sent to that server. Continue?`,
-    )
-  )
-    throw new Error('Cancelled: the remote AI endpoint was not confirmed.');
-  confirmedRemoteHosts.add(host);
-}
-async function streamOne(promptText, inputText, onText, label) {
-  const provider = currentAiProvider();
-  confirmRemoteEndpoint();
-  state.lmAbort = new AbortController();
-  setStopButtons(true);
-  $('#showPreviewBtn').disabled = false;
-  const info = { finishReasons: [], done: false, error: '' };
-  const res = await fetch('/api/lm_stream', {
-    method: 'POST',
-    headers: apiHeaders(),
-    body: JSON.stringify({
-      base_url: $('#lmBase').value,
-      provider: $('#lmProvider').value,
-      api_key: $('#lmApiKey').value,
-      model: $('#lmModel').value,
-      prompt: promptText,
-      input: inputText,
-      options: advancedOptions(),
-    }),
-    signal: state.lmAbort.signal,
-  });
-  if (!res.ok) {
-    let msg = await res.text();
-    try {
-      msg = JSON.parse(msg).error || msg;
-    } catch (e) {}
-    throw new Error(msg || `${provider.label} request failed`);
-  }
-  let thinking = false,
-    shownState = '';
-  const parser = createNdjsonParser((ev) => {
-    if (ev.t === 'delta') {
-      if (thinking) {
-        thinking = false;
-        $('#streamState').textContent = shownState;
-      }
-      if (ev.text) onText(ev.text);
-    } else if (ev.t === 'reasoning') {
-      if (!thinking) {
-        thinking = true;
-        shownState = $('#streamState').textContent;
-        $('#streamState').textContent = `${shownState} · thinking...`;
-      }
-    } else if (ev.t === 'finish') {
-      info.finishReasons.push(ev.reason);
-    } else if (ev.t === 'error') {
-      info.error = ev.message || 'The AI provider reported an error.';
-    } else if (ev.t === 'done') {
-      info.done = true;
-    }
-  });
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    parser.push(decoder.decode(value, { stream: true }));
-  }
-  parser.end();
-  if (!info.done)
-    throw new Error(
-      info.error || 'The AI stream ended before the provider finished. The output is incomplete and cannot be applied.',
-    );
-  return info;
 }

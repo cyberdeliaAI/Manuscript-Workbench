@@ -110,9 +110,9 @@ manuscript_workbench/       the Python backend
 static/                     the frontend (served from /static/, no build step)
   index.html  css/app.css
   js/main.js                  entry point (ES modules)
-  js/core/                    pure logic: cleaning, diagnostics, language profiles, analysis, chunking, guardrails, project file format, word diff and review hunks, glossary (no DOM, unit-tested)
+  js/core/                    pure logic: cleaning, diagnostics, language profiles, analysis, chunking, guardrails, project file format, word diff and review hunks, glossary, run state (no DOM, unit-tested)
   js/workers/                 the analysis Web Worker (runs core/analysis.js off the main thread)
-  js/ui/                      DOM-bound modules, one per feature (project.js / project-ui.js: projects and snapshots; ai-review.js: accept or reject AI changes)
+  js/ui/                      DOM-bound modules, one per feature (project.js / project-ui.js: projects and snapshots; ai-run.js: AI runs with resumable sections; ai-review.js: accept or reject AI changes)
 tests/                      pytest + node:test suites (see tests/README.md)
 ```
 

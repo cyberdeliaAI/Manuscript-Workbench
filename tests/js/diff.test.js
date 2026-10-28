@@ -110,10 +110,13 @@ test('splitBlocks loses nothing, whatever the whitespace', () => {
     'a\nb\n \nc\n\t\nd',
     'Chapter\r\n\r\ntext\r\n',
     'trailing  ',
+    'ends in a blank line\n\n',
+    'two\n\nblank lines at the end\n\n\n\n',
   ];
   for (const text of samples) {
     const { lead, blocks } = api.splitBlocks(text);
     assert.equal(lead + blocks.map((b) => b.text + b.sep).join(''), text, JSON.stringify(text));
+    assert.ok(blocks.every((b) => b.text), 'no empty paragraphs: ' + JSON.stringify(text));
   }
   assert.deepEqual(
     api.splitBlocks('a\nb\n\nc').blocks.map((b) => b.text),

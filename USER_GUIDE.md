@@ -621,11 +621,24 @@ Every AI action opens a before/after preview that streams the output live:
 
 - `Split` / `After only` / `Before only` / `Diff` switch the layout (remembered between sessions; see [Reviewing the changes](#reviewing-the-changes-diff-view) for `Diff`);
 - `auto-scroll` follows the generation; `Bottom` jumps to the end;
-- `Stop generation` aborts; partial output stays visible but **cannot** be applied. Stopping also closes the connection to the provider, so a local model stops generating;
-- if the provider connection drops or the stream ends before the provider says it is finished, the preview shows an error and the incomplete output **cannot** be applied;
+- `Stop generation` aborts the request in flight. Stopping also closes the connection to the provider, so a local model stops generating. The text of the section that was being written is thrown away, because it is incomplete; sections that were already finished stay (see [Sections, resuming and retrying](#sections-resuming-and-retrying));
+- if the provider connection drops or the stream ends before the provider says it is finished, that request counts as failed and its incomplete output **cannot** be applied;
 - reasoning models: while the model is thinking the status shows `thinking...`; the reasoning itself is never added to your text;
-- `Apply change` replaces the original text with the result — nothing touches your manuscript until you click it;
+- `Apply change` replaces the original text with the result — nothing touches your manuscript until you click it. If some sections did not finish, the button reads `Apply finished sections`;
 - closing the modal keeps the result available behind the `Show Preview` button in the AI tab.
+
+### Sections, resuming and retrying
+
+Chunked runs, runs by heading, and `Translate by Heading` generate their sections one after the other. Above the panes the preview shows one numbered box per section: grey = waiting, amber = being written, green = done, red = failed, orange = stopped. Click a box to see its status and the error message.
+
+- When the provider fails (or the connection drops) the run **pauses** at that section. Nothing is lost: the finished sections stay finished.
+- `Resume` generates everything that is not finished yet, in order. You can change the model first, for example when a small model ran out of context.
+- Under the boxes, `Run this` generates only the selected section again, `Run from here` generates it and every unfinished section after it, and `Redo` generates a finished section again when you do not like the result.
+- `Stop generation` pauses the run the same way (the section that was being written is stopped, the finished ones stay).
+- **Apply** puts the finished sections into the editor and leaves every other section exactly as it was, so a half-finished run can still be used. The `Diff` view then shows only the finished sections as changes.
+- `Retries per section` (AI tab → `Advanced request options`, default 1) makes the app try a failed section again by itself after 2, 4, 6 seconds before the run pauses. Set it to 0 to stop at the first error.
+
+A run without sections (selection, paragraph, whole text) is one section: when it fails the panel shows the error and `Run again`.
 
 ### Reviewing the changes (Diff view)
 
@@ -949,6 +962,7 @@ The AI API key is kept in the browser's localStorage so you do not have to re-en
 
 - AI quality depends entirely on the provider and model you run locally.
 - A small provider context length can cause errors with large selections; chunked mode reduces this but chunk boundaries can still need review.
+- A paused run lives in the preview of the current page: reloading the page forgets it (apply the finished sections first).
 - DOCX export does not yet create true Word lists or tables from Markdown lists/tables (Preflight warns; the text is preserved literally).
 - DOCX import is style-aware but not a full Word layout converter; tables in imported DOCX files are skipped.
 - RTF import extracts plain text only.

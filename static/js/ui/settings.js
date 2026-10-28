@@ -72,6 +72,7 @@ export function getSettings() {
     lmModel: $('#lmModel').value,
     lmStrength: $('#lmStrength')?.value || 'medium',
     chunkSize: $('#chunkSize').value,
+    autoRetry: $('#autoRetry')?.value || '1',
     guidedContext: $('#guidedContext')?.value || '',
     translateTarget: $('#translateTarget')?.value || 'English',
     advTemperature: $('#advTemperature')?.value || '',
@@ -150,6 +151,7 @@ export async function loadSettings() {
   }
   if (s.lmStrength) $('#lmStrength').value = s.lmStrength;
   if (s.chunkSize) $('#chunkSize').value = s.chunkSize;
+  if (s.autoRetry) $('#autoRetry').value = String(s.autoRetry);
   if (s.guidedContext) $('#guidedContext').value = s.guidedContext;
   if (s.translateTarget) $('#translateTarget').value = s.translateTarget;
   $('#allowRemoteImages').checked = !!s.allowRemoteImages;

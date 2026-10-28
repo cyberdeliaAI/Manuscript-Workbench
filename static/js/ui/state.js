@@ -15,7 +15,6 @@ export const state = {
     title: 'Preview',
     finished: false,
     running: false,
-    partial: false,
     expectedMarkers: null,
     applyMode: 'replace',
     review: null, // the Diff view's hunks and which of them are rejected
