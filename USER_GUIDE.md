@@ -632,11 +632,24 @@ Reasoning models that emit `<think>…</think>` blocks are handled automatically
 
 ## 13. Markdown Tab
 
-The Markdown tab summarizes the current structure:
+The Markdown tab summarizes the current structure and helps you finish it:
 
 - counts of chapters/parts, subheads, special blocks, and unmarked chapter **candidates**;
-- a list of every structure item with a jump button (first 80 shown);
-- candidate lines that look like chapters but are not marked yet, tagged `CHECK`.
+- the **chapter candidate manager**: lines that look like chapter or front/back-matter titles ("Chapter 3", "Proloog", "Colofon") but are not marked yet, each tagged `CHECK`;
+- a list of every structure item with a jump button (first 80 shown).
+
+### Chapter candidate manager
+
+Every candidate row has these buttons:
+
+| Button | What it does |
+|---|---|
+| `line N` | jumps to the line |
+| `Chapter` | marks it as a chapter or part (`# …`); a title starting with "Part" or "Deel" becomes a part |
+| `H2` | marks it as a subhead (`## …`) |
+| `Ignore` | says "this is body text" and stops suggesting it. Ignored candidates are remembered (also after a restart), no longer counted in the Markdown tab, and no longer reported by Preflight |
+
+`Mark all as chapters` marks every remaining candidate at once, after a confirmation, as a **single undo step**. If you ignored too much, `Ignored (n) - restore` brings them all back. Lines inside a `::: block` are never candidates.
 
 Use it as a quick audit: every `CHECK` row is a line you probably want to mark as a chapter or deliberately leave as body text.
 

@@ -131,5 +131,12 @@
     ["don’t and zo’n", "nl", 0],
     ["‘Ik kijk’ zei hij", "nl", 0],
     ["", "nl", 0]
+  ],
+  "candidate_keys": [
+    ["Chapter 1", "chapter 1"],
+    ["  Chapter   Two ", "chapter two"],
+    ["PROLOGUE", "prologue"],
+    ["Hoofdstuk\t3", "hoofdstuk 3"],
+    ["", ""]
   ]
 }

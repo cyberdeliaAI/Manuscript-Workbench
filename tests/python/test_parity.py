@@ -39,3 +39,8 @@ def test_normalize_language(mw, value, expected):
 @pytest.mark.parametrize("text,language,expected", CASES["apostrophes"])
 def test_wrong_apostrophes(mw, text, language, expected):
     assert mw.count_wrong_apostrophes(text, language) == expected
+
+
+@pytest.mark.parametrize("text,expected", CASES["candidate_keys"])
+def test_candidate_key(mw, text, expected):
+    assert mw.candidate_key(text) == expected

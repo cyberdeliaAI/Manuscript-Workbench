@@ -41,3 +41,9 @@ for (const [text, language, expected] of cases.apostrophes) {
     assert.equal(api.countWrongApostrophes(text, language), expected);
   });
 }
+
+for (const [text, expected] of cases.candidate_keys) {
+  test(`candidate key: ${JSON.stringify(text)}`, () => {
+    assert.equal(api.candidateKey(text), expected);
+  });
+}

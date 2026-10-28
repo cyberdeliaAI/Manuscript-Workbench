@@ -1,4 +1,5 @@
 // Preflight panel.
+import { state } from './state.js';
 import { escapeHtml } from '../core/text-utils.js';
 import { api } from './api.js';
 import { $, editor } from './dom.js';
@@ -11,7 +12,11 @@ async function runPreflight() {
   const metadata = getMetadata();
   // the checks judge typography by the language the Clean tools use: the chosen one, else the suggested one
   metadata.language = metadata.language || effectiveLanguage();
-  const res = await api('/api/preflight', { text: editor.value, metadata });
+  const res = await api('/api/preflight', {
+    text: editor.value,
+    metadata,
+    ignored_candidates: state.ignoredCandidates,
+  });
   const data = await res.json();
   renderPreflight(data);
 }

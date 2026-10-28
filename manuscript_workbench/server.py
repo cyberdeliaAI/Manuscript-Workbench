@@ -258,7 +258,7 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
             self.wfile.write(docx_bytes)
         elif path == "/api/preflight":
             payload = get_json_body(self)
-            json_response(self, preflight(payload.get("text") or "", payload.get("metadata") or {}))
+            json_response(self, preflight(payload.get("text") or "", payload.get("metadata") or {}, payload.get("ignored_candidates")))
         elif path == "/api/lm_models":
             self.handle_lm_models()
         elif path == "/api/lm_stream":

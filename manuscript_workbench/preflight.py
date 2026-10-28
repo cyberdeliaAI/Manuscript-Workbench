@@ -60,6 +60,11 @@ def count_wrong_apostrophes(text: str, language: Any = "") -> int:
     return sum(len(rule.findall(text)) for rule in rules)
 
 
+def candidate_key(text: Any) -> str:
+    """Identifies a chapter candidate regardless of case and spacing. static/js/core/candidates.js has the same rule."""
+    return " ".join(str(text or "").split()).lower()
+
+
 def is_chapter_candidate(line: str) -> bool:
     """A line that looks like a chapter or front/back-matter title. static/js/core/structure.js has the same rule."""
     return bool(CHAPTER_CANDIDATE_RE.match(line.strip()))
@@ -110,8 +115,9 @@ def parse_chapter_number(line: str) -> Optional[int]:
     return roman_to_int(token)
 
 
-def preflight(text: str, metadata: Dict[str, str]) -> Dict[str, Any]:
+def preflight(text: str, metadata: Dict[str, str], ignored_candidates: Optional[List[str]] = None) -> Dict[str, Any]:
     lines = text.split("\n")
+    ignored = {candidate_key(k) for k in (ignored_candidates or []) if isinstance(k, str)}
     language = normalize_language(metadata.get("language"))
     issues: List[Dict[str, Any]] = []
     info: List[Dict[str, Any]] = []
@@ -148,7 +154,7 @@ def preflight(text: str, metadata: Dict[str, str]) -> Dict[str, Any]:
             special += 1
         if marker and not content and marker not in ("scene", "ornament"):
             empty_markers.append((idx, marker))
-        if not marker and is_chapter_candidate(line):
+        if not marker and is_chapter_candidate(line) and candidate_key(line) not in ignored:
             candidates.append((idx, line.strip()))
         if not marker and is_page_number_line(lines, idx - 1):
             page_nums.append((idx, line.strip()))

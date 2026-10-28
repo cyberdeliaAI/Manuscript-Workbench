@@ -34,4 +34,5 @@ export const state = {
   findIndex: -1,
   findScopeRange: null,
   detectedLanguage: '',
+  ignoredCandidates: [],
 };

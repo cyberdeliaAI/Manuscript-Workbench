@@ -79,6 +79,7 @@ function getSettings() {
     advRepeatPenalty: $('#advRepeatPenalty')?.value || '',
     advMaxTokens: $('#advMaxTokens')?.value || '',
     allowRemoteImages: $('#allowRemoteImages')?.checked || false,
+    ignoredCandidates: state.ignoredCandidates,
     quoteStyle: $('#quoteStyle')?.value || 'auto',
     dashStyle: $('#dashStyle')?.value || 'auto',
   };
@@ -150,6 +151,8 @@ export async function loadSettings() {
   if (s.guidedContext) $('#guidedContext').value = s.guidedContext;
   if (s.translateTarget) $('#translateTarget').value = s.translateTarget;
   $('#allowRemoteImages').checked = !!s.allowRemoteImages;
+  if (Array.isArray(s.ignoredCandidates))
+    state.ignoredCandidates = s.ignoredCandidates.filter((k) => typeof k === 'string');
   if (s.quoteStyle) $('#quoteStyle').value = s.quoteStyle;
   if (s.dashStyle) $('#dashStyle').value = s.dashStyle;
   ['advTemperature', 'advTopP', 'advTopK', 'advRepeatPenalty', 'advMaxTokens'].forEach((id) => {

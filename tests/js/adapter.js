@@ -5,7 +5,7 @@ const path = require('node:path');
 
 const CORE_DIR = path.resolve(__dirname, '..', '..', 'static', 'js', 'core');
 const MODULES = [
-  'storage', 'text-utils', 'structure', 'inline-markup', 'mojibake', 'line-heuristics', 'language', 'cleaning',
+  'storage', 'text-utils', 'structure', 'inline-markup', 'mojibake', 'line-heuristics', 'language', 'candidates', 'cleaning',
   'diagnostics', 'chunking', 'integrity', 'prompts', 'ai-stream',
 ];
 

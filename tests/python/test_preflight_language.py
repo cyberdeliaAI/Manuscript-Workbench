@@ -40,3 +40,20 @@ def test_dutch_front_and_back_matter_is_recognised_as_candidates(mw):
     text = "Proloog\n\nTekst.\n\nBijlage 2\n\nColofon\n\nInhoudsopgave\n"
     result = mw.preflight(text, {"title": "T", "author": "A", "language": "nl"})
     assert issue(result, "chapter-candidates")["count"] == 4
+
+
+def test_ignored_candidates_are_not_reported(mw):
+    text = "Prologue\n\nChapter 3\n\nText.\n"
+    meta = {"title": "T", "author": "A"}
+    assert issue(mw.preflight(text, meta), "chapter-candidates")["count"] == 2
+    some = mw.preflight(text, meta, ["  PROLOGUE "])
+    assert issue(some, "chapter-candidates")["count"] == 1
+    assert issue(mw.preflight(text, meta, ["prologue", "chapter 3"]), "chapter-candidates") is None
+    assert issue(mw.preflight(text, meta, [None, 5, "prologue"]), "chapter-candidates")["count"] == 1  # junk entries are ignored
+
+
+def test_preflight_endpoint_passes_the_ignore_list(server):
+    status, _h, body = server.request("POST", "/api/preflight", body={"text": "Prologue\n\ntext", "metadata": {"title": "T", "author": "A"}, "ignored_candidates": ["prologue"]})
+    import json
+
+    assert status == 200 and "chapter-candidates" not in {i["code"] for i in json.loads(body)["issues"]}
