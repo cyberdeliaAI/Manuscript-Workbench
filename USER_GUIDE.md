@@ -1,6 +1,6 @@
 # Manuscript Workbench — User Guide
 
-Manuscript Workbench is a local Python web app for manuscript cleanup, Markdown-based structure, AI rewrite/cleanup through local OpenAI-compatible providers, live preview, and export to TXT, Markdown, and DOCX.
+Manuscript Workbench is a local Python web app for manuscript cleanup, Markdown-based structure, projects with snapshots, AI rewrite/cleanup/translation with a word-level review through local OpenAI-compatible providers, live preview, and export to TXT, Markdown, DOCX, and EPUB. This guide is for version 2.0; [CHANGELOG.md](CHANGELOG.md) lists what changed since 1.2.
 
 Everything runs on your own computer. The only network traffic the app produces is:
 
@@ -24,11 +24,11 @@ Nothing else leaves your machine. Your manuscript text is never sent to a cloud 
 11. [Clean Tab](#11-clean-tab)
 12. [AI Tab](#12-ai-tab)
 13. [Markdown Tab](#13-markdown-tab)
-14. [Book Tab: Metadata](#14-book-tab-metadata)
+14. [Book Tab: Metadata and Glossary](#14-book-tab-metadata-and-glossary)
 15. [Find / Replace](#15-find--replace)
 16. [Selection Menu](#16-selection-menu)
 17. [Exporting](#17-exporting)
-18. [Autosave, Undo, and Local Storage](#18-autosave-undo-and-local-storage)
+18. [Projects, Snapshots, Autosave, and Undo](#18-projects-snapshots-autosave-and-undo)
 19. [Keyboard Shortcuts](#19-keyboard-shortcuts)
 20. [Practical Workflows](#20-practical-workflows)
 21. [Troubleshooting](#21-troubleshooting)
@@ -50,9 +50,10 @@ It is designed for:
 - removing or repairing encoding artifacts, hidden characters, excess spaces, tabs, headers, footers, and HTML markup;
 - adding manuscript structure with Markdown;
 - previewing the rendered manuscript;
-- rewriting, cleaning, translating, or reviewing text through LM Studio, oMLX, Ollama, or another OpenAI-compatible local endpoint;
+- keeping the work in projects on disk, with snapshots you can compare and restore;
+- rewriting, cleaning, translating, or reviewing text through LM Studio, oMLX, Ollama, or another OpenAI-compatible local endpoint, and accepting or rejecting every changed paragraph before it touches your text;
 - merging multiple files from a folder in a chosen order;
-- exporting to TXT, Markdown, or DOCX with real Word paragraph styles.
+- exporting to TXT, Markdown, DOCX (real Word paragraph styles, lists, tables and links), or EPUB.
 
 The app is **Markdown-first**: structure lives in the text itself as `#` headings, `>` quotes, `***` scene breaks, and `::: name` blocks. That makes the manuscript readable, portable, diff-friendly, and usable in any other Markdown tool.
 
@@ -105,6 +106,10 @@ The default port is `8765`. To use another port:
 MANUSCRIPT_WORKBENCH_PORT=8766 ./start_mac_linux.sh
 ```
 
+### Changing the data folder
+
+Projects and their snapshots are stored in a `projects` folder next to the app. Set `MANUSCRIPT_WORKBENCH_DATA_DIR` to keep them somewhere else; see [section 18](#18-projects-snapshots-autosave-and-undo).
+
 ### If Port 8765 Is Already in Use
 
 If you see:
@@ -132,8 +137,8 @@ Replace `<PID>` with the number shown by `lsof`. Or simply start a second copy o
 
 From top to bottom:
 
-- **Header bar** — filename display and the main file actions: `Load File`, `Import URL`, `Merge Folder`, `Undo`, `Clear`, `Export TXT`, `Export Markdown`, `Export DOCX`.
-- **Recovery bar** — appears only when a previous autosave is found (see [section 18](#18-autosave-undo-and-local-storage)).
+- **Header bar** — the project status and filename display, and the `☰ Menu` with the project actions (`New`, `Open`, `Save`, `Save as`, `Snapshots`, `Export`/`Import project file`, see [section 18](#18-projects-snapshots-autosave-and-undo)) and the main file actions: `Load File`, `Import URL`, `Merge Folder`, `Undo`, `Clear`, `Export TXT`, `Export Markdown`, `Export DOCX`, `Export EPUB`.
+- **Recovery bar** — appears only when a previous autosave is found (see [section 18](#18-projects-snapshots-autosave-and-undo)).
 - **Stats bar** — live counts: characters, words, lines, chapters (`#` headings), subheads (`##`–`######` headings).
 - **Quick formatting bar** — text style dropdown, inline formatting buttons (B, I, U, SC, Mono, Sans), `Find`, `Preview`, `AI`, `Clean`, `Clear`.
 - **Markdown tools toolbar** — collapsible toolbar with every structure marker, special block, and inline style. Click `Expand` to open it.
@@ -160,7 +165,7 @@ Notes on each format:
 
 - **Encoding detection.** Text files are read as UTF-8, UTF-16 (with or without BOM), or Windows-1252, whichever produces the cleanest result. A BOM is removed and line endings are normalized to LF. The toast message after loading tells you what was detected.
 - **Content sniffing.** A file with the wrong extension is still recognized by its content: DOCX by its ZIP signature, RTF by `{\rtf`, HTML by its opening tags.
-- **DOCX import** maps common Word paragraph styles back to Markdown: `Heading 1`–`Heading 6` become `#`–`######`, `Quote`/`Intense Quote`/manuscript block quote styles become `>`, ornamental lines (`* * *`, `---`) become `***` scene breaks, and manuscript block styles (verse, written note, attribution, and so on) become `::: name` blocks. Inline bold, italic, underline, small caps, monospace, and sans serif runs become Markdown/inline markers. Tables inside the DOCX are **skipped** (the import note tells you how many).
+- **DOCX import** maps common Word paragraph styles back to Markdown: `Heading 1`–`Heading 6` become `#`–`######`, `Quote`/`Intense Quote`/manuscript block quote styles become `>`, ornamental lines (`* * *`, `---`) become `***` scene breaks, and manuscript block styles (verse, written note, attribution, and so on) become `::: name` blocks. Inline bold, italic, underline, small caps, monospace, and sans serif runs become Markdown/inline markers. The body is read in document order, so **tables** come back as Markdown pipe tables at the right place (merged cells repeat nothing, the header row is not marked bold, column alignment is kept) and **lists** (Word list styles, or any paragraph with Word numbering) become `-` / `1.` lists with nesting; numbered headings stay headings. Hyperlinks keep their text, and web links become `[text](url)`. **Images** and **footnotes/endnotes** are not imported; the import note says how many were skipped.
 - **RTF import** extracts plain text, converting paragraph breaks, tabs, special dashes/quotes, and Unicode escapes. Formatting is not preserved.
 - **`.doc` (old binary Word)** is not supported. Save it as `.docx`, `.rtf`, or `.txt` first — the app tells you this if you try.
 
@@ -184,7 +189,8 @@ Pick the version that preserves your text best. For unusual manuscript exports, 
 Built-in safety limits:
 
 - only `http` and `https` URLs;
-- localhost, private, and internal network addresses are blocked;
+- localhost, private, and internal network addresses are blocked. This includes alternative spellings such as `127.1` or `2130706433`, and host names that resolve to a private address;
+- every redirect is checked *before* it is followed, so a public page cannot bounce the fetch to an internal address;
 - URLs with embedded usernames/passwords are rejected;
 - responses larger than 12 MB are refused;
 - the fetch times out if the site is slow (about 8 s to connect, 25 s to read).
@@ -218,6 +224,10 @@ The large text area on the left is the editor. It is a plain-text Markdown edito
 
 Above the editor: **chars**, **words**, **lines**, **chapters** (lines starting with a single `#`), **subheads** (lines starting with `##` through `######`). These update live as you type.
 
+### Large manuscripts
+
+The statistics, diagnostics, outline, Markdown tab and gutter are computed in a background thread (a Web Worker), about a tenth of a second after you stop typing, so typing itself stays responsive. With a 500,000-word manuscript (100 chapters, 21,000 lines) the analysis takes roughly 35 ms in the worker; the panels refresh about 0.2 seconds after a pause. What remains slow at that size is the browser's own text area: very large texts make every edit a little heavier. For very large projects, work chapter by chapter (`Merge Folder` joins them for export). The Markdown preview is rendered by the server and is given more time between refreshes as the text grows.
+
 ### Line gutter
 
 The gutter shows line numbers with colored stripes for lines that need attention:
@@ -230,7 +240,7 @@ The gutter shows line numbers with colored stripes for lines that need attention
 | blue | typography spacing (double spaces, space before punctuation) |
 | amber (thin) | recognized Markdown structure line |
 
-Hover a stripe to see a short description. On documents over 12,000 lines the gutter switches off for performance (the editor itself keeps working normally). The gutter is also hidden while `Word wrap` is on, because wrapped visual lines no longer match physical line numbers.
+Hover a stripe to see a short description. The gutter only builds the lines that are on screen, so it costs the same for a short story and a 500,000-word manuscript. It is hidden while `Word wrap` is on, because wrapped visual lines no longer match physical line numbers.
 
 ### Scope toggle
 
@@ -376,7 +386,7 @@ Details worth knowing:
 - Rendering is done by Python-Markdown on the local server, with a built-in JavaScript fallback if the server call fails, so the preview keeps working either way.
 - The preview output is sanitized: only a safe set of tags and attributes is allowed, and only `http(s)`, `mailto:`, and relative links survive.
 - Editor and preview scrolling are synchronized proportionally. On very large or complex documents the matched position may be approximate.
-- The preview shows how the *Markdown* reads. DOCX export has its own mapping and limitations (notably lists and tables, see [section 17](#17-exporting)).
+- The preview shows how the *Markdown* reads. DOCX export has its own mapping (see [section 17](#17-exporting)).
 
 ## 9. Check Tab: Diagnostics and Preflight
 
@@ -398,7 +408,8 @@ Details worth knowing:
 | Trailing whitespace | spaces/tabs at line ends |
 | Tabs in the text | literal tab characters |
 | Double spaces | two or more spaces inside a line |
-| Space before punctuation | ` ,` ` .` ` !` and similar |
+| Space before punctuation | ` ,` ` .` ` !` and similar (not reported for languages where it is correct) |
+| Opening quote used as apostrophe | `‘t huis`, `‘s avonds`, `‘90s` |
 | Exact `--` instead of em dash | double hyphens |
 | Three dots instead of ellipsis | `...` instead of `…` |
 | Quotes counter | straight vs curly quote counts; flags mixed usage |
@@ -411,7 +422,7 @@ Each diagnostic has a matching Clean operation, so the Check tab doubles as a to
 
 - **missing title/author** — Book metadata is empty;
 - **no chapters** — nothing is marked with `#` yet (error);
-- **chapter candidates** — lines that look like chapter titles ("Chapter Seven", "Hoofdstuk 3", "Prologue", "Epilogue", "Part Two", front matter like "Copyright" or "About the author") but are not marked;
+- **chapter candidates** — lines that look like chapter titles ("Chapter Seven", "Hoofdstuk 3", "Prologue", "Proloog", "Part Two", front and back matter like "Copyright", "About the author", "Bijlage 2", "Colofon", "Inhoudsopgave") but are not marked;
 - **page numbers** — standalone page-number-like lines still present;
 - **tabs** — literal tabs (Word imports are safer with styles instead of tabs);
 - **trailing whitespace / extra blank runs**;
@@ -420,8 +431,10 @@ Each diagnostic has a matching Clean operation, so the Check tab doubles as a to
 - **unclosed `:::` block** — an odd number of fence lines;
 - **repeated lines** — short lines that repeat throughout the text (header/footer suspects);
 - **chapter numbering sequence** — chapter numbers that skip or reset (works with digits, roman numerals, and English/Dutch number words);
-- **lists / tables as literal text** — Markdown lists and tables preview correctly but are written as literal text in DOCX export;
-- **invisible/control/mojibake characters** still present.
+- the summary also counts the **Markdown list items and tables**, which become Word lists and tables on export (no warning is needed any more);
+- **invisible/control/mojibake characters** still present;
+- **mixed quotes** — straight and typographic double quotes in the same text (and an info line when the whole text uses straight quotes);
+- **wrong apostrophes** — an opening quote used as an apostrophe (`‘t huis`); `Clean` → `Repair apostrophes` fixes them.
 
 Each issue that has a location gets a `line N` button that jumps straight to it.
 
@@ -435,7 +448,7 @@ For chapter rows (`#` level) you can:
 - **AI** — select the chapter's text and start an AI rewrite;
 - **Clean** — select the chapter's text and start an AI clean.
 
-Chapter actions select the text from the chapter heading to the next heading of the same or higher level. Very long outlines show the first 120 headings.
+Chapter actions select the text from the chapter heading to the next heading of the same or higher level. The outline lists every heading; use the `+`/`-` button on a row to collapse or expand its sub-headings.
 
 ## 11. Clean Tab
 
@@ -457,10 +470,11 @@ Operations that can change structure show a **before/after preview** first (`App
 8. trim trailing spaces;
 9. collapse multiple spaces;
 10. remove space before punctuation;
-11. add missing space after punctuation;
-12. trim document edges.
+11. trim document edges.
 
-It intentionally does **not** join lines, remove blank lines, delete page numbers, or change quotes/dashes — those are separate, previewed operations.
+Mojibake is repaired per damaged sequence, so a broken `Ã©` right next to a no-break space is fixed in the same pass.
+
+It intentionally does **not** join lines, remove blank lines, delete page numbers, add spaces after punctuation, or change quotes/dashes — those are separate, previewed operations.
 
 ### Strip Markers Preview
 
@@ -495,14 +509,29 @@ Shows what the document looks like with all Markdown structure and inline marker
 
 Tabs to spaces · Collapse multiple spaces · Remove space before punctuation · Add missing space after punctuation.
 
+`Add missing space after punctuation` is previewed first. It only acts on a clear sentence join such as `etc.Dit` (two lowercase letters, a sentence mark, then a capitalised word) and on `word,word`; it leaves `Node.JS`, `a.b` and numbers like `3,5` alone.
+
 ### Typography (previewed)
 
 | Operation | Notes |
 |---|---|
-| Quotes to curly | converts straight quotes to typographic quotes; handles leading apostrophes ('em, 'cause, '90s) |
-| Quotes to straight | the reverse |
-| `--` to em dash | converts `--` and `---` between words to `—`. Note: a line consisting only of `---` (a Markdown divider) is also converted — check the preview if you use `---` as a scene break; prefer `***` |
+| Quotes to curly | converts straight quotes to typographic quotes (`“ ” ‘ ’`, or `„ ” ‚ ’` with the low-high quote style); handles leading apostrophes in English (`'em`, `'cause`, `'90s`) and Dutch (`'s avonds`, `'t huis`, `'k`, `'m`, `'s-Hertogenbosch`), which get a closing apostrophe `’` rather than an opening quote |
+| Quotes to straight | the reverse (also for `„ ‚`) |
+| Repair apostrophes | turns an opening single quote that is really an apostrophe into `’`: `‘t huis` → `’t huis`, `‘s avonds` → `’s avonds`, `‘90s` → `’90s`. This is what word processors do wrong in Dutch. Real quotes (`‘Dag’`) are left alone |
+| `--` to dash | converts `--` and `---` to the dash of the language profile: `—` for English (spacing kept), a spaced en dash ` – ` for Dutch (and `– ` at the start of a line, for dialogue). Lines that consist only of dashes (`---`, a scene break or Markdown divider) and Markdown table separator rows (`\|---\|---\|`) are left alone |
 | `...` to ellipsis | converts three dots (also spaced `. . .`) to `…` |
+
+#### Language profiles
+
+The typography operations follow a **language profile**, chosen in `Book` → `Language` (`en`, `nl`, or the language name). If you leave it empty, the app suggests one after looking at the text (a hint with a button appears under the Language field) and uses that suggestion; if it cannot tell, it uses English. The Typography group shows which profile is active.
+
+| Profile | Quotes | Dash | Space before `, . ; : ! ?` |
+|---|---|---|---|
+| English (`en`) | `“ ”` | `—` | removed |
+| Nederlands (`nl`) | `“ ”` | spaced `–` | removed |
+| any other language | `“ ”` | `—` | **kept** (French, for instance, puts a space before `: ; ! ?`), and no English/Dutch apostrophe guesses |
+
+The `Quote style` and `Dash style` menus in the Typography group override the profile (`Auto` follows it). Safe Cleanup and the Diagnostics respect the profile too.
 
 ### File
 
@@ -528,17 +557,25 @@ Each request contains the model name, a system prompt (the selected preset), you
 Steps:
 
 1. Start the provider and load/serve a model there.
-2. Choose the provider in `Provider setup`. The endpoint fills in automatically (editing the endpoint switches the provider to Custom).
+2. Choose the provider in `Provider setup`. The endpoint fills in automatically when it is empty or still a provider default; an endpoint you typed yourself is kept.
 3. If the provider needs authentication, paste the key into `API Key`.
 4. Click `Detect Model` and pick a model from the dropdown. `Test` checks the connection without changing anything.
 
 If no model is selected, the app asks the provider for its model list and uses the first available model.
 
-**LM Studio**: open LM Studio → load a model → start the Local Server → Detect Model here.
+**Remote endpoints.** The endpoint normally points at your own machine or LAN. If it points anywhere else, the app asks you to confirm (once per host per session) before it sends any manuscript text, because that text would leave your network. An endpoint must be a plain `http://` or `https://` URL without embedded credentials; use the API Key field instead.
+
+**LM Studio**: open LM Studio → load a model → start the Local Server → Detect Model here. For LM Studio the app also asks LM Studio's own model list (`/api/v0/models`, or `/api/v1/models` in newer versions) what it knows: models that are loaded come first in the dropdown, each entry shows `loaded` / `not loaded`, the context size and the quantization, and embedding models (which cannot write text) are left out. If your LM Studio version does not offer that list the app silently falls back to the plain model list.
 
 **oMLX**: start oMLX and its OpenAI-compatible server → choose oMLX here → paste the oMLX API key if required → Detect Model. If the oMLX log shows `GET /v1/models -> 401: API key required`, the endpoint is reachable but the key is missing or wrong.
 
 **Ollama**: `ollama pull <model>` and make sure Ollama is running → Detect Model.
+
+### What the app learns about a model
+
+`Detect Model` and `Test` read the provider's model list. When the provider reports how much context a model has (LM Studio does; some other servers do under names such as `context_length` or `max_model_len`), the line under `Model` says so and suggests a `Chunk size` that fits: the answer is about as long as the text, so roughly half of what is left of the window after the prompt, between 1,200 and 12,000 characters. `Use this chunk size` copies the suggestion into the field; it never changes by itself. oMLX and Ollama are asked only for the standard `/v1/models`, so they show no context information unless they include it there.
+
+When a call to the provider fails the message says what to do: `Cannot connect ... Is it running, with its server enabled?`, `The provider refused the request (HTTP 401). Check the API Key field.`, or a hint about the `/v1` in the endpoint.
 
 ### Prompt presets
 
@@ -589,11 +626,38 @@ A productive loop: select a passage → `Improve Questions` → paste your answe
 
 Every AI action opens a before/after preview that streams the output live:
 
-- `Split` / `After only` / `Before only` switch the layout (remembered between sessions);
+- `Split` / `After only` / `Before only` / `Diff` switch the layout (remembered between sessions; see [Reviewing the changes](#reviewing-the-changes-diff-view) for `Diff`);
 - `auto-scroll` follows the generation; `Bottom` jumps to the end;
-- `Stop generation` aborts; partial output stays visible but **cannot** be applied;
-- `Apply change` replaces the original text with the result — nothing touches your manuscript until you click it;
+- `Stop generation` aborts the request in flight. Stopping also closes the connection to the provider, so a local model stops generating. The text of the section that was being written is thrown away, because it is incomplete; sections that were already finished stay (see [Sections, resuming and retrying](#sections-resuming-and-retrying));
+- if the provider connection drops or the stream ends before the provider says it is finished, that request counts as failed and its incomplete output **cannot** be applied;
+- reasoning models: while the model is thinking the status shows `thinking... 12 s` (this works both for models that send their reasoning separately and for models that put it in `<think>` tags); the reasoning itself is never shown and never added to your text;
+- `Apply change` replaces the original text with the result — nothing touches your manuscript until you click it. If some sections did not finish, the button reads `Apply finished sections`;
 - closing the modal keeps the result available behind the `Show Preview` button in the AI tab.
+
+### Sections, resuming and retrying
+
+Chunked runs, runs by heading, and `Translate by Heading` generate their sections one after the other. Above the panes the preview shows one numbered box per section: grey = waiting, amber = being written, green = done, red = failed, orange = stopped. Click a box to see its status and the error message.
+
+- When the provider fails (or the connection drops) the run **pauses** at that section. Nothing is lost: the finished sections stay finished.
+- `Resume` generates everything that is not finished yet, in order. You can change the model first, for example when a small model ran out of context.
+- Under the boxes, `Run this` generates only the selected section again, `Run from here` generates it and every unfinished section after it, and `Redo` generates a finished section again when you do not like the result.
+- `Stop generation` pauses the run the same way (the section that was being written is stopped, the finished ones stay).
+- **Apply** puts the finished sections into the editor and leaves every other section exactly as it was, so a half-finished run can still be used. The `Diff` view then shows only the finished sections as changes.
+- `Retries per section` (AI tab → `Advanced request options`, default 1) makes the app try a failed section again by itself after 2, 4, 6 seconds before the run pauses. Set it to 0 to stop at the first error.
+
+A run without sections (selection, paragraph, whole text) is one section: when it fails the panel shows the error and `Run again`.
+
+### Reviewing the changes (Diff view)
+
+`Diff` shows the result as a list of changes instead of two long panes, and lets you keep some changes and refuse others:
+
+- Each paragraph that the AI changed is one **change**. Inside a rewritten paragraph the words that were removed are struck through in red and the words that were added are green, so a small edit is easy to see in a long paragraph. A paragraph that only exists in the new text is shown as *added*, one that is gone as *removed*.
+- Paragraphs the AI did not touch are folded into a single line such as `▸ 12 unchanged paragraphs`; click it to read them.
+- Every change has a checkbox, checked by default. Uncheck it to keep the **original** paragraph for that change. The status line counts how many changes are accepted, and the button reads for example `Apply 3 of 5 changes`. `Accept all` and `Reject all` set every box at once; `Previous` / `Next` jump between changes.
+- `Apply` writes the original text with only the accepted changes into the editor. With everything accepted the result is exactly the AI output; with everything rejected there is nothing to apply.
+- The Diff view needs a finished generation and is not offered for review-only results (`Improve Questions`, `Feedback Only`). Very long reviews show the first 250 rows and a `Show more` button.
+
+Changes are matched paragraph by paragraph, so a rewrite that splits or merges paragraphs shows as a changed paragraph next to an added or removed one.
 
 ### Structure warnings and content guardrails
 
@@ -608,15 +672,30 @@ Reasoning models that emit `<think>…</think>` blocks are handled automatically
 
 ## 13. Markdown Tab
 
-The Markdown tab summarizes the current structure:
+The Markdown tab summarizes the current structure and helps you finish it:
 
 - counts of chapters/parts, subheads, special blocks, and unmarked chapter **candidates**;
-- a list of every structure item with a jump button (first 80 shown);
-- candidate lines that look like chapters but are not marked yet, tagged `CHECK`.
+- the **chapter candidate manager**: lines that look like chapter or front/back-matter titles ("Chapter 3", "Proloog", "Colofon") but are not marked yet, each tagged `CHECK`;
+- a list of every structure item with a jump button (first 80 shown).
+
+### Chapter candidate manager
+
+Every candidate row has these buttons:
+
+| Button | What it does |
+|---|---|
+| `line N` | jumps to the line |
+| `Chapter` | marks it as a chapter or part (`# …`); a title starting with "Part" or "Deel" becomes a part |
+| `H2` | marks it as a subhead (`## …`) |
+| `Ignore` | says "this is body text" and stops suggesting it. Ignored candidates are remembered (also after a restart), no longer counted in the Markdown tab, and no longer reported by Preflight |
+
+`Mark all as chapters` marks every remaining candidate at once, after a confirmation, as a **single undo step**. If you ignored too much, `Ignored (n) - restore` brings them all back. Lines inside a `::: block` are never candidates.
 
 Use it as a quick audit: every `CHECK` row is a line you probably want to mark as a chapter or deliberately leave as body text.
 
-## 14. Book Tab: Metadata
+## 14. Book Tab: Metadata and Glossary
+
+### Metadata
 
 The Book tab stores export metadata:
 
@@ -625,14 +704,36 @@ The Book tab stores export metadata:
 | Book Title | DOCX core property "title" |
 | Subtitle | DOCX core property "subject" |
 | Author | DOCX core property "author" |
-| Language / Series / Book # / Publisher | DOCX keywords |
+| Language / Series / Book # / Publisher | DOCX keywords. Language also selects the typography rules of the Clean tab (see [Language profiles](#language-profiles)) |
 | Filename base | base name for all exported files |
 
 Preflight warns when Title or Author is empty. Metadata is included in the autosave, so it survives restarts.
 
+### Glossary
+
+The glossary is a list of terms the AI must treat with care: character and place names, invented words, titles. It belongs to the project (it is saved with it, see [section 18](#18-projects-snapshots-autosave-and-undo)) and to the browser autosave when no project is open.
+
+Write one entry per line:
+
+```text
+# lines that start with # are comments
+Marta
+Brandt
+De Zeven Zussen => The Seven Sisters
+```
+
+- A **plain term** (`Marta`) is kept exactly as written by every AI action that produces text: rewrite, AI Clean, guided rewrite and translate. The AI is told not to translate, rename, inflect or drop it.
+- **`term => translation`** is enforced by `Translate Selection` / `Translate by Heading`: every occurrence of the term must become the translation. In rewrites and cleanups, where nothing is translated, both the term and the translation are simply kept as written.
+- Terms are matched as **whole words and case-sensitively**, so a name such as `Will` does not match the verb `will`, and `Marta` matches in `Marta's` but not in `Martaschool`. Dutch compound words and inflected forms are therefore not matched; add them as separate lines when they matter.
+- Only the entries that occur in the text being sent are added to the request, so a long glossary does not use up a small model's context.
+- `Add names from the text` appends capitalised words that recur in the middle of sentences (and are not yet in the list) for you to keep or delete.
+- A line the app cannot read (for example `term =>` without a translation) is reported under the box and ignored.
+
+The glossary is also a **check**: after generation the content guardrails list every protected term that appears less often than in the original, and every term that was not translated as required. In the `Diff` view the changes that break the glossary are marked with a flag, and `Reject flagged` rejects them all at once.
+
 ## 15. Find / Replace
 
-Open with the `Find` button or `Cmd+F` (Mac) / `Ctrl+F` (Windows/Linux). If text is selected when you open it, short selections pre-fill the search field, and multi-line selections set the scope to `Selection only`.
+Open with the `Find` button or `Cmd+F` (Mac) / `Ctrl+F` (Windows/Linux). If text is selected when you open it, short single-line selections pre-fill the search field. The scope always starts as `Whole text`; switch it to `Selection only` to search just the selection you made before opening Find.
 
 Options:
 
@@ -681,14 +782,75 @@ Creates `<base>-formatted.docx`: a Word document where every Markdown structure 
 Details:
 
 - Book metadata is written into the document properties.
+- Control characters that a Word or EPUB file cannot hold (form feeds and other codes left over from PDFs) are dropped during export instead of making it fail; Preflight lists them as `control-chars` so you can clean them first.
 - Special manuscript blocks use clear named Word styles such as `Manuscript Verse`, `Manuscript Written Note`, and `Manuscript Block Quote`. In Word, you can restyle those centrally.
-- **Known limitation:** Markdown lists and tables render in the preview but are written as literal `- item` / `| cell |` text in the DOCX. Preflight warns when your document contains them.
+- **Lists.** Lines that start with `- `, `* `, `+ ` or `1. ` / `1) ` become real Word lists, using Word's `List Bullet` / `List Number` styles (and `List Bullet 2`, `List Bullet 3`... for nested lists; indent a nested item by two spaces, four spaces or a tab). Every numbered list starts again at its own number, also when it starts at 5, and a sub-list starts again under every item. A blank line between items does not end a list. Lists nested deeper than three levels use the third level. Inside a `:::` block, list-looking lines stay ordinary text.
+- **Tables.** A pipe table (a header row, a `|---|---|` separator row, then the rows) becomes a real Word table in the `Table Grid` style: the header row is bold and repeats on every page, `:---:` / `---:` set the alignment of a column, inline markup works inside cells, `\|` is a pipe inside a cell, `<br>` is a line break inside a cell, and shorter rows are padded with empty cells.
+- If your dialogue lines start with a hyphen (`- Hello`), switch off `Book` → `Export` → `Turn Markdown lists into real lists`; those lines then stay ordinary paragraphs (in the EPUB too). The setting is saved with the project.
+- **Links.** `[text](https://example.org)` becomes a real Word hyperlink (also `mailto:`); other text in square brackets stays as it is.
 
-The DOCX round-trips: importing an exported DOCX back into the app restores the Markdown structure.
+The DOCX round-trips: importing an exported DOCX back into the app restores the Markdown structure, including lists, tables and links.
 
-## 18. Autosave, Undo, and Local Storage
+### Export EPUB
 
-### Autosave
+`☰ Menu` → `Export EPUB` creates `<base>.epub`, an EPUB 3 e-book that opens in Apple Books, Kobo, Calibre and most other readers, and that publishing platforms accept for upload. It is built from the same Markdown as the DOCX, with the same rules: every line of text is a paragraph, and lists, tables, quotes, `***` scene breaks, links and the inline markers work as in the DOCX.
+
+- **Chapters.** Every `#` heading starts a new chapter file. Text before the first heading becomes a `Front matter` section (`Voorwerk` for Dutch books). `##` headings are listed under their chapter in the table of contents, which is generated for you (`Contents` / `Inhoud`).
+- **Metadata** comes from the `Book` tab: title and subtitle, author, language (`en`, `nl`, or any language code; `und` when it is empty), publisher, and series with its book number. With a title there is a title page. The book identifier is derived from title and author, so a new export of the same book keeps its identity.
+- **Special blocks.** `::: verse`, `::: note`, `::: text` and the other blocks become styled sections (indented verse, a bar next to written notes, sans-serif text conversations), centered text and attribution lines get their own style. The look is in a small stylesheet; readers let the reader choose the font.
+- **Not included:** images (a book with images needs them embedded; add them in a tool such as Calibre or Sigil), a cover, and custom fonts. The export has not been run through the official `epubcheck` validator; if a store rejects a file, open it in Calibre first.
+
+## 18. Projects, Snapshots, Autosave, and Undo
+
+### Projects
+
+A **project** is your manuscript saved on disk under a name, so it survives a cleared browser, a different browser, or a crash. Everything is in the `☰ Menu` at the top right:
+
+| Menu item | What it does |
+|---|---|
+| `New project…` | Asks for a name and starts an empty project (the current project is saved first). |
+| `Open project…` | Lists the saved projects, newest first, with word count and last change. |
+| `Save project` | Saves now. Also `Cmd+S` / `Ctrl+S`, or a click on the status next to the filename. |
+| `Save project as…` | Saves the text on screen under a new name (this is also how an unsaved session becomes a project). |
+| `Snapshots…` | Opens the snapshot list of the current project (see below). |
+| `Export project file` / `Import project file` | Downloads or loads a single `.mwb.json` file, for moving a project to another machine. If the name is taken, the import asks for another one. |
+| `Close project` | Saves, then leaves the project and keeps the text on screen as an unsaved session. |
+
+What a project keeps: the text, the book details (`Book` tab), the chapter candidates you chose to ignore, your custom prompts, and the AI and typography settings. The AI API key is **never** part of a project.
+
+The status next to the filename shows where you stand: `saved`, `unsaved changes`, `saving...`, `could not save`, or `changed elsewhere`. Changes are saved automatically about three seconds after you stop typing, and the app asks before you close the tab while something is unsaved. The last project you used opens again after a reload.
+
+**Changed elsewhere.** If the same project was saved from another tab or window since you opened it, the app does not overwrite that version silently. Use `Save project` and confirm to let the version on screen win, or `Export project file` first if you want to keep both.
+
+**Where the files are.** Projects are `<name>.mwb.json` files in the `projects` folder next to the app (the exact path is shown at the top of the `Open project…` list). Every save keeps the previous version as `<name>.mwb.json.bak`. Deleting a project moves its files to `projects/.trash/`; nothing is erased for good. To keep projects elsewhere (for instance in a synced folder), start the app with another data folder:
+
+```bash
+MANUSCRIPT_WORKBENCH_DATA_DIR="$HOME/Documents/Manuscripts" ./start_mac_linux.sh
+```
+
+The projects folder is then `Manuscripts/projects`.
+
+### Snapshots
+
+A snapshot is a full copy of the text at one moment, stored with the project (`<name>.snapshots/`). Open the list with `☰ Menu` → `Snapshots…`.
+
+- **Manual** snapshots (`MANUAL`): type a label such as "Before rewriting chapter 3" and press `Take snapshot`. They are never deleted automatically.
+- **Automatic** snapshots (`AUTO`) are taken for you, with the reason as the label, right before something that can replace a lot of text:
+  - applying an AI result (`Before applying: …`);
+  - `Replace All` in Find / Replace;
+  - loading a file, merging a folder, or clearing the editor;
+  - a Clean action that changes the whole text (`Before Safe Cleanup`, previewed fixes);
+  - `Mark all` chapter candidates;
+  - copying the revised text from the Compare window.
+
+  A change that leaves the text identical to the newest automatic snapshot does not make a new one. While a project is open and its text changed, one more is taken every 15 minutes. Only the newest 50 automatic snapshots are kept.
+- **Compare** shows the snapshot (left) against the text on screen (right).
+- **Restore** replaces the text on screen with the snapshot. The text you replace is saved as a snapshot first, and the top-bar `Undo` also works.
+- **Delete** removes one snapshot.
+
+Snapshots need a project: with an unsaved session, use `Save project as…` first.
+
+### Autosave (browser)
 
 The app autosaves your text, metadata, and settings to the **browser's localStorage** shortly after every change. When you reopen the app and the editor is empty, a recovery bar offers:
 
@@ -701,7 +863,7 @@ Limits to be aware of:
 - browsers cap localStorage (typically 5–10 MB); on very large manuscripts the app warns when autosave fails;
 - clearing browser site data deletes the autosave and your saved prompts/settings.
 
-**Autosave is a safety net, not a saving system.** Export a Markdown file for anything you care about.
+**Browser autosave is a safety net, not a saving system.** Keep anything you care about in a project (above) or export a Markdown file.
 
 ### Undo
 
@@ -717,12 +879,13 @@ Note: loading a new file clears the undo history.
 | settings | UI state, provider, endpoint, model, **API key**, advanced options |
 | prompts | your prompt presets |
 
-The AI API key is kept in localStorage so you do not have to re-enter it. On a shared computer, clear site data for `127.0.0.1:8765` (or remove the key from the field) when you are done.
+The AI API key is kept in the browser's localStorage so you do not have to re-enter it. The app **never writes it to disk**: it is not part of `manuscript_workbench_settings.json`, and the server does not return it. If an older version saved a key in that file, it is removed when the app starts. On a shared computer, clear site data for `127.0.0.1:8765` (or remove the key from the field) when you are done.
 
 ## 19. Keyboard Shortcuts
 
 | Keys | Action |
 |---|---|
+| `Cmd+S` / `Ctrl+S` | save the project (asks for a name when there is none yet) |
 | `Cmd+F` / `Ctrl+F` | open Find/Replace |
 | `Escape` | close Find/Replace |
 | `Enter` in Find field | next match |
@@ -765,7 +928,22 @@ The AI API key is kept in localStorage so you do not have to re-enter it. On a s
 2. AI tab: choose a prompt preset and rewrite strength.
 3. `Rewrite Selection`.
 4. Watch the stream; check the guardrails panel and any structure warning.
-5. `Apply change` only when the after-pane is right.
+5. Switch to `Diff` and accept or reject the changed paragraphs one by one ([Reviewing the changes](#reviewing-the-changes-diff-view)).
+6. `Apply change` (or `Apply 3 of 5 changes`) only when the result is right. With a project open, a snapshot is taken first, and `Undo` still works.
+
+### Rewrite a whole book in sections, and carry on after an error
+
+1. Save the text as a project, and put names and invented words in the `Book` tab's glossary.
+2. In the AI tab choose the model and check the suggested `Chunk size` under the model list.
+3. `Rewrite by Heading` (or `Rewrite Chunked`) on the whole text, with nothing selected.
+4. If the provider fails, the run pauses at that section: fix the problem (start the model, switch to a bigger one) and press `Resume`. Sections that finished stay finished.
+5. Review in `Diff`, press `Reject flagged` for changes that break the glossary, then apply.
+
+### Make a project and an e-book
+
+1. `☰ Menu` → `Save project as…`, then fill in the `Book` tab (title, author, language, series).
+2. Mark chapters with `#`; the Markdown tab's candidate manager finds the unmarked ones.
+3. `Preflight`, then `Export DOCX` for your editor and `Export EPUB` for a reader or a store.
 
 ### Improve a passage with questions first
 
@@ -801,15 +979,25 @@ The AI API key is kept in localStorage so you do not have to re-enter it. On a s
 
 **Provider returns 401.** The endpoint is reachable but needs an API key — paste it into `API Key`.
 
+**"Cannot connect to the AI provider".** Nothing is listening at that address. Start the provider and its local server (LM Studio: start its Local Server; oMLX: start its OpenAI-compatible server and check the port), then `Detect Model` again.
+
+**An AI run paused with a red section.** The provider failed on that section (the message says why). Fix the cause and press `Resume`, or select the red box and use `Run this`. `Retries per section` in the advanced options makes the app try again by itself.
+
+**The Diff view is empty, or `Apply` says "Nothing accepted".** The Diff view only exists for a finished run that has something to apply. Every change is unchecked, or the run was review-only (`Improve Questions`, `Feedback Only`). `Accept all` checks them again.
+
+**Dialogue lines became bullet points in the Word file.** Lines that start with `- ` are lists. Switch off `Turn Markdown lists into real lists` in the `Book` tab (or use an en dash `–` for dialogue; Clean can convert `--` to the dash of your language).
+
+**A project says "changed elsewhere".** The same project was saved from another tab or window. Use `Save project` and confirm to keep the version on screen, or export it first to keep both.
+
 **AI output stops early or errors on long text.** The model's context window is too small for the request. Use `Rewrite Chunked` / `AI Clean Chunked`, or lower `Chunk size`.
 
 **AI preview shows structure warnings on every run.** The model is rewriting your `#`/`>`/`:::` lines. Try a lower rewrite strength, a more conservative preset, or a better model; the warning system exists precisely to catch this before you apply.
 
-**The Markdown preview looks different from the exported DOCX.** Expected for lists and tables (literal in DOCX) and for advanced Markdown that only the preview supports. The preview shows the Markdown; Preflight tells you which parts will not carry into DOCX.
+**The Markdown preview looks different from the exported DOCX.** Expected for advanced Markdown that only the preview supports (for example task-list checkboxes, which become plain text starting with `[ ]`). The preview shows the Markdown; the DOCX uses Word styles.
 
 **Text is full of `Ã©`-style characters after import.** Encoding damage from the source. Run `Repair mojibake` (also part of Safe Cleanup).
 
-**The line-number gutter disappeared.** Word wrap is on, or the document exceeds 12,000 lines. Both are intentional.
+**The line-number gutter disappeared.** Word wrap is on; the gutter is hidden then, by design.
 
 **Autosave warning: "browser storage is full".** The manuscript is too large for localStorage. Export to disk; the app keeps working, only the crash-recovery net is unavailable at that size.
 
@@ -819,22 +1007,35 @@ The AI API key is kept in localStorage so you do not have to re-enter it. On a s
 
 - AI quality depends entirely on the provider and model you run locally.
 - A small provider context length can cause errors with large selections; chunked mode reduces this but chunk boundaries can still need review.
-- DOCX export does not yet create true Word lists or tables from Markdown lists/tables (Preflight warns; the text is preserved literally).
-- DOCX import is style-aware but not a full Word layout converter; tables in imported DOCX files are skipped.
+- A paused run lives in the preview of the current page: reloading the page forgets it (apply the finished sections first).
+- DOCX export of lists is capped at three levels, list items are single paragraphs (an indented continuation line becomes its own paragraph), and table cells hold inline text only (no lists or images inside a cell).
+- The EPUB export has no images or cover, and has not been checked with the official `epubcheck` validator; open it in a reader (Calibre, Apple Books) before you upload it to a store.
+- DOCX import is style-aware but not a full Word layout converter: images, footnotes/endnotes, text boxes and nested tables are skipped, and a table cell that spans several paragraphs becomes one cell with `<br>`.
 - RTF import extracts plain text only.
 - HTML/URL import is practical extraction, not a browser; JavaScript-heavy pages may import incompletely.
 - Old binary `.doc` files are not supported — convert them first.
 - Loading a file resets the undo history (the app asks for confirmation before replacing existing text).
-- Autosave uses browser localStorage and is not a substitute for exported files.
+- Browser autosave uses localStorage and is not a substitute for a saved project or exported files.
+- Projects are plain files on this computer: there is no sync, no sharing and no merging of two versions of the same project. Use `Export project file` to move one.
+- Snapshots store the whole text each time, so a very large manuscript with many manual snapshots takes disk space (automatic ones are capped at 50).
 - The app binds to `127.0.0.1` only: it is not reachable from other machines, by design.
+
+### Security notes
+
+- Every request to the app's API needs a random session token that is created when the app starts and is only handed to the page the app itself serves. Requests with a foreign `Host` or `Origin` header are refused. A web page open in another tab therefore cannot read or change your settings, or use the app to reach other machines.
+- If you see "Missing or invalid session token", reload the page (the token changes each time the app is restarted).
+- The Markdown preview blocks images from other servers by default, so a manuscript cannot make your browser contact a third party. Turn it on in `Book` → `Preview` and reload the page if you want remote images.
+- The preview removes scripts and other active content. Unknown HTML tags such as `<font>` are dropped but their text stays visible.
+- The AI API key stays in your browser. It is never written to a file, never part of a project, and never returned by the app; projects, snapshots and the settings file contain no secrets.
+- Manuscript text is only sent to the AI endpoint you configure. If that endpoint is not on your own machine or network, the app asks for confirmation (once per host and session) before the first request.
 
 ## 23. Recommended Daily Workflow
 
 1. Import text.
-2. **Immediately export a Markdown backup.**
+2. **Immediately save the text as a project** (`☰ Menu` → `Save project as…`), and export a Markdown backup if you want a copy outside the app.
 3. Run `Safe Cleanup`, then fix what Diagnostics still flags.
 4. Add structure with `#`, `##`, `***`, and special blocks where needed; check the Markdown tab for `CHECK` candidates.
 5. Use `Preview` to check the readable version.
-6. Use AI on selections, paragraphs, or chunked text — review guardrails before every apply.
+6. Use AI on selections, paragraphs, or chunked text — review the Diff view and the guardrails before every apply.
 7. Run `Preflight`.
-8. Export to Markdown (archive) and DOCX (delivery).
+8. Export to Markdown (archive) and DOCX or EPUB (delivery).

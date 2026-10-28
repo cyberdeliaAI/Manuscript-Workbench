@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mw-token" content="">
+<title>Manuscript Workbench — Python</title>
+<link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+<header>
+  <div class="brand"><div class="mark">Manuscript <span>Workbench</span></div><div class="sub">v2.0 · local Python edition · Markdown structure · projects · DOCX and EPUB export · local AI review</div></div>
+  <div class="actions">
+    <span class="project-status" id="projectStatus" title="Click to save the project"></span>
+    <span class="filename" id="filename">no file loaded</span>
+    <details class="header-menu" id="headerMenu">
+      <summary class="btn">☰ Menu</summary>
+      <div class="menu-panel">
+        <button id="projectNewBtn">New project…</button>
+        <button id="projectOpenBtn">Open project…</button>
+        <button id="projectSaveBtn">Save project</button>
+        <button id="projectSaveAsBtn">Save project as…</button>
+        <button id="projectSnapshotsBtn" disabled>Snapshots…</button>
+        <button id="projectExportBtn">Export project file</button>
+        <label class="btn" for="projectImportInput">Import project file</label><input type="file" id="projectImportInput" accept=".json,application/json">
+        <button id="projectCloseBtn" disabled>Close project</button>
+        <div class="menu-sep"></div>
+        <label class="btn" for="fileInput">Load File</label><input type="file" id="fileInput" accept=".txt,.md,.markdown,.rtf,.docx,.doc,.html,.htm,text/plain,text/markdown,text/x-markdown,text/html,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+        <button id="importUrlBtn">Import URL</button>
+        <label class="btn" for="folderInput">Merge Folder</label><input type="file" id="folderInput" webkitdirectory directory multiple accept=".txt,.md,.markdown,.rtf,.docx,.doc,.html,.htm,text/plain,text/markdown,text/x-markdown,text/html,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+        <button id="compareBtn">Compare</button>
+        <button id="undoBtn" disabled>Undo</button>
+        <button id="clearBtn">Clear</button>
+        <div class="menu-sep"></div>
+        <button id="exportTxtBtn">Export TXT</button>
+        <button id="exportMarkedTxtBtn">Export Markdown</button>
+        <button id="exportDocxBtn" class="primary">Export DOCX</button>
+        <button id="exportEpubBtn">Export EPUB</button>
+        <div class="menu-sep"></div>
+        <button id="aboutBtn">About</button>
+        <a class="btn" href="/help" target="_blank" rel="noopener">Help / User Manual</a>
+      </div>
+    </details>
+  </div>
+</header>
+<div class="recovery" id="recovery"><strong>Previous autosave found.</strong><span>Restore your last local session?</span><span class="spacer"></span><button id="restoreBtn" class="mini">Restore</button><button id="discardRestoreBtn" class="mini">Discard</button></div>
+<main>
+  <div class="card editor-card">
+    <div class="statbar"><span><span class="label">chars</span><b id="statChars">0</b></span><span><span class="label">words</span><b id="statWords">0</b></span><span><span class="label">lines</span><b id="statLines">0</b></span><span><span class="label">chapters</span><b id="statChapters">0</b></span><span><span class="label">subheads</span><b id="statSubheads">0</b></span></div>
+    <div class="quickbar" id="quickbar" aria-label="Quick formatting">
+      <select id="quickStyle" title="Text style">
+        <option value="">Text style...</option>
+        <option value="normal">Normal text</option>
+        <option value="chapter">Title / Chapter</option>
+        <option value="part">Part</option>
+        <option value="subhead1">Heading 1</option>
+        <option value="subhead2">Heading 2</option>
+        <option value="subhead3">Heading 3</option>
+        <option value="quote">Quote block</option>
+        <option value="verse">Verse</option>
+        <option value="written-note">Written note</option>
+      </select>
+      <select id="quickIcon" title="Insert icon">
+        <option value="">Insert icon...</option>
+        <option value="📌">📌 Important</option>
+        <option value="💡">💡 Tip</option>
+        <option value="⚠️">⚠️ Warning</option>
+        <option value="ℹ️">ℹ️ Info</option>
+        <option value="✅">✅ Done</option>
+        <option value="🔧">🔧 Setup</option>
+        <option value="❗">❗ Attention</option>
+        <option value="🔒">🔒 Security</option>
+        <option value="📝">📝 Note</option>
+      </select>
+      <button data-quick-inline="bold" class="b" title="Bold">B</button>
+      <button data-quick-inline="italic" class="i" title="Italic">I</button>
+      <button data-quick-inline="u" class="u" title="Underline">U</button>
+      <button data-quick-inline="sc" class="sc" title="Small Caps">SC</button>
+      <button data-quick-inline="mono" class="mono" title="Monospace">Mono</button>
+      <button data-quick-inline="sans" title="Sans Serif">Sans</button>
+      <button id="quickQuote" title="Mark selected/current lines as quote">Quote</button>
+      <span class="sep"></span>
+      <button id="openFindBtn" title="Find and replace">Find</button>
+      <button id="togglePreview" title="Toggle rendered Markdown preview">Preview</button>
+      <button id="quickAiRewrite" title="AI Rewrite Selection">AI</button>
+      <button id="quickAiClean" title="AI Clean Selection">Clean</button>
+      <button id="quickClearMark" title="Clear heading/structure marker">Clear</button>
+    </div>
+    <div class="toolbar collapsed" id="structureToolbar">
+      <div class="toolbar-head"><div class="toolbar-title">Markdown tools</div><button id="toggleStructureTools" class="mini">Expand</button></div>
+      <div class="toolbar-body">
+        <span class="group-label">Structure</span>
+        <button data-marker="chapter" title="Marks this line as a chapter heading for Markdown/DOCX export.">Chapter</button><button data-marker="part" title="Marks a larger section that contains multiple chapters, such as Part One.">Part</button><button data-marker="subhead1" title="Marks a section title inside a chapter.">Subhead 1</button><button data-marker="subhead2" title="Marks a lower-level section title inside a chapter.">Subhead 2</button><button data-marker="subhead3" title="Marks a third-level section title inside a chapter.">Subhead 3</button><button data-marker="subhead4" title="Marks a fourth-level section title inside a chapter. Use sparingly.">Subhead 4</button><button data-marker="subhead5" title="Marks a fifth-level section title inside a chapter. Use rarely.">Subhead 5</button>
+        <button data-marker="subtitle" title="Adds a chapter subtitle. It appears with the chapter heading but is not normally a TOC item.">Subtitle</button><button data-marker="element-author" title="Adds an author credit for this chapter/section, useful for anthologies or guest sections.">Element Author</button><button data-marker="hidden-heading" title="Keeps the element title for structure/TOC while hiding the visible heading in the book.">Hidden Heading</button>
+        <span class="group-label">Special</span>
+        <button data-marker="quote" title="Formats this paragraph as an inset block quotation.">Quote</button><button data-marker="verse" title="Formats lines as poetry, lyrics, or verse where line breaks matter.">Verse</button><button data-marker="attribution" title="Formats a quote attribution, usually aligned after a block quote.">Attribution</button><button data-marker="centered" title="Centers this paragraph as an alignment block.">Centered</button><button data-marker="flush-left" title="Forces this paragraph flush left, overriding normal paragraph styling.">Flush Left</button><button data-marker="written-note" title="Formats text as a note written by a character.">Written Note</button><button data-marker="text-conversation" title="Formats text messages or chat-style dialogue between characters.">Text Conversation</button><button data-marker="caption" title="Formats this line as an image caption.">Caption</button><button data-marker="inline-image" title="Marks a placeholder line for an inline image to handle later in Word or another editor.">Inline Image</button><button data-insert="ornament" title="Inserts an ornamental break, a styled divider often used between scenes.">Ornament</button><button data-insert="scene" title="Inserts a plain scene break for a change of time, place, or narrator.">Scene Break</button><button id="clearStructureBtn" title="Removes the structure marker from the selected/current line without deleting the text.">Clear Mark</button>
+        <span class="group-label">Inline</span>
+        <button data-inline="italic" title="Wraps the selected text in italic markup for export.">Italic</button><button data-inline="bold" title="Wraps the selected text in bold markup for export.">Bold</button><button data-inline="u" title="Marks selected text as underlined for Word export.">Underline</button><button data-inline="sc" title="Marks selected text as small caps for DOCX export.">Small Caps</button><button data-inline="mono" title="Marks selected text as monospace, useful for code or machine text.">Monospace</button><button data-inline="sans" title="Marks selected text as sans serif for a distinct inline style.">Sans Serif</button>
+      </div>
+    </div>
+    <div class="editor-wrap">
+      <div class="editor-area" id="editorArea"><div class="gutter" id="gutter"></div><div class="find-highlights" id="findHighlights" aria-hidden="true"></div><textarea id="editor" spellcheck="false" wrap="off" placeholder="Load a TXT, MD, RTF, DOCX, or HTML file, or paste text here.&#10;&#10;Markdown structure:&#10;# Chapter One&#10;## A Subhead&#10;&gt; A quoted paragraph&#10;***&#10;&#10;Inline markup:&#10;*italic*  **bold**  [[u:underline]]&#10;[[sc:small caps]]  [[mono:code]]  [[sans:sans serif]]"></textarea><div class="markdown-preview" id="markdownPreview" aria-label="Markdown preview"></div></div>
+      <div class="editor-foot">
+        <div class="scope-toggle" id="scopeToggle">
+          <label><input type="radio" name="scope" value="all" checked><span>Whole text</span></label>
+          <label><input type="radio" name="scope" value="selection"><span>Selection only</span></label>
+        </div>
+        <label class="wrap-control"><input type="checkbox" id="wrapToggle"><span>Word wrap</span></label>
+        <span class="sel-info" id="selInfo">no selection</span>
+      </div>
+    </div>
+  </div>
+  <div class="sidebar">
+    <div class="side-tabs" role="tablist" aria-label="Workbench tools">
+      <button class="active" data-side-tab="check" type="button">Check</button>
+      <button data-side-tab="outline" type="button">Outline</button>
+      <button data-side-tab="clean" type="button">Clean</button>
+      <button data-side-tab="ai" type="button">AI</button>
+      <button data-side-tab="markdown" type="button" title="Markdown">MD</button>
+      <button data-side-tab="book" type="button">Book</button>
+    </div>
+
+    <div class="side-panel active" data-side-panel="check">
+      <div class="card">
+        <div class="panel-title">Diagnostics</div>
+        <div id="diagList"></div>
+      </div>
+      <div class="card">
+        <div class="panel-title"><span>Preflight</span><button id="preflightBtn" class="mini amber">Run</button></div>
+        <div class="panel-body"><div id="preflightSummary" class="hint">Run Preflight before exporting to catch unmarked chapters, page numbers, TOC text, tabs and repeated headers.</div><div class="issue-list" id="issueList"></div></div>
+      </div>
+    </div>
+
+    <div class="side-panel" data-side-panel="outline">
+      <div class="card">
+        <div class="panel-title">Chapter Navigator</div>
+        <div class="empty-hint">Clickable outline from Markdown headings. Chapter actions use the text between this chapter and the next chapter.</div>
+        <div class="outline-list" id="outlineList"></div>
+      </div>
+    </div>
+
+    <div class="side-panel" data-side-panel="ai">
+      <div class="card" id="lmPanel">
+        <div class="panel-title">AI Tools</div>
+        <div class="lm-panel">
+          <div class="ai-block">
+            <div class="ai-block-title">Writing actions</div>
+            <details class="ai-section" open>
+              <summary>Rewrite & clean</summary>
+              <div class="ai-section-body">
+                <div class="lm-field"><label for="promptSelect">Prompt preset</label><select id="promptSelect"></select></div>
+                <div class="lm-field"><label for="lmStrength">Rewrite strength</label><select id="lmStrength"><option value="default">Prompt default</option><option value="light">Light</option><option value="medium" selected>Medium</option><option value="strong">Strong</option></select></div>
+                <div class="lm-subgroup"><div class="lm-subgroup-title">Rewrite</div><div class="lm-grid"><button id="rewriteSelBtn" class="primary">Rewrite Selection</button><button id="rewriteParaBtn">Current Paragraph</button><button id="rewriteWholeBtn">Rewrite Whole</button><button id="rewriteChunkBtn" title="Uses the current selection if there is one; otherwise rewrites the whole text in chunks.">Rewrite Chunked</button><button id="rewriteHeadingBtn" title="Uses the current selection if there is one; otherwise rewrites the whole text section by section at Markdown headings (# through ######).">Rewrite by Heading</button></div></div>
+                <div class="lm-subgroup"><div class="lm-subgroup-title">AI Clean</div><div class="lm-grid"><button id="cleanSelBtn">AI Clean Selection</button><button id="cleanParaBtn">AI Clean Paragraph</button><button id="cleanWholeBtn">AI Clean Whole</button><button id="cleanChunkBtn" title="Uses the current selection if there is one; otherwise cleans the whole text in chunks.">AI Clean Chunked</button></div></div>
+              </div>
+            </details>
+            <details class="ai-section" open>
+              <summary>Guided tools</summary>
+              <div class="ai-section-body">
+                <div class="lm-field"><label for="guidedContext">Goal / answers / context</label><textarea class="compact" id="guidedContext" placeholder="Optional. Example: make this warmer, less formal, for newsletter readers; or paste answers to AI questions here."></textarea></div>
+                <div class="lm-grid"><button id="askImproveBtn">Improve Questions</button><button id="feedbackOnlyBtn">Feedback Only</button><button id="rewriteGuidedBtn" class="primary">Rewrite with Guidance</button><button id="translateSelBtn">Translate Selection</button><button id="translateHeadingBtn" title="Uses the current selection if there is one; otherwise translates the whole text section by section at Markdown headings (# through ######).">Translate by Heading</button></div>
+                <div class="lm-field"><label for="translateTarget">Translate to</label><input id="translateTarget" type="text" value="English" spellcheck="false"></div>
+              </div>
+            </details>
+            <details class="ai-section">
+              <summary>Prompt editor</summary>
+              <div class="ai-section-body">
+                <div class="lm-field"><label for="promptText">System prompt</label><textarea class="prompt" id="promptText"></textarea></div>
+                <div class="prompt-actions"><button id="savePromptBtn">Save Prompt</button><button id="savePromptAsBtn">Save As New</button><button id="deletePromptBtn">Delete</button><button id="resetPromptsBtn">Reset Defaults</button></div>
+              </div>
+            </details>
+          </div>
+          <div class="ai-block">
+            <div class="ai-block-title">Provider & request</div>
+            <div class="ai-section static">
+              <div class="ai-static-title">Provider setup</div>
+              <div class="ai-section-body">
+                <div class="lm-field"><label for="lmProvider">Provider</label><select id="lmProvider"><option value="lmstudio">LM Studio (easy GUI)</option><option value="omlx">oMLX (Mac MLX)</option><option value="ollama">Ollama (cross-platform)</option><option value="custom">Custom OpenAI-compatible</option></select></div>
+                <div class="lm-field"><label for="lmBase">Endpoint</label><input id="lmBase" type="text" value="http://localhost:1234/v1" spellcheck="false"></div>
+                <div class="lm-field"><label for="lmApiKey">API Key</label><input id="lmApiKey" type="password" placeholder="optional; required by some providers such as oMLX" spellcheck="false" autocomplete="off"></div>
+                <div class="lm-field"><label for="lmModel">Model</label><select id="lmModel"><option value="">Detect first available model</option></select><div class="hint" id="modelHint"></div><button id="useChunkSizeBtn" class="mini" hidden>Use this chunk size</button></div>
+                <div class="lm-grid"><button id="detectModelBtn">Detect Model</button><button id="lmTestBtn">Test</button></div>
+              </div>
+            </div>
+            <details class="ai-section">
+              <summary>Advanced request options</summary>
+              <div class="ai-section-body">
+                <div class="advanced-grid">
+                  <div class="lm-field"><label for="advTemperature">Temperature</label><input id="advTemperature" type="text" placeholder="provider default"></div>
+                  <div class="lm-field"><label for="advTopP">Top P</label><input id="advTopP" type="text" placeholder="provider default"></div>
+                  <div class="lm-field"><label for="advTopK">Top K</label><input id="advTopK" type="text" placeholder="provider default"></div>
+                  <div class="lm-field"><label for="advRepeatPenalty">Repeat penalty</label><input id="advRepeatPenalty" type="text" placeholder="provider default"></div>
+                  <div class="lm-field"><label for="advMaxTokens">Max tokens</label><input id="advMaxTokens" type="text" placeholder="provider default"></div>
+                  <div class="lm-field"><label for="chunkSize">Chunk size</label><input id="chunkSize" type="text" value="6000"></div>
+                  <div class="lm-field"><label for="autoRetry">Retries per section</label><select id="autoRetry" title="How often a section is tried again by itself when the provider fails"><option value="0">0 (stop at the error)</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option></select></div>
+                </div>
+                <div class="hint">Leave fields empty to use the provider or model defaults.</div>
+              </div>
+            </details>
+          </div>
+          <div class="lm-grid"><button id="lmStopBtn" class="danger wide" disabled>Stop generation</button><button id="showPreviewBtn" class="wide" disabled>Show Preview</button></div>
+          <div class="lm-status" id="lmStatus">Local AI idle.</div>
+          <div class="lm-note" id="lmNote">This app sends only model + messages + stream to the selected OpenAI-compatible local endpoint. Runtime settings stay in your provider app.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-panel" data-side-panel="clean">
+      <div class="card">
+        <div class="panel-title">Operations</div>
+        <div class="empty-hint">Safe Cleanup is one-pass and conservative. Structure and typography actions show a preview before applying.</div>
+        <div class="fix-row"><button id="safeCleanupBtn" class="primary">Safe Cleanup: encoding, spaces, hidden chars</button></div>
+        <div class="fix-row"><button id="showMarkersBtn">Strip Markers Preview</button></div>
+        <div class="fix-row"><button data-fix="htmlText">Extract text from HTML</button></div>
+
+        <div class="fix-group">
+          <div class="fix-group-title">Encoding &amp; hidden characters</div>
+          <div class="fix-row"><button data-fix="mojibake">Repair mojibake</button></div>
+          <div class="fix-row"><button data-fix="invisible">Remove zero-width / invisible chars</button></div>
+          <div class="fix-row"><button data-fix="specialSpaces">Normalize special spaces</button></div>
+          <div class="fix-row"><button data-fix="controlChars">Strip control / page-break chars</button></div>
+          <div class="fix-row"><button data-fix="unicodeNFC">Normalize Unicode composition</button></div>
+          <div class="fix-row"><button data-fix="ligatures">Replace typographic ligatures</button></div>
+        </div>
+        <div class="fix-group">
+          <div class="fix-group-title">Structure</div>
+          <div class="fix-row"><button data-fix="join">Join wrapped lines conservatively</button></div>
+          <div class="fix-note"><label><input type="checkbox" id="dehyphenate" checked> re-join words split by a hyphen at line end</label></div>
+          <div class="fix-row"><button data-fix="blankRuns">Normalize blank lines</button></div>
+          <div class="fix-row"><button data-fix="trailingSpaces">Trim trailing spaces only</button></div>
+          <div class="fix-row"><button data-fix="indentation">Remove indentation</button></div>
+          <div class="fix-row"><button data-fix="pageNumbers">Remove standalone page-number lines</button></div>
+          <div class="fix-row"><button data-fix="repeatLines">Remove repeated header/footer candidates</button></div>
+          <div class="fix-note caveat"><span>Previewed first: page numbers, headers, poetry, scene breaks and chapter titles can look similar.</span></div>
+        </div>
+        <div class="fix-group">
+          <div class="fix-group-title">Spaces &amp; tabs</div>
+          <div class="fix-row"><button data-fix="tabsToSpace">Tabs to spaces</button></div>
+          <div class="fix-row"><button data-fix="collapseSpaces">Collapse multiple spaces</button></div>
+          <div class="fix-row"><button data-fix="spaceBeforePunct">Remove space before punctuation</button></div>
+          <div class="fix-row"><button data-fix="spaceAfterPunct">Add missing space after punctuation</button></div>
+        </div>
+        <div class="fix-group">
+          <div class="fix-group-title">Typography</div>
+          <div class="fix-note" id="profileNote"></div>
+          <div class="fix-row"><label class="fix-select"><span>Quote style</span><select id="quoteStyle"><option value="auto">Auto (by language)</option><option value="standard">“ ”  ‘ ’  standard</option><option value="low-high">„ ”  ‚ ’  low-high</option></select></label></div>
+          <div class="fix-row"><label class="fix-select"><span>Dash style</span><select id="dashStyle"><option value="auto">Auto (by language)</option><option value="em">— em dash</option><option value="spaced-en">– spaced en dash</option></select></label></div>
+          <div class="fix-row"><button data-fix="quotesCurly">Quotes to curly</button></div>
+          <div class="fix-row"><button data-fix="quotesStraight">Quotes to straight</button></div>
+          <div class="fix-row"><button data-fix="apostrophes">Repair apostrophes (‘t → ’t)</button></div>
+          <div class="fix-row"><button data-fix="dashEm">-- to dash</button></div>
+          <div class="fix-row"><button data-fix="ellipsis">... to ellipsis</button></div>
+        </div>
+        <div class="fix-group">
+          <div class="fix-group-title">File</div>
+          <div class="fix-row"><button data-fix="trimDoc">Trim document edges</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-panel" data-side-panel="markdown">
+      <div class="card">
+        <div class="panel-title">Markdown Structure</div>
+        <div class="structure-help">Marked lines are exported as real Word styles. Use the toolbar above the editor to mark structure and inline formatting.</div>
+        <div class="structure-summary" id="structureSummary"></div>
+        <div id="candidateList"></div>
+        <div id="structureList"></div>
+        <div class="marker-legend">Markdown structure includes # chapter, ## subhead, &gt; quote, ***, and fenced blocks like ::: verse or ::: written-note.</div>
+      </div>
+    </div>
+
+    <div class="side-panel" data-side-panel="book">
+      <div class="card">
+        <div class="panel-title">Metadata</div>
+        <div class="panel-body"><div class="meta-grid">
+          <label>Book Title<input id="metaTitle" type="text"></label><label>Subtitle<input id="metaSubtitle" type="text"></label><label>Author<input id="metaAuthor" type="text"></label><label>Language<input id="metaLanguage" type="text" placeholder="en / nl" list="languageList"></label><label>Series<input id="metaSeries" type="text"></label><label>Book #<input id="metaBookNumber" type="text"></label><label>Publisher<input id="metaPublisher" type="text"></label><label>Filename base<input id="metaFilename" type="text" placeholder="manuscript"></label>
+        </div><datalist id="languageList"><option value="en"></option><option value="nl"></option></datalist><p class="hint" id="languageHint"></p><p class="hint">Title/author go into DOCX core properties; the other fields are stored as keywords/comments where possible. Language selects the typography rules of the Clean tab (English, Nederlands; other languages get only the language-neutral fixes).</p></div>
+      </div>
+      <div class="card">
+        <div class="panel-title">Export</div>
+        <div class="panel-body"><label class="fix-note flush"><input type="checkbox" id="docxLists" checked> <span>Turn Markdown lists into real lists in the DOCX and EPUB export</span></label><p class="hint">Lines that start with <code>- </code>, <code>* </code>, <code>+ </code> or <code>1. </code> become bullet and numbered lists, and pipe tables become Word tables. Switch lists off when dialogue lines start with a hyphen, so they stay ordinary paragraphs.</p></div>
+      </div>
+      <div class="card">
+        <div class="panel-title">Glossary</div>
+        <div class="panel-body"><textarea class="compact glossary" id="glossaryText" rows="8" spellcheck="false" placeholder="Marta&#10;Brandt&#10;De Zeven Zussen =&gt; The Seven Sisters"></textarea><div class="lm-grid"><button id="glossaryNamesBtn" title="Adds capitalised words that recur in the text, for you to keep or delete">Add names from the text</button></div><p class="hint glossary-status" id="glossaryStatus"></p><p class="hint">One term per line. A plain term is kept exactly as written by every AI action; <code>term =&gt; translation</code> is enforced by Translate and the translation itself is kept in rewrites. Lines starting with # are ignored. Matching is by whole word and case-sensitive. The glossary belongs to the project.</p></div>
+      </div>
+      <div class="card">
+        <div class="panel-title">Preview</div>
+        <div class="panel-body"><label class="fix-note flush"><input type="checkbox" id="allowRemoteImages"> <span>Load remote images in the Markdown preview</span></label><p class="hint">Off by default, so a manuscript cannot make your browser contact other servers. Reload the page after changing this.</p></div>
+      </div>
+    </div>
+  </div>
+</main>
+<div class="selection-menu" id="selectionMenu" hidden>
+  <select id="selectionAction" aria-label="Selection action">
+    <option value="">Selection actions...</option>
+    <optgroup label="AI">
+      <option value="ai-rewrite">AI Rewrite Selection</option>
+      <option value="ai-clean">AI Clean Selection</option>
+    </optgroup>
+    <optgroup label="Inline">
+      <option value="inline-bold">Bold</option>
+      <option value="inline-italic">Italic</option>
+      <option value="inline-u">Underline</option>
+      <option value="inline-sc">Small Caps</option>
+      <option value="inline-mono">Monospace</option>
+      <option value="inline-sans">Sans Serif</option>
+    </optgroup>
+    <optgroup label="Markdown structure">
+      <option value="mark-chapter">Chapter</option>
+      <option value="mark-part">Part</option>
+      <option value="mark-subhead1">Subhead 1</option>
+      <option value="mark-subhead2">Subhead 2</option>
+      <option value="mark-quote">Quote</option>
+      <option value="mark-verse">Verse</option>
+      <option value="mark-written-note">Written Note</option>
+      <option value="clear-structure">Clear Structure Mark</option>
+    </optgroup>
+    <optgroup label="Clean">
+      <option value="safe-clean">Safe Cleanup Selection</option>
+    </optgroup>
+  </select>
+  <button id="selectionRunBtn" class="mini primary" type="button">Run</button>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="projectsModal">
+  <div class="modal-card modal-tall-760">
+    <div class="modal-head"><div><div class="modal-title">Projects</div><div class="small" id="projectsDir"></div></div><div class="modal-actions"><button id="projectsNewBtn" class="mini primary">New project…</button><button id="projectsCloseBtn" class="mini">Close</button></div></div>
+    <div class="merge-list" id="projectList"></div>
+    <div class="modal-foot"><span class="lm-status">Projects keep the text, the book details, ignored chapter candidates, prompts and AI settings. Deleted projects are moved to .trash.</span></div>
+  </div>
+</div>
+<div class="modal" id="snapshotsModal">
+  <div class="modal-card modal-tall-760">
+    <div class="modal-head"><div><div class="modal-title" id="snapshotsTitle">Snapshots</div><div class="small" id="snapshotSummary"></div></div><div class="modal-actions"><button id="snapshotsCloseBtn" class="mini">Close</button></div></div>
+    <div class="snapshot-add"><input id="snapshotLabel" type="text" placeholder="Label for a new snapshot, e.g. Before rewriting chapter 3" spellcheck="false"><button id="snapshotTakeBtn" class="primary">Take snapshot</button></div>
+    <div class="merge-list" id="snapshotList"></div>
+    <div class="modal-foot"><span class="lm-status">Compare shows a snapshot next to the text on screen. Restore keeps what you replace as a snapshot.</span></div>
+  </div>
+</div>
+<div class="modal" id="nameModal">
+  <div class="modal-card modal-narrow-560">
+    <div class="modal-head"><div class="modal-title" id="nameModalTitle">Name</div><div class="modal-actions"><button id="nameModalCancel" class="mini">Cancel</button></div></div>
+    <div class="find-body"><div class="find-field"><label for="nameModalInput" id="nameModalLabel">Name</label><input id="nameModalInput" type="text" spellcheck="false" maxlength="120"></div><div class="hint" id="nameModalHint"></div></div>
+    <div class="modal-foot"><span></span><div class="modal-actions"><button id="nameModalOk" class="primary">OK</button></div></div>
+  </div>
+</div>
+<div class="modal" id="aboutModal">
+  <div class="modal-card modal-narrow-560">
+    <div class="modal-head"><div><div class="modal-title">About Manuscript Workbench</div><div class="small">Version 2.0</div></div><div class="modal-actions"><button id="closeAboutBtn" class="mini">Close</button></div></div>
+    <div class="find-body">
+      <div class="hint about-text">Local-first manuscript, Markdown, cleanup, DOCX and AI rewrite workbench.</div>
+      <div class="hint about-text">Settings are saved locally next to the app in <code>manuscript_workbench_settings.json</code>.</div>
+      <div class="hint about-text">Help: open <a href="/help" target="_blank" rel="noopener">User Manual</a>.</div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="previewModal">
+  <div class="modal-card" id="modalCard">
+    <div class="modal-head"><div><div class="modal-title" id="previewTitle">Preview</div><div class="small" id="previewSub">before / after</div></div><div class="modal-actions"><button data-view="split" class="mini viewBtn">Split</button><button data-view="after-only" class="mini viewBtn">After only</button><button data-view="before-only" class="mini viewBtn">Before only</button><button data-view="diff" class="mini viewBtn" title="Compare word by word and accept or reject each changed paragraph">Diff</button><label class="small"><input type="checkbox" id="previewLinked"> linked scroll</label><label class="small"><input type="checkbox" id="autoScroll" checked> auto-scroll</label><button id="bottomBtn" class="mini">Bottom</button><button id="closePreviewBtn" class="mini">Close</button></div></div>
+    <div class="integrity-panel" id="integrityPanel"></div>
+    <div class="run-panel" id="runPanel"><div class="run-bar"><span class="small" id="runSummary"></span><button id="runResumeBtn" class="mini" title="Generate the sections that are not finished yet">Resume</button></div><div class="run-chips" id="runChips"></div><div class="run-detail" id="runDetail"></div></div>
+    <div class="preview-grid"><div class="pane before-pane"><div class="pane-head"><span>Before</span></div><div class="preview-box" id="beforeBox"></div></div><div class="pane after-pane"><div class="pane-head"><span>After</span><span id="streamState" class="small"></span></div><div class="preview-box" id="afterBox"></div></div></div>
+    <div class="diff-panel" id="diffPanel"><div class="diff-bar"><span class="small" id="diffSummary"></span><div class="diff-actions"><button id="diffPrevBtn" class="mini">Previous</button><button id="diffNextBtn" class="mini">Next</button><button id="diffRejectFlaggedBtn" class="mini" title="Reject the changes that break the glossary" disabled>Reject flagged</button><button id="diffAcceptAllBtn" class="mini">Accept all</button><button id="diffRejectAllBtn" class="mini">Reject all</button></div></div><div class="diff-list" id="diffList"></div></div>
+    <div class="modal-foot"><span class="lm-status" id="previewStatus">Ready.</span><div class="modal-actions"><button id="comparePreviewBtn">Open in Compare</button><button id="stopBtn" class="danger" disabled>Stop generation</button><button id="applyPreviewBtn" class="primary" disabled>Apply change</button></div></div>
+  </div>
+</div>
+<div class="modal" id="compareModal">
+  <div class="modal-card">
+    <div class="modal-head"><div><div class="modal-title">Compare / Parallel View</div><div class="small" id="compareSub">Original and revised text side by side</div></div><div class="modal-actions"><label class="small"><input type="checkbox" id="compareLinked" checked> linked scroll</label><button id="closeCompareBtn" class="mini">Close</button></div></div>
+    <div class="compare-grid">
+      <div class="pane"><div class="pane-head"><span>Original</span><span id="compareOriginalMeta" class="compare-meta">empty</span></div><textarea id="compareOriginal" class="compare-text" spellcheck="false"></textarea></div>
+      <div class="pane"><div class="pane-head"><span>Revised / Translation</span><span id="compareRevisedMeta" class="compare-meta">empty</span></div><textarea id="compareRevised" class="compare-text" spellcheck="false"></textarea></div>
+    </div>
+    <div class="modal-foot"><span class="lm-status" id="compareStatus">Ready.</span><div class="modal-actions"><label class="btn mini" for="compareOriginalInput">Load Original</label><input type="file" id="compareOriginalInput" accept=".txt,.md,.markdown,.rtf,.docx,.doc,.html,.htm,text/plain,text/markdown,text/x-markdown,text/html,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"><label class="btn mini" for="compareRevisedInput">Load Revised</label><input type="file" id="compareRevisedInput" accept=".txt,.md,.markdown,.rtf,.docx,.doc,.html,.htm,text/plain,text/markdown,text/x-markdown,text/html,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"><button id="compareUseEditorOriginal">Editor -> Original</button><button id="compareUseEditorRevised">Editor -> Revised</button><button id="compareSwapBtn">Swap</button><button id="compareExportRevisedBtn">Export Revised</button><button id="compareCopyRevisedBtn" class="primary">Revised -> Editor</button></div></div>
+  </div>
+</div>
+<div class="modal" id="mergeModal">
+  <div class="modal-card modal-tall-760">
+    <div class="modal-head"><div><div class="modal-title">Merge Folder</div><div class="small" id="mergeSub">Arrange files before merging</div></div><div class="modal-actions"><button id="mergeCancelBtn" class="mini">Cancel</button></div></div>
+    <div class="merge-list" id="mergeList"></div>
+    <div class="modal-foot"><span class="lm-status" id="mergeStatus">Ready.</span><div class="modal-actions"><button id="mergeBtn" class="primary">Merge into editor</button></div></div>
+  </div>
+</div>
+<div class="modal" id="urlModal">
+  <div class="modal-card modal-narrow-720">
+    <div class="modal-head"><div><div class="modal-title">Import URL</div><div class="small">Fetch a web page and extract readable text</div></div><div class="modal-actions"><button id="urlCancelBtn" class="mini">Cancel</button></div></div>
+    <div class="find-body">
+      <div class="find-field"><label for="urlInput">URL</label><input id="urlInput" type="text" spellcheck="false" placeholder="https://example.com/article"></div>
+      <div class="hint">Only http/https URLs are allowed. Local and private addresses are blocked.</div>
+    </div>
+    <div class="modal-foot"><span class="lm-status" id="urlStatus">Ready.</span><div class="modal-actions"><button id="urlFetchBtn" class="primary">Fetch URL</button></div></div>
+  </div>
+</div>
+<div class="modal" id="htmlImportModal">
+  <div class="modal-card">
+    <div class="modal-head"><div><div class="modal-title" id="htmlImportTitle">Choose HTML Import</div><div class="small" id="htmlImportSub">Compare extraction methods before loading</div></div><div class="modal-actions"><button id="htmlImportCancelBtn" class="mini">Cancel</button></div></div>
+    <div class="preview-grid"><div class="pane"><div class="pane-head"><span>Simple extraction</span><span id="htmlSimpleMeta" class="small"></span></div><div class="preview-box" id="htmlSimpleBox"></div></div><div class="pane"><div class="pane-head"><span>Main text extraction</span><span id="htmlMainMeta" class="small"></span></div><div class="preview-box" id="htmlMainBox"></div></div></div>
+    <div class="modal-foot"><span class="lm-status" id="htmlImportStatus">Choose an import method.</span><div class="modal-actions"><button id="htmlUseSimpleBtn">Use Simple</button><button id="htmlUseMainBtn" class="primary">Use Main Text</button></div></div>
+  </div>
+</div>
+<div class="modal" id="findModal">
+  <div class="modal-card modal-narrow-760">
+    <div class="modal-head"><div><div class="modal-title">Find / Replace</div><div class="small">Search whole manuscript or current selection</div></div><div class="modal-actions"><button id="closeFindBtn" class="mini">Close</button></div></div>
+    <div class="find-body">
+      <div class="find-grid">
+        <div class="find-field"><label for="findText">Find</label><input id="findText" type="text" spellcheck="false"></div>
+        <div class="find-field"><label for="replaceText">Replace with</label><input id="replaceText" type="text" spellcheck="false"></div>
+      </div>
+      <div class="find-options">
+        <label><input type="checkbox" id="findRegex"> Regex</label>
+        <label><input type="checkbox" id="findCase"> Case sensitive</label>
+        <label>Scope <select id="findScope"><option value="all">Whole text</option><option value="selection">Selection only</option></select></label>
+      </div>
+    </div>
+    <div class="modal-foot"><span class="lm-status" id="findStatus">Ready.</span><div class="modal-actions"><button id="findPrevBtn">Previous</button><button id="findNextBtn" class="primary">Next</button><button id="replaceOneBtn">Replace</button><button id="replaceAllBtn" class="danger">Replace All</button></div></div>
+  </div>
+</div>
+<script type="module" src="/static/js/main.js"></script>
+</body>
+</html>
