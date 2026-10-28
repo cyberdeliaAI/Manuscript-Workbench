@@ -259,7 +259,8 @@ class ManuscriptWorkbenchHandler(BaseHTTPRequestHandler):
             payload = get_json_body(self)
             text = payload.get("text") or ""
             metadata = payload.get("metadata") or {}
-            docx_bytes = create_manuscript_docx(text, metadata)
+            options = payload.get("options") if isinstance(payload.get("options"), dict) else {}
+            docx_bytes = create_manuscript_docx(text, metadata, options)
             filename = safe_filename(payload.get("filename") or metadata.get("filename") or "manuscript") + "-formatted.docx"
             self.send_response(200)
             self.send_header("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")

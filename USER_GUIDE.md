@@ -164,7 +164,7 @@ Notes on each format:
 
 - **Encoding detection.** Text files are read as UTF-8, UTF-16 (with or without BOM), or Windows-1252, whichever produces the cleanest result. A BOM is removed and line endings are normalized to LF. The toast message after loading tells you what was detected.
 - **Content sniffing.** A file with the wrong extension is still recognized by its content: DOCX by its ZIP signature, RTF by `{\rtf`, HTML by its opening tags.
-- **DOCX import** maps common Word paragraph styles back to Markdown: `Heading 1`–`Heading 6` become `#`–`######`, `Quote`/`Intense Quote`/manuscript block quote styles become `>`, ornamental lines (`* * *`, `---`) become `***` scene breaks, and manuscript block styles (verse, written note, attribution, and so on) become `::: name` blocks. Inline bold, italic, underline, small caps, monospace, and sans serif runs become Markdown/inline markers. Tables inside the DOCX are **skipped** (the import note tells you how many).
+- **DOCX import** maps common Word paragraph styles back to Markdown: `Heading 1`–`Heading 6` become `#`–`######`, `Quote`/`Intense Quote`/manuscript block quote styles become `>`, ornamental lines (`* * *`, `---`) become `***` scene breaks, and manuscript block styles (verse, written note, attribution, and so on) become `::: name` blocks. Inline bold, italic, underline, small caps, monospace, and sans serif runs become Markdown/inline markers. The body is read in document order, so **tables** come back as Markdown pipe tables at the right place (merged cells repeat nothing, the header row is not marked bold, column alignment is kept) and **lists** (Word list styles, or any paragraph with Word numbering) become `-` / `1.` lists with nesting; numbered headings stay headings. Hyperlinks keep their text, and web links become `[text](url)`. **Images** and **footnotes/endnotes** are not imported; the import note says how many were skipped.
 - **RTF import** extracts plain text, converting paragraph breaks, tabs, special dashes/quotes, and Unicode escapes. Formatting is not preserved.
 - **`.doc` (old binary Word)** is not supported. Save it as `.docx`, `.rtf`, or `.txt` first — the app tells you this if you try.
 
@@ -385,7 +385,7 @@ Details worth knowing:
 - Rendering is done by Python-Markdown on the local server, with a built-in JavaScript fallback if the server call fails, so the preview keeps working either way.
 - The preview output is sanitized: only a safe set of tags and attributes is allowed, and only `http(s)`, `mailto:`, and relative links survive.
 - Editor and preview scrolling are synchronized proportionally. On very large or complex documents the matched position may be approximate.
-- The preview shows how the *Markdown* reads. DOCX export has its own mapping and limitations (notably lists and tables, see [section 17](#17-exporting)).
+- The preview shows how the *Markdown* reads. DOCX export has its own mapping (see [section 17](#17-exporting)).
 
 ## 9. Check Tab: Diagnostics and Preflight
 
@@ -430,7 +430,7 @@ Each diagnostic has a matching Clean operation, so the Check tab doubles as a to
 - **unclosed `:::` block** — an odd number of fence lines;
 - **repeated lines** — short lines that repeat throughout the text (header/footer suspects);
 - **chapter numbering sequence** — chapter numbers that skip or reset (works with digits, roman numerals, and English/Dutch number words);
-- **lists / tables as literal text** — Markdown lists and tables preview correctly but are written as literal text in DOCX export;
+- the summary also counts the **Markdown list items and tables**, which become Word lists and tables on export (no warning is needed any more);
 - **invisible/control/mojibake characters** still present;
 - **mixed quotes** — straight and typographic double quotes in the same text (and an info line when the whole text uses straight quotes);
 - **wrong apostrophes** — an opening quote used as an apostrophe (`‘t huis`); `Clean` → `Repair apostrophes` fixes them.
@@ -782,9 +782,11 @@ Details:
 
 - Book metadata is written into the document properties.
 - Special manuscript blocks use clear named Word styles such as `Manuscript Verse`, `Manuscript Written Note`, and `Manuscript Block Quote`. In Word, you can restyle those centrally.
-- **Known limitation:** Markdown lists and tables render in the preview but are written as literal `- item` / `| cell |` text in the DOCX. Preflight warns when your document contains them.
+- **Lists.** Lines that start with `- `, `* `, `+ ` or `1. ` / `1) ` become real Word lists, using Word's `List Bullet` / `List Number` styles (and `List Bullet 2`, `List Bullet 3`... for nested lists; indent a nested item by two spaces, four spaces or a tab). Every numbered list starts again at its own number, also when it starts at 5, and a sub-list starts again under every item. A blank line between items does not end a list. Lists nested deeper than three levels use the third level. Inside a `:::` block, list-looking lines stay ordinary text.
+- **Tables.** A pipe table (a header row, a `|---|---|` separator row, then the rows) becomes a real Word table in the `Table Grid` style: the header row is bold and repeats on every page, `:---:` / `---:` set the alignment of a column, inline markup works inside cells, `\|` is a pipe inside a cell, `<br>` is a line break inside a cell, and shorter rows are padded with empty cells.
+- If your dialogue lines start with a hyphen (`- Hello`), switch off `Book` → `Export` → `Turn Markdown lists into Word lists`; those lines then stay ordinary paragraphs. The setting is saved with the project.
 
-The DOCX round-trips: importing an exported DOCX back into the app restores the Markdown structure.
+The DOCX round-trips: importing an exported DOCX back into the app restores the Markdown structure, including lists and tables.
 
 ## 18. Projects, Snapshots, Autosave, and Undo
 
@@ -954,7 +956,7 @@ The AI API key is kept in the browser's localStorage so you do not have to re-en
 
 **AI preview shows structure warnings on every run.** The model is rewriting your `#`/`>`/`:::` lines. Try a lower rewrite strength, a more conservative preset, or a better model; the warning system exists precisely to catch this before you apply.
 
-**The Markdown preview looks different from the exported DOCX.** Expected for lists and tables (literal in DOCX) and for advanced Markdown that only the preview supports. The preview shows the Markdown; Preflight tells you which parts will not carry into DOCX.
+**The Markdown preview looks different from the exported DOCX.** Expected for advanced Markdown that only the preview supports (for example task-list checkboxes, which become plain text starting with `[ ]`). The preview shows the Markdown; the DOCX uses Word styles.
 
 **Text is full of `Ã©`-style characters after import.** Encoding damage from the source. Run `Repair mojibake` (also part of Safe Cleanup).
 
@@ -969,8 +971,8 @@ The AI API key is kept in the browser's localStorage so you do not have to re-en
 - AI quality depends entirely on the provider and model you run locally.
 - A small provider context length can cause errors with large selections; chunked mode reduces this but chunk boundaries can still need review.
 - A paused run lives in the preview of the current page: reloading the page forgets it (apply the finished sections first).
-- DOCX export does not yet create true Word lists or tables from Markdown lists/tables (Preflight warns; the text is preserved literally).
-- DOCX import is style-aware but not a full Word layout converter; tables in imported DOCX files are skipped.
+- DOCX export of lists is capped at three levels, list items are single paragraphs (an indented continuation line becomes its own paragraph), and table cells hold inline text only (no lists or images inside a cell).
+- DOCX import is style-aware but not a full Word layout converter: images, footnotes/endnotes, text boxes and nested tables are skipped, and a table cell that spans several paragraphs becomes one cell with `<br>`.
 - RTF import extracts plain text only.
 - HTML/URL import is practical extraction, not a browser; JavaScript-heavy pages may import incompletely.
 - Old binary `.doc` files are not supported — convert them first.

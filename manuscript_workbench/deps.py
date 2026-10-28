@@ -30,9 +30,13 @@ try:
     from docx import Document
     from docx.enum.style import WD_STYLE_TYPE
     from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.oxml import OxmlElement
+    from docx.oxml.ns import qn
     from docx.shared import Pt
 except Exception:  # pragma: no cover
     Document = None
     WD_STYLE_TYPE = None
     WD_ALIGN_PARAGRAPH = None
+    OxmlElement = None
+    qn = None
     Pt = None

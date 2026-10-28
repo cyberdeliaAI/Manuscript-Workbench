@@ -447,12 +447,12 @@
             "i": null,
             "sc": null,
             "style": "Default Paragraph Font",
-            "t": "- bullet one",
+            "t": "bullet one",
             "u": null
           }
         ],
-        "style": "Normal",
-        "text": "- bullet one"
+        "style": "List Bullet",
+        "text": "bullet one"
       },
       {
         "align": null,
@@ -462,12 +462,12 @@
             "i": null,
             "sc": null,
             "style": "Default Paragraph Font",
-            "t": "  - nested bullet",
+            "t": "nested bullet",
             "u": null
           }
         ],
-        "style": "Normal",
-        "text": "  - nested bullet"
+        "style": "List Bullet 2",
+        "text": "nested bullet"
       },
       {
         "align": null,
@@ -477,12 +477,12 @@
             "i": null,
             "sc": null,
             "style": "Default Paragraph Font",
-            "t": "- bullet two",
+            "t": "bullet two",
             "u": null
           }
         ],
-        "style": "Normal",
-        "text": "- bullet two"
+        "style": "List Bullet",
+        "text": "bullet two"
       },
       {
         "align": null,
@@ -498,12 +498,12 @@
             "i": null,
             "sc": null,
             "style": "Default Paragraph Font",
-            "t": "1. first",
+            "t": "first",
             "u": null
           }
         ],
-        "style": "Normal",
-        "text": "1. first"
+        "style": "List Number",
+        "text": "first"
       },
       {
         "align": null,
@@ -513,12 +513,12 @@
             "i": null,
             "sc": null,
             "style": "Default Paragraph Font",
-            "t": "2. second",
+            "t": "second",
             "u": null
           }
         ],
-        "style": "Normal",
-        "text": "2. second"
+        "style": "List Number",
+        "text": "second"
       },
       {
         "align": null,
@@ -534,12 +534,12 @@
             "i": null,
             "sc": null,
             "style": "Default Paragraph Font",
-            "t": "- [x] done task",
+            "t": "[x] done task",
             "u": null
           }
         ],
-        "style": "Normal",
-        "text": "- [x] done task"
+        "style": "List Bullet",
+        "text": "[x] done task"
       },
       {
         "align": null,
@@ -549,78 +549,18 @@
             "i": null,
             "sc": null,
             "style": "Default Paragraph Font",
-            "t": "- [ ] open task",
+            "t": "[ ] open task",
             "u": null
           }
         ],
-        "style": "Normal",
-        "text": "- [ ] open task"
+        "style": "List Bullet",
+        "text": "[ ] open task"
       },
       {
         "align": null,
         "runs": [],
         "style": "Normal",
         "text": ""
-      },
-      {
-        "align": null,
-        "runs": [
-          {
-            "b": null,
-            "i": null,
-            "sc": null,
-            "style": "Default Paragraph Font",
-            "t": "| Name | Value |",
-            "u": null
-          }
-        ],
-        "style": "Normal",
-        "text": "| Name | Value |"
-      },
-      {
-        "align": null,
-        "runs": [
-          {
-            "b": null,
-            "i": null,
-            "sc": null,
-            "style": "Default Paragraph Font",
-            "t": "|------|-------|",
-            "u": null
-          }
-        ],
-        "style": "Normal",
-        "text": "|------|-------|"
-      },
-      {
-        "align": null,
-        "runs": [
-          {
-            "b": null,
-            "i": null,
-            "sc": null,
-            "style": "Default Paragraph Font",
-            "t": "| a    | 1     |",
-            "u": null
-          }
-        ],
-        "style": "Normal",
-        "text": "| a    | 1     |"
-      },
-      {
-        "align": null,
-        "runs": [
-          {
-            "b": null,
-            "i": null,
-            "sc": null,
-            "style": "Default Paragraph Font",
-            "t": "| b    | 2     |",
-            "u": null
-          }
-        ],
-        "style": "Normal",
-        "text": "| b    | 2     |"
       },
       {
         "align": null,
@@ -717,13 +657,34 @@
       }
     ],
     "subject": "S",
+    "tables": [
+      {
+        "rows": [
+          [
+            "Name",
+            "Value"
+          ],
+          [
+            "a",
+            "1"
+          ],
+          [
+            "b",
+            "2"
+          ]
+        ],
+        "style": "Table Grid"
+      }
+    ],
     "title": "T"
   },
   "docx_roundtrip": {
     "notes": [
-      "Imported DOCX paragraphs: 46"
+      "Imported DOCX paragraphs: 42",
+      "Converted DOCX list items to Markdown lists: 7",
+      "Converted DOCX tables to Markdown tables: 1"
     ],
-    "text": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with [[mono:code]].\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\n:::\n::: verse\nViolets are blue\n:::\n\n::: written-note\nA note written by a character.\n:::\n\n***\n\n- bullet one\n  - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n|------|-------|\n| a    | 1     |\n| b    | 2     |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue"
+    "text": "# Part One\n\n# Chapter One\n\nRegular *italic* and **bold** and ***both*** text with [[mono:code]].\nInline markers: [[u:underlined]] [[sc:small caps]] [[mono:mono]] [[sans:sans]].\n\n## A Subhead\n\n### Lower subhead\n\n> A quoted paragraph.\n>\n> Second quoted paragraph.\n\n***\n\n::: verse\nRoses are red\n:::\n::: verse\nViolets are blue\n:::\n\n::: written-note\nA note written by a character.\n:::\n\n***\n\n- bullet one\n    - nested bullet\n- bullet two\n\n1. first\n2. second\n\n- [x] done task\n- [ ] open task\n\n| Name | Value |\n| --- | --- |\n| a | 1 |\n| b | 2 |\n\n```\n# not a heading\n```\n\nA [link](https://example.com) and ![image](https://example.com/x.png).\n\nEpilogue"
   },
   "html_to_text": "Title\nFirst paragraph with bold.\nSecond paragraph.",
   "import_file": {
@@ -1105,7 +1066,12 @@
     },
     "messy_pdf_en": {
       "no_meta": {
-        "info": [],
+        "info": [
+          {
+            "label": "Markdown list items",
+            "value": 1
+          }
+        ],
         "issues": [
           {
             "code": "missing-title",
@@ -1180,14 +1146,6 @@
             "sample": "Table of Contents"
           },
           {
-            "code": "docx-list-literal",
-            "count": 1,
-            "level": "warning",
-            "line": 27,
-            "message": "Markdown lists preview nicely, but DOCX export currently keeps list markers as literal text.",
-            "sample": "- 13 -"
-          },
-          {
             "code": "repeated-lines",
             "count": 8,
             "level": "warning",
@@ -1232,12 +1190,17 @@
         "summary": {
           "error": 1,
           "info": 2,
-          "warning": 12
+          "warning": 11
         },
         "wordCount": 551
       },
       "with_meta": {
-        "info": [],
+        "info": [
+          {
+            "label": "Markdown list items",
+            "value": 1
+          }
+        ],
         "issues": [
           {
             "code": "no-chapters",
@@ -1296,14 +1259,6 @@
             "sample": "Table of Contents"
           },
           {
-            "code": "docx-list-literal",
-            "count": 1,
-            "level": "warning",
-            "line": 27,
-            "message": "Markdown lists preview nicely, but DOCX export currently keeps list markers as literal text.",
-            "sample": "- 13 -"
-          },
-          {
             "code": "repeated-lines",
             "count": 8,
             "level": "warning",
@@ -1348,7 +1303,7 @@
         "summary": {
           "error": 1,
           "info": 2,
-          "warning": 10
+          "warning": 9
         },
         "wordCount": 551
       }
@@ -1607,6 +1562,14 @@
           {
             "label": "Special structure blocks",
             "value": 5
+          },
+          {
+            "label": "Markdown list items",
+            "value": 7
+          },
+          {
+            "label": "Markdown tables",
+            "value": 1
           }
         ],
         "issues": [
@@ -1641,29 +1604,13 @@
             "line": 13,
             "message": "Structure markers without text found.",
             "sample": "quote"
-          },
-          {
-            "code": "docx-list-literal",
-            "count": 7,
-            "level": "warning",
-            "line": 29,
-            "message": "Markdown lists preview nicely, but DOCX export currently keeps list markers as literal text.",
-            "sample": "- bullet one"
-          },
-          {
-            "code": "docx-table-literal",
-            "count": 1,
-            "level": "warning",
-            "line": 39,
-            "message": "Markdown tables preview nicely, but DOCX export currently keeps table syntax as literal text.",
-            "sample": "| Name | Value |"
           }
         ],
         "lineCount": 50,
         "summary": {
           "error": 0,
           "info": 0,
-          "warning": 6
+          "warning": 4
         },
         "wordCount": 106
       },
@@ -1680,6 +1627,14 @@
           {
             "label": "Special structure blocks",
             "value": 5
+          },
+          {
+            "label": "Markdown list items",
+            "value": 7
+          },
+          {
+            "label": "Markdown tables",
+            "value": 1
           }
         ],
         "issues": [
@@ -1698,29 +1653,13 @@
             "line": 13,
             "message": "Structure markers without text found.",
             "sample": "quote"
-          },
-          {
-            "code": "docx-list-literal",
-            "count": 7,
-            "level": "warning",
-            "line": 29,
-            "message": "Markdown lists preview nicely, but DOCX export currently keeps list markers as literal text.",
-            "sample": "- bullet one"
-          },
-          {
-            "code": "docx-table-literal",
-            "count": 1,
-            "level": "warning",
-            "line": 39,
-            "message": "Markdown tables preview nicely, but DOCX export currently keeps table syntax as literal text.",
-            "sample": "| Name | Value |"
           }
         ],
         "lineCount": 50,
         "summary": {
           "error": 0,
           "info": 0,
-          "warning": 4
+          "warning": 2
         },
         "wordCount": 106
       }

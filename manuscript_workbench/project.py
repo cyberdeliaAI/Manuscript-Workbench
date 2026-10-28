@@ -39,7 +39,7 @@ METADATA_KEYS = ("title", "subtitle", "author", "language", "series", "bookNumbe
 # The AI and typography settings that travel with a project (never secrets, never window layout).
 PROJECT_SETTING_KEYS = (
     "lmProvider", "lmBase", "lmModel", "lmStrength", "chunkSize", "guidedContext", "translateTarget",
-    "quoteStyle", "dashStyle", "advTemperature", "advTopP", "advTopK", "advRepeatPenalty", "advMaxTokens",
+    "quoteStyle", "dashStyle", "advTemperature", "advTopP", "advTopK", "advRepeatPenalty", "advMaxTokens", "docxLists",
 )
 
 _ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$")

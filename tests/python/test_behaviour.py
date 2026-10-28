@@ -87,9 +87,11 @@ def test_preflight_messy_pdf_text(mw, corpus):
             "extra-blank-runs", "toc-detected"} <= found
 
 
-def test_preflight_warns_that_lists_and_tables_stay_literal_in_docx(mw, corpus):
-    found = codes(mw.preflight(corpus["structure_en"], {"title": "T", "author": "A"}))
-    assert {"docx-list-literal", "docx-table-literal"} <= found
+def test_preflight_counts_lists_and_tables_instead_of_warning_about_them(mw, corpus):
+    result = mw.preflight(corpus["structure_en"], {"title": "T", "author": "A"})
+    assert not {"docx-list-literal", "docx-table-literal"} & codes(result)
+    labels = {item["label"]: item["value"] for item in result["info"]}
+    assert labels["Markdown list items"] >= 1 and labels["Markdown tables"] >= 1
 
 
 # ---------- DOCX export / import ----------

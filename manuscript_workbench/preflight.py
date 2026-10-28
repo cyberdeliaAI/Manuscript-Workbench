@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
-from .structure import MARKDOWN_CONTAINER_RE, strip_structure_line, structure_marker_for_line
+from .structure import MARKDOWN_CONTAINER_RE, is_table_start, list_item, strip_structure_line, structure_marker_for_line
 
 
 CHAPTER_CANDIDATE_RE = re.compile(
@@ -175,17 +175,16 @@ def preflight(text: str, metadata: Dict[str, str], ignored_candidates: Optional[
     if blank_run_len >= 3:
         extra_blank_runs += 1
 
-    docx_list_lines: List[Tuple[int, str]] = []
-    table_blocks: List[Tuple[int, str]] = []
-    table_separator_re = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|?\s*$")
+    list_items = 0
+    tables = 0
     for idx, line in enumerate(lines, start=1):
         marker, _content = structure_marker_for_line(line)
         if marker:
             continue
-        if re.match(r"^\s*(?:[-+*]|\d+[.)])\s+\S", line):
-            docx_list_lines.append((idx, line.strip()))
-        if idx < len(lines) and "|" in line and table_separator_re.match(lines[idx]):
-            table_blocks.append((idx, line.strip()))
+        if list_item(line):
+            list_items += 1
+        if is_table_start(lines, idx - 1):
+            tables += 1
 
     if not metadata.get("title"):
         add("warning", "missing-title", "Book title metadata is empty.")
@@ -215,10 +214,10 @@ def preflight(text: str, metadata: Dict[str, str], ignored_candidates: Optional[
         add("warning", "empty-markers", "Structure markers without text found.", len(empty_markers), empty_markers[0][0], empty_markers[0][1])
     if len(block_fence_lines) % 2:
         add("warning", "unclosed-structure-block", "A ::: structure block appears to be unclosed.", 1, block_fence_lines[-1], ":::")
-    if docx_list_lines:
-        add("warning", "docx-list-literal", "Markdown lists preview nicely, but DOCX export currently keeps list markers as literal text.", len(docx_list_lines), docx_list_lines[0][0], docx_list_lines[0][1])
-    if table_blocks:
-        add("warning", "docx-table-literal", "Markdown tables preview nicely, but DOCX export currently keeps table syntax as literal text.", len(table_blocks), table_blocks[0][0], table_blocks[0][1])
+    if list_items:
+        info.append({"label": "Markdown list items", "value": list_items})
+    if tables:
+        info.append({"label": "Markdown tables", "value": tables})
 
     repeated_candidates = [(k, v) for k, v in repeated.items() if len(v) >= 4 and v[-1] - v[0] >= 40]
     if repeated_candidates:

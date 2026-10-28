@@ -21,6 +21,7 @@ export const PROJECT_SETTING_KEYS = [
   'advTopK',
   'advRepeatPenalty',
   'advMaxTokens',
+  'docxLists',
 ];
 export const METADATA_KEYS = [
   'title',

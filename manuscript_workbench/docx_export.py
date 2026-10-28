@@ -1,12 +1,20 @@
-"""Markdown to DOCX export with real Word styles."""
+"""Markdown to DOCX export with real Word styles, lists and tables."""
 from __future__ import annotations
 
 import io
 import re
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
-from .deps import Document, Pt, WD_ALIGN_PARAGRAPH, WD_STYLE_TYPE
-from .structure import MARKDOWN_CONTAINER_RE, PARAGRAPH_STYLE_MAP, canonical_structure_marker, structure_marker_for_line
+from .deps import Document, OxmlElement, Pt, WD_ALIGN_PARAGRAPH, WD_STYLE_TYPE, qn
+from .structure import (
+    MARKDOWN_CONTAINER_RE,
+    PARAGRAPH_STYLE_MAP,
+    canonical_structure_marker,
+    is_table_start,
+    list_item,
+    read_table,
+    structure_marker_for_line,
+)
 
 
 EXPORT_PARAGRAPH_STYLES = [
@@ -60,7 +68,10 @@ def ensure_character_style(doc: Any, name: str) -> None:
         style.font.small_caps = True
 
 
-def create_manuscript_docx(text: str, metadata: Dict[str, str]) -> bytes:
+def create_manuscript_docx(text: str, metadata: Dict[str, str], options: Optional[Dict[str, Any]] = None) -> bytes:
+    """The manuscript as a DOCX. `options["lists"] = False` keeps Markdown list markers as literal text (for manuscripts
+    whose dialogue lines start with a hyphen)."""
+    lists_enabled = (options or {}).get("lists") is not False
     if Document is None:
         raise RuntimeError("python-docx is not installed. Run: pip install -r requirements.txt")
     doc = Document()
@@ -91,13 +102,33 @@ def create_manuscript_docx(text: str, metadata: Dict[str, str]) -> bytes:
 
     lines = text.split("\n")
     block_marker = ""
-    for raw_line in lines:
-        line = raw_line.rstrip("\r")
+    numbering = ListNumbering()
+    index = 0
+    while index < len(lines):
+        line = lines[index].rstrip("\r")
         container = MARKDOWN_CONTAINER_RE.match(line)
         if container:
             block_marker = canonical_structure_marker(container.group(1) or "")
+            numbering.end()
+            index += 1
+            continue
+        if not block_marker and is_table_start(lines, index):
+            header, alignments, rows, index = read_table(lines, index)
+            add_markdown_table(doc, header, alignments, rows)
+            numbering.end()
             continue
         marker, content = structure_marker_for_line(line, block_marker)
+        item = list_item(line) if lists_enabled and not marker and not block_marker else None
+        if item:
+            add_list_item(doc, item, numbering)
+            index += 1
+            continue
+        if not line.strip():
+            if not continues_list(lines, index):
+                numbering.end()
+        else:
+            numbering.end()
+        index += 1
 
         if marker == "scene":
             p = doc.add_paragraph("* * *", style="Normal")
@@ -165,3 +196,126 @@ def add_marked_runs(paragraph: Any, text: str, doc: Any) -> None:
         pos = m.end()
     if pos < len(text):
         paragraph.add_run(text[pos:])
+
+
+# ---- lists ----------------------------------------------------------------------------------------------
+
+MAX_LIST_LEVEL = 2  # Word's built-in "List Bullet" / "List Number" styles come in three levels
+
+
+def continues_list(lines: List[str], index: int) -> bool:
+    """A blank line does not end a list when the next line with text is a list item again."""
+    for later in lines[index + 1:]:
+        if later.strip():
+            return list_item(later) is not None
+    return False
+
+
+class ListNumbering:
+    """Where we are in the lists of the document: the indentation of the open levels, and for every numbered level the
+    Word numbering instance it uses, so that every Markdown list starts again at its own number."""
+
+    def __init__(self) -> None:
+        self.indents: List[int] = []
+        self.instances: Dict[int, int] = {}  # level -> numId of the numbered list that is open there
+
+    def end(self) -> None:
+        self.indents = []
+        self.instances = {}
+
+    def level_for(self, indent: int) -> int:
+        while self.indents and indent < self.indents[-1]:
+            self.indents.pop()
+        if not self.indents or indent > self.indents[-1]:
+            self.indents.append(indent)
+        return len(self.indents) - 1
+
+
+def list_style_name(ordered: bool, level: int) -> str:
+    base = "List Number" if ordered else "List Bullet"
+    return base if level == 0 else f"{base} {level + 1}"
+
+
+def new_numbering_instance(doc: Any, style_name: str, start: int) -> Optional[int]:
+    """A fresh numbering instance for the list style, so its numbering starts again at `start`."""
+    style = doc.styles[style_name].element
+    properties = style.pPr
+    if properties is None or properties.numPr is None or properties.numPr.numId is None:
+        return None
+    style_num = str(properties.numPr.numId.val)
+    root = doc.part.numbering_part.element
+    abstract = None
+    for num in root.findall(qn("w:num")):
+        if num.get(qn("w:numId")) == style_num:
+            found = num.find(qn("w:abstractNumId"))
+            abstract = found.get(qn("w:val")) if found is not None else None
+    if abstract is None:
+        return None
+    num_id = max(int(num.get(qn("w:numId"))) for num in root.findall(qn("w:num"))) + 1
+    num = OxmlElement("w:num")
+    num.set(qn("w:numId"), str(num_id))
+    reference = OxmlElement("w:abstractNumId")
+    reference.set(qn("w:val"), abstract)
+    num.append(reference)
+    override = OxmlElement("w:lvlOverride")
+    override.set(qn("w:ilvl"), "0")
+    restart = OxmlElement("w:startOverride")
+    restart.set(qn("w:val"), str(start))
+    override.append(restart)
+    num.append(override)
+    root.append(num)
+    return num_id
+
+
+def add_list_item(doc: Any, item: Any, numbering: ListNumbering) -> None:
+    indent, ordered, number, content = item
+    level = min(numbering.level_for(indent), MAX_LIST_LEVEL)
+    for deeper in [lvl for lvl in numbering.instances if lvl > level]:
+        del numbering.instances[deeper]  # a sub-list under the next item starts again
+    style_name = list_style_name(ordered, level)
+    ensure_paragraph_style(doc, style_name)
+    p = doc.add_paragraph(style=style_name)
+    if ordered:
+        if level not in numbering.instances:
+            instance = new_numbering_instance(doc, style_name, number or 1)
+            if instance is not None:
+                numbering.instances[level] = instance
+        if level in numbering.instances:
+            numbers = p._p.get_or_add_pPr().get_or_add_numPr()
+            numbers.get_or_add_ilvl().val = 0
+            numbers.get_or_add_numId().val = numbering.instances[level]
+    else:
+        numbering.instances.pop(level, None)  # a numbered list after a bullet list starts again
+    add_marked_runs(p, content, doc)
+
+
+# ---- tables ---------------------------------------------------------------------------------------------
+
+CELL_ALIGNMENT = {"left": "LEFT", "center": "CENTER", "right": "RIGHT"}
+
+
+def add_cell_text(paragraph: Any, text: str, doc: Any) -> None:
+    """Cell text with inline markup; <br> becomes a line break inside the cell."""
+    for position, part in enumerate(re.split(r"<br\s*/?>", text, flags=re.I)):
+        if position:
+            paragraph.add_run().add_break()
+        add_marked_runs(paragraph, part.strip() if position else part, doc)
+
+
+def add_markdown_table(doc: Any, header: List[str], alignments: List[str], rows: List[List[str]]) -> None:
+    columns = max([len(header), len(alignments)] + [len(row) for row in rows])
+    table = doc.add_table(rows=1 + len(rows), cols=columns)
+    table.style = "Table Grid"
+    for r, cells in enumerate([header] + rows):
+        cells = cells + [""] * (columns - len(cells))
+        for c, text in enumerate(cells):
+            paragraph = table.cell(r, c).paragraphs[0]
+            add_cell_text(paragraph, text, doc)
+            align = alignments[c] if c < len(alignments) else ""
+            if align:
+                paragraph.alignment = getattr(WD_ALIGN_PARAGRAPH, CELL_ALIGNMENT[align])
+            if r == 0:
+                for run in paragraph.runs:
+                    run.bold = True
+    properties = table.rows[0]._tr.get_or_add_trPr()
+    properties.append(OxmlElement("w:tblHeader"))  # repeat the header row on every page

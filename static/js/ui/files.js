@@ -274,7 +274,12 @@ $('#exportMarkedTxtBtn').addEventListener('click', () => {
 $('#exportDocxBtn').addEventListener('click', async () => {
   try {
     const base = cleanFilename($('#metaFilename').value || state.currentFilename.replace(/\.[^.]+$/, ''));
-    const res = await api('/api/export_docx', { text: editor.value, metadata: getMetadata(), filename: base });
+    const res = await api('/api/export_docx', {
+      text: editor.value,
+      metadata: getMetadata(),
+      filename: base,
+      options: { lists: $('#docxLists').checked },
+    });
     if (!res.ok) {
       const data = await res.json().catch(() => ({ error: 'Export failed' }));
       throw new Error(data.error || 'Export failed');

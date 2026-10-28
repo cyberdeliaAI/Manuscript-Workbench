@@ -276,6 +276,10 @@
         </div><datalist id="languageList"><option value="en"></option><option value="nl"></option></datalist><p class="hint" id="languageHint"></p><p class="hint">Title/author go into DOCX core properties; the other fields are stored as keywords/comments where possible. Language selects the typography rules of the Clean tab (English, Nederlands; other languages get only the language-neutral fixes).</p></div>
       </div>
       <div class="card">
+        <div class="panel-title">Export</div>
+        <div class="panel-body"><label class="fix-note flush"><input type="checkbox" id="docxLists" checked> <span>Turn Markdown lists into Word lists in the DOCX export</span></label><p class="hint">Lines that start with <code>- </code>, <code>* </code>, <code>+ </code> or <code>1. </code> become bullet and numbered lists, and pipe tables become Word tables. Switch lists off when dialogue lines start with a hyphen, so they stay ordinary paragraphs.</p></div>
+      </div>
+      <div class="card">
         <div class="panel-title">Glossary</div>
         <div class="panel-body"><textarea class="compact glossary" id="glossaryText" rows="8" spellcheck="false" placeholder="Marta&#10;Brandt&#10;De Zeven Zussen =&gt; The Seven Sisters"></textarea><div class="lm-grid"><button id="glossaryNamesBtn" title="Adds capitalised words that recur in the text, for you to keep or delete">Add names from the text</button></div><p class="hint glossary-status" id="glossaryStatus"></p><p class="hint">One term per line. A plain term is kept exactly as written by every AI action; <code>term =&gt; translation</code> is enforced by Translate and the translation itself is kept in rewrites. Lines starting with # are ignored. Matching is by whole word and case-sensitive. The glossary belongs to the project.</p></div>
       </div>

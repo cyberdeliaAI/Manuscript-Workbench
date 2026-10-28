@@ -7,6 +7,7 @@ import { activateSideTab } from './chrome.js';
 import { $, editor, toast } from './dom.js';
 import { getScope } from './editor-ops.js';
 import { setGlossaryText } from './glossary.js';
+import { markProjectDirty } from './project.js';
 import { updateStats } from './stats.js';
 import { storage } from './storage.js';
 
@@ -81,6 +82,7 @@ export function getSettings() {
     advRepeatPenalty: $('#advRepeatPenalty')?.value || '',
     advMaxTokens: $('#advMaxTokens')?.value || '',
     allowRemoteImages: $('#allowRemoteImages')?.checked || false,
+    docxLists: $('#docxLists')?.checked !== false,
     ignoredCandidates: state.ignoredCandidates,
     glossary: state.projectGlossary,
     quoteStyle: $('#quoteStyle')?.value || 'auto',
@@ -155,6 +157,7 @@ export async function loadSettings() {
   if (s.guidedContext) $('#guidedContext').value = s.guidedContext;
   if (s.translateTarget) $('#translateTarget').value = s.translateTarget;
   $('#allowRemoteImages').checked = !!s.allowRemoteImages;
+  if (typeof s.docxLists === 'boolean') $('#docxLists').checked = s.docxLists;
   if (Array.isArray(s.ignoredCandidates))
     state.ignoredCandidates = s.ignoredCandidates.filter((k) => typeof k === 'string');
   if (typeof s.glossary === 'string') setGlossaryText(s.glossary);
@@ -206,6 +209,10 @@ $('#allowRemoteImages').addEventListener('change', () => {
   toast('Reload the page to apply the image setting.');
 });
 $('#lmModel').addEventListener('change', saveSettings);
+$('#docxLists').addEventListener('change', () => {
+  saveSettings();
+  markProjectDirty();
+});
 export function showRecoveryIfNeeded() {
   const raw = storage.get('autosave');
   if (!raw) return;
@@ -264,6 +271,7 @@ export function applyProjectSettings(settings) {
   for (const [key, selector] of Object.entries(PROJECT_SETTING_FIELDS)) {
     if (s[key] !== undefined && $(selector)) $(selector).value = String(s[key]);
   }
+  if (typeof s.docxLists === 'boolean') $('#docxLists').checked = s.docxLists;
   if (s.lmModel) {
     const sel = $('#lmModel');
     if (!Array.from(sel.options).some((o) => o.value === s.lmModel)) {

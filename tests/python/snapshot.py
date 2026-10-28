@@ -33,8 +33,13 @@ def _docx_summary(data: bytes) -> Dict[str, Any]:
             ],
         })
     cp = doc.core_properties
+    tables = [
+        {"style": t.style.name if t.style is not None else None, "rows": [[cell.text for cell in row.cells] for row in t.rows]}
+        for t in doc.tables
+    ]
     return {
         "paragraphs": paragraphs,
+        "tables": tables,
         "title": cp.title,
         "author": cp.author,
         "subject": cp.subject,

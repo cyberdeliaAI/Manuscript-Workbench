@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import re
-from typing import Tuple
+from typing import List, Optional, Sequence, Tuple
 
 
 PARAGRAPH_STYLE_MAP = {
@@ -130,3 +130,62 @@ def structure_marker_for_line(line: str, block_marker: str = "") -> Tuple[str, s
 def strip_structure_line(line: str) -> str:
     marker, content = structure_marker_for_line(line)
     return content.rstrip() if marker else line.rstrip()
+
+
+# ---- lists and tables ------------------------------------------------------------------------------------------
+
+LIST_ITEM_RE = re.compile(r"^([ \t]*)([-+*]|\d{1,9}[.)])[ \t]+(\S.*?)\s*$")
+
+
+def list_item(line: str) -> Optional[Tuple[int, bool, int, str]]:
+    """A Markdown list item as (indent width, ordered, number, text), or None. A tab counts as four spaces."""
+    match = LIST_ITEM_RE.match(line.rstrip("\r"))
+    if not match:
+        return None
+    marker = match.group(2)
+    ordered = marker[0].isdigit()
+    return len(match.group(1).replace("\t", "    ")), ordered, int(marker[:-1]) if ordered else 0, match.group(3)
+
+
+def is_table_separator(line: str) -> bool:
+    """The |---|:---:| row under a table header (like Python-Markdown, any number of dashes, one column is enough)."""
+    if "|" not in line:
+        return False
+    cells = split_table_row(line)
+    return bool(cells) and all(re.fullmatch(r":?-+:?", cell) for cell in cells)
+
+
+def is_table_start(lines: Sequence[str], index: int) -> bool:
+    """True when lines[index] is the header row of a pipe table (the next line is its |---|---| separator)."""
+    return index + 1 < len(lines) and "|" in lines[index] and is_table_separator(lines[index + 1].rstrip("\r"))
+
+
+def split_table_row(line: str) -> List[str]:
+    """The cells of a pipe table row. An escaped pipe (\\|) stays inside its cell."""
+    text = line.strip()
+    if text.startswith("|"):
+        text = text[1:]
+    if text.endswith("|") and not text.endswith("\\|"):
+        text = text[:-1]
+    return [cell.strip().replace("\\|", "|") for cell in re.split(r"(?<!\\)\|", text)]
+
+
+def table_alignments(separator: str) -> List[str]:
+    """'left', 'right', 'center' or '' for every column, from the :---: marks of the separator row."""
+    result = []
+    for cell in split_table_row(separator):
+        left, right = cell.startswith(":"), cell.endswith(":")
+        result.append("center" if left and right else "right" if right else "left" if left else "")
+    return result
+
+
+def read_table(lines: Sequence[str], index: int) -> Tuple[List[str], List[str], List[List[str]], int]:
+    """Reads the pipe table that starts at lines[index]: (header cells, alignments, body rows, index after the table)."""
+    header = split_table_row(lines[index])
+    alignments = table_alignments(lines[index + 1])
+    rows: List[List[str]] = []
+    position = index + 2
+    while position < len(lines) and lines[position].strip() and "|" in lines[position]:
+        rows.append(split_table_row(lines[position]))
+        position += 1
+    return header, alignments, rows, position
