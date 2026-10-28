@@ -1,6 +1,7 @@
 // The Diff view of the AI preview: every changed paragraph can be accepted or rejected before it is applied.
 import { state } from './state.js';
 import { composeFromHunks, diffDocuments, reviewableIds } from '../core/diff.js';
+import { glossaryIssues } from '../core/glossary.js';
 import { $ } from './dom.js';
 
 const PAGE_SIZE = 250; // rows rendered at once, so a book-sized review stays light
@@ -65,6 +66,19 @@ function el(tag, className, text) {
   return node;
 }
 
+/** Glossary problems in one hunk (a protected term that is gone, a translation that was not used). */
+function flagsOf(h) {
+  if (!h.flags) {
+    const p = state.previewState;
+    h.flags = glossaryIssues(h.before ? h.before.text : '', h.after ? h.after.text : '', p.glossary, p.task);
+  }
+  return h.flags;
+}
+
+function flaggedIds(r) {
+  return reviewableIds(r.diff).filter((id) => flagsOf(r.diff.hunks[id]).length);
+}
+
 function summaryText(r) {
   const { stats } = r.diff;
   const total = stats.changed + stats.added + stats.removed;
@@ -74,7 +88,9 @@ function summaryText(r) {
   if (stats.changed) parts.push(`${stats.changed} rewritten`);
   if (stats.added) parts.push(`${stats.added} added`);
   if (stats.removed) parts.push(`${stats.removed} removed`);
-  return `${kept} of ${total} changes accepted (${parts.join(', ')}; ${stats.same} paragraphs unchanged).`;
+  const flagged = flaggedIds(r).length;
+  const flagNote = flagged ? ` ${flagged} break${flagged === 1 ? 's' : ''} the glossary.` : '';
+  return `${kept} of ${total} changes accepted (${parts.join(', ')}; ${stats.same} paragraphs unchanged).${flagNote}`;
 }
 
 function wordsNode(words) {
@@ -104,6 +120,16 @@ function hunkNode(h, r) {
   });
   const label = { changed: 'Rewritten', added: 'Added paragraph', removed: 'Removed paragraph' }[h.kind];
   head.append(box, el('span', 'hunk-title', label));
+  const flags = flagsOf(h);
+  if (flags.length) {
+    const note = el(
+      'span',
+      'hunk-flag',
+      `⚑ ${flags[0].message}${flags.length > 1 ? ` (+${flags.length - 1} more)` : ''}`,
+    );
+    note.title = flags.map((f) => f.message).join('\n');
+    head.appendChild(note);
+  }
   row.append(head, bodyNode(h, rejected));
   return row;
 }
@@ -143,6 +169,7 @@ export function renderReview() {
   const r = ensureReview();
   const p = state.previewState;
   for (const id of ['diffAcceptAllBtn', 'diffRejectAllBtn', 'diffPrevBtn', 'diffNextBtn']) $('#' + id).disabled = !r;
+  $('#diffRejectFlaggedBtn').disabled = !r || !flaggedIds(r).length;
   if (!r) {
     $('#diffSummary').textContent = '';
     list.appendChild(
@@ -215,5 +242,11 @@ export function refreshReview() {
 
 $('#diffAcceptAllBtn').addEventListener('click', () => setAll(false));
 $('#diffRejectAllBtn').addEventListener('click', () => setAll(true));
+$('#diffRejectFlaggedBtn').addEventListener('click', () => {
+  const r = ensureReview();
+  if (!r) return;
+  for (const id of flaggedIds(r)) r.rejected.add(id);
+  renderReview();
+});
 $('#diffNextBtn').addEventListener('click', () => jump(1));
 $('#diffPrevBtn').addEventListener('click', () => jump(-1));

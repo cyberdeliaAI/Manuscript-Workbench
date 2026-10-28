@@ -24,7 +24,7 @@ Nothing else leaves your machine. Your manuscript text is never sent to a cloud 
 11. [Clean Tab](#11-clean-tab)
 12. [AI Tab](#12-ai-tab)
 13. [Markdown Tab](#13-markdown-tab)
-14. [Book Tab: Metadata](#14-book-tab-metadata)
+14. [Book Tab: Metadata and Glossary](#14-book-tab-metadata-and-glossary)
 15. [Find / Replace](#15-find--replace)
 16. [Selection Menu](#16-selection-menu)
 17. [Exporting](#17-exporting)
@@ -673,7 +673,9 @@ Every candidate row has these buttons:
 
 Use it as a quick audit: every `CHECK` row is a line you probably want to mark as a chapter or deliberately leave as body text.
 
-## 14. Book Tab: Metadata
+## 14. Book Tab: Metadata and Glossary
+
+### Metadata
 
 The Book tab stores export metadata:
 
@@ -686,6 +688,28 @@ The Book tab stores export metadata:
 | Filename base | base name for all exported files |
 
 Preflight warns when Title or Author is empty. Metadata is included in the autosave, so it survives restarts.
+
+### Glossary
+
+The glossary is a list of terms the AI must treat with care: character and place names, invented words, titles. It belongs to the project (it is saved with it, see [section 18](#18-projects-snapshots-autosave-and-undo)) and to the browser autosave when no project is open.
+
+Write one entry per line:
+
+```text
+# lines that start with # are comments
+Marta
+Brandt
+De Zeven Zussen => The Seven Sisters
+```
+
+- A **plain term** (`Marta`) is kept exactly as written by every AI action that produces text: rewrite, AI Clean, guided rewrite and translate. The AI is told not to translate, rename, inflect or drop it.
+- **`term => translation`** is enforced by `Translate Selection` / `Translate by Heading`: every occurrence of the term must become the translation. In rewrites and cleanups, where nothing is translated, both the term and the translation are simply kept as written.
+- Terms are matched as **whole words and case-sensitively**, so a name such as `Will` does not match the verb `will`, and `Marta` matches in `Marta's` but not in `Martaschool`. Dutch compound words and inflected forms are therefore not matched; add them as separate lines when they matter.
+- Only the entries that occur in the text being sent are added to the request, so a long glossary does not use up a small model's context.
+- `Add names from the text` appends capitalised words that recur in the middle of sentences (and are not yet in the list) for you to keep or delete.
+- A line the app cannot read (for example `term =>` without a translation) is reported under the box and ignored.
+
+The glossary is also a **check**: after generation the content guardrails list every protected term that appears less often than in the original, and every term that was not translated as required. In the `Diff` view the changes that break the glossary are marked with a flag, and `Reject flagged` rejects them all at once.
 
 ## 15. Find / Replace
 

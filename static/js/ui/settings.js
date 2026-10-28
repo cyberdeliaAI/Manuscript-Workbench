@@ -6,6 +6,7 @@ import { api, apiGet } from './api.js';
 import { activateSideTab } from './chrome.js';
 import { $, editor, toast } from './dom.js';
 import { getScope } from './editor-ops.js';
+import { setGlossaryText } from './glossary.js';
 import { updateStats } from './stats.js';
 import { storage } from './storage.js';
 
@@ -80,6 +81,7 @@ export function getSettings() {
     advMaxTokens: $('#advMaxTokens')?.value || '',
     allowRemoteImages: $('#allowRemoteImages')?.checked || false,
     ignoredCandidates: state.ignoredCandidates,
+    glossary: state.projectGlossary,
     quoteStyle: $('#quoteStyle')?.value || 'auto',
     dashStyle: $('#dashStyle')?.value || 'auto',
   };
@@ -153,6 +155,7 @@ export async function loadSettings() {
   $('#allowRemoteImages').checked = !!s.allowRemoteImages;
   if (Array.isArray(s.ignoredCandidates))
     state.ignoredCandidates = s.ignoredCandidates.filter((k) => typeof k === 'string');
+  if (typeof s.glossary === 'string') setGlossaryText(s.glossary);
   if (s.quoteStyle) $('#quoteStyle').value = s.quoteStyle;
   if (s.dashStyle) $('#dashStyle').value = s.dashStyle;
   ['advTemperature', 'advTopP', 'advTopK', 'advRepeatPenalty', 'advMaxTokens'].forEach((id) => {

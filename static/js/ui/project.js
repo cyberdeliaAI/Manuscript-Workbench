@@ -5,6 +5,7 @@ import { buildProject, buildProjectFile, parseProjectFile, projectFileName } fro
 import { DEFAULT_PROMPTS } from '../core/prompts.js';
 import { api } from './api.js';
 import { askName } from './dialogs.js';
+import { setGlossaryText } from './glossary.js';
 import { $, editor, filenameEl, toast } from './dom.js';
 import { replaceRange } from './editor-ops.js';
 import { downloadBlob } from './files.js';
@@ -218,7 +219,7 @@ function applyProject(project) {
     editor.value = project.text;
     setMetadata(project.metadata);
     state.ignoredCandidates = project.ignoredCandidates || [];
-    state.projectGlossary = project.glossary || '';
+    setGlossaryText(project.glossary || '');
     applyProjectPrompts(project.customPrompts);
     applyProjectSettings(project.settings);
     undoStack.length = 0;

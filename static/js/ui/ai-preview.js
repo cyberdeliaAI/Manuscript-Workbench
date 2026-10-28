@@ -1,5 +1,6 @@
 // AI preview modal, integrity guardrails and stop handling.
 import { state } from './state.js';
+import { glossaryIssues } from '../core/glossary.js';
 import { analyzeIntegrity } from '../core/integrity.js';
 import { markerCount, markerSignature } from '../core/structure.js';
 import { escapeHtml, progressPercent } from '../core/text-utils.js';
@@ -34,6 +35,8 @@ export function renderIntegrityGuardrails(before, after) {
   const panel = $('#integrityPanel');
   if (!panel) return;
   const result = analyzeIntegrity(before, after);
+  for (const issue of glossaryIssues(before, after, state.previewState.glossary, state.previewState.task))
+    result.issues.push(`glossary: ${issue.message}`);
   panel.className = 'integrity-panel show ' + (result.issues.length ? 'warn' : 'ok');
   const title = result.issues.length
     ? `Content guardrails: ${result.issues.length} item(s) to review`
@@ -59,7 +62,7 @@ export function setPreviewProgress(done, total) {
   state.previewState.progress = { done, total, percent: progressPercent(done, total) };
   $('#previewSub').textContent = previewSubText();
 }
-export function openPreview(title, before, after, start, end, running, applyMode = 'replace') {
+export function openPreview(title, before, after, start, end, running, applyMode = 'replace', extra = {}) {
   state.previewState = {
     title,
     before,
@@ -73,6 +76,9 @@ export function openPreview(title, before, after, start, end, running, applyMode
     applyMode,
     progress: null,
     review: null,
+    task: '',
+    glossary: [],
+    ...extra,
   };
   resetReview();
   clearIntegrityGuardrails();

@@ -9,6 +9,7 @@ import {
   guidedUserContent,
   prepareTextForLm,
 } from '../core/prompts.js';
+import { withGlossary } from '../core/glossary.js';
 import { markerSignature } from '../core/structure.js';
 import { escapeHtml, progressPercent } from '../core/text-utils.js';
 import {
@@ -23,6 +24,7 @@ import {
 import { api, apiHeaders } from './api.js';
 import { $, editor, toast } from './dom.js';
 import { currentParagraphRange, selectedTextLength } from './editor-ops.js';
+import { glossaryEntries } from './glossary.js';
 import { saveSettings } from './settings.js';
 
 export function currentAiProvider() {
@@ -183,6 +185,14 @@ export function setLmBusy(on) {
     $('#' + id).disabled = on;
   });
 }
+/** What a run knows about the glossary: its task and a snapshot of the entries, so editing mid-run changes nothing. */
+function runContext(task) {
+  const reviewOnly = task === 'questions' || task === 'feedback';
+  return { task, glossary: reviewOnly ? [] : glossaryEntries() };
+}
+function withProjectGlossary(prompt, text) {
+  return withGlossary(prompt, state.previewState.glossary, state.previewState.task, text);
+}
 function noteStreamFinish(info) {
   (info?.finishReasons || []).forEach((reason) => {
     if (!state.previewState.finishReasons) state.previewState.finishReasons = [];
@@ -210,11 +220,20 @@ export async function startLM(task, scope, chunked) {
       return;
     }
     const prep = prepareTextForLm(range.text);
-    openPreview(`${task === 'clean' ? 'AI Clean' : 'Rewrite'} ${scope}`, range.text, '', range.start, range.end, true);
+    openPreview(
+      `${task === 'clean' ? 'AI Clean' : 'Rewrite'} ${scope}`,
+      range.text,
+      '',
+      range.start,
+      range.end,
+      true,
+      'replace',
+      runContext(task),
+    );
     state.previewState.expectedMarkers = markerSignature(range.text);
     noteStreamFinish(
       await streamOne(
-        promptText,
+        withProjectGlossary(promptText, prep.text),
         buildLmUserContent(prep.text, prep, task, rewriteStrength()),
         (txt) => {
           state.previewState.after += txt;
@@ -264,11 +283,11 @@ async function startGuidedAI(kind, scope) {
       'guided-rewrite': 'Rewrite with Guidance',
       translate: 'Translate Selection',
     };
-    openPreview(titles[kind] || 'AI Tool', range.text, '', range.start, range.end, true, applyMode);
+    openPreview(titles[kind] || 'AI Tool', range.text, '', range.start, range.end, true, applyMode, runContext(kind));
     state.previewState.expectedMarkers = applyMode === 'replace' ? markerSignature(range.text) : null;
     noteStreamFinish(
       await streamOne(
-        guidedSystemPrompt(kind),
+        withProjectGlossary(guidedSystemPrompt(kind), range.text),
         guidedUserContent(kind, range.text, guidedContext()),
         (txt) => {
           state.previewState.after += txt;
@@ -324,6 +343,8 @@ async function startLMSectioned(task, scope) {
       range.start,
       range.end,
       true,
+      'replace',
+      runContext(task),
     );
     state.previewState.expectedMarkers = markerSignature(range.text);
     state.previewState.sectionSplitNote = headingSplitNote(sections);
@@ -336,7 +357,7 @@ async function startLMSectioned(task, scope) {
       if (i > 0) state.previewState.after += '\n\n';
       const prep = prepareTextForLm(sections[i]);
       const info = await streamOne(
-        promptText,
+        withProjectGlossary(promptText, prep.text),
         buildLmUserContent(prep.text, prep, task, rewriteStrength()),
         (txt) => {
           state.previewState.after += txt;
@@ -369,7 +390,16 @@ async function startGuidedSectioned(kind, scope) {
     const maxChars = Math.max(1200, parseInt($('#chunkSize').value, 10) || 6000);
     const sections = makeHeadingSections(range.text, maxChars);
     const titles = { translate: 'Translate by Heading', 'guided-rewrite': 'Rewrite with Guidance by Heading' };
-    openPreview(titles[kind] || 'AI by Heading', range.text, '', range.start, range.end, true, 'replace');
+    openPreview(
+      titles[kind] || 'AI by Heading',
+      range.text,
+      '',
+      range.start,
+      range.end,
+      true,
+      'replace',
+      runContext(kind),
+    );
     state.previewState.expectedMarkers = markerSignature(range.text);
     state.previewState.sectionSplitNote = headingSplitNote(sections);
     setPreviewProgress(0, sections.length);
@@ -380,7 +410,7 @@ async function startGuidedSectioned(kind, scope) {
       $('#previewStatus').textContent = `Generating heading section ${i + 1} of ${sections.length} (${pct}% done)...`;
       if (i > 0) state.previewState.after += '\n\n';
       const info = await streamOne(
-        guidedSystemPrompt(kind),
+        withProjectGlossary(guidedSystemPrompt(kind), sections[i]),
         guidedUserContent(kind, sections[i], guidedContext()),
         (txt) => {
           state.previewState.after += txt;
@@ -434,6 +464,8 @@ async function startLMChunked(task, scope, range, promptText) {
     range.start,
     range.end,
     true,
+    'replace',
+    runContext(task),
   );
   state.previewState.expectedMarkers = markerSignature(range.text);
   state.previewState.sectionSplitNote = chunks.largeParagraphCount
@@ -448,7 +480,7 @@ async function startLMChunked(task, scope, range, promptText) {
     if (i > 0) state.previewState.after += '\n\n';
     const prep = prepareTextForLm(chunks[i]);
     const info = await streamOne(
-      promptText,
+      withProjectGlossary(promptText, prep.text),
       buildLmUserContent(prep.text, prep, task, rewriteStrength()),
       (txt) => {
         state.previewState.after += txt;

@@ -18,6 +18,7 @@ import './ui/prompts.js';
 import './ui/ai.js';
 import './ui/ai-preview.js';
 import './ui/settings.js';
+import './ui/glossary.js';
 import './ui/project-ui.js';
 
 import { loadPrompts } from './ui/prompts.js';
