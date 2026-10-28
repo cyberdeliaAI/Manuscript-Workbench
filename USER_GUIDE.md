@@ -1,6 +1,6 @@
 # Manuscript Workbench — User Guide
 
-Manuscript Workbench is a local Python web app for manuscript cleanup, Markdown-based structure, AI rewrite/cleanup through local OpenAI-compatible providers, live preview, and export to TXT, Markdown, and DOCX.
+Manuscript Workbench is a local Python web app for manuscript cleanup, Markdown-based structure, projects with snapshots, AI rewrite/cleanup/translation with a word-level review through local OpenAI-compatible providers, live preview, and export to TXT, Markdown, DOCX, and EPUB. This guide is for version 2.0; [CHANGELOG.md](CHANGELOG.md) lists what changed since 1.2.
 
 Everything runs on your own computer. The only network traffic the app produces is:
 
@@ -50,9 +50,10 @@ It is designed for:
 - removing or repairing encoding artifacts, hidden characters, excess spaces, tabs, headers, footers, and HTML markup;
 - adding manuscript structure with Markdown;
 - previewing the rendered manuscript;
-- rewriting, cleaning, translating, or reviewing text through LM Studio, oMLX, Ollama, or another OpenAI-compatible local endpoint;
+- keeping the work in projects on disk, with snapshots you can compare and restore;
+- rewriting, cleaning, translating, or reviewing text through LM Studio, oMLX, Ollama, or another OpenAI-compatible local endpoint, and accepting or rejecting every changed paragraph before it touches your text;
 - merging multiple files from a folder in a chosen order;
-- exporting to TXT, Markdown, or DOCX with real Word paragraph styles.
+- exporting to TXT, Markdown, DOCX (real Word paragraph styles, lists, tables and links), or EPUB.
 
 The app is **Markdown-first**: structure lives in the text itself as `#` headings, `>` quotes, `***` scene breaks, and `::: name` blocks. That makes the manuscript readable, portable, diff-friendly, and usable in any other Markdown tool.
 
@@ -927,7 +928,22 @@ The AI API key is kept in the browser's localStorage so you do not have to re-en
 2. AI tab: choose a prompt preset and rewrite strength.
 3. `Rewrite Selection`.
 4. Watch the stream; check the guardrails panel and any structure warning.
-5. `Apply change` only when the after-pane is right.
+5. Switch to `Diff` and accept or reject the changed paragraphs one by one ([Reviewing the changes](#reviewing-the-changes-diff-view)).
+6. `Apply change` (or `Apply 3 of 5 changes`) only when the result is right. With a project open, a snapshot is taken first, and `Undo` still works.
+
+### Rewrite a whole book in sections, and carry on after an error
+
+1. Save the text as a project, and put names and invented words in the `Book` tab's glossary.
+2. In the AI tab choose the model and check the suggested `Chunk size` under the model list.
+3. `Rewrite by Heading` (or `Rewrite Chunked`) on the whole text, with nothing selected.
+4. If the provider fails, the run pauses at that section: fix the problem (start the model, switch to a bigger one) and press `Resume`. Sections that finished stay finished.
+5. Review in `Diff`, press `Reject flagged` for changes that break the glossary, then apply.
+
+### Make a project and an e-book
+
+1. `☰ Menu` → `Save project as…`, then fill in the `Book` tab (title, author, language, series).
+2. Mark chapters with `#`; the Markdown tab's candidate manager finds the unmarked ones.
+3. `Preflight`, then `Export DOCX` for your editor and `Export EPUB` for a reader or a store.
 
 ### Improve a passage with questions first
 
@@ -963,6 +979,16 @@ The AI API key is kept in the browser's localStorage so you do not have to re-en
 
 **Provider returns 401.** The endpoint is reachable but needs an API key — paste it into `API Key`.
 
+**"Cannot connect to the AI provider".** Nothing is listening at that address. Start the provider and its local server (LM Studio: start its Local Server; oMLX: start its OpenAI-compatible server and check the port), then `Detect Model` again.
+
+**An AI run paused with a red section.** The provider failed on that section (the message says why). Fix the cause and press `Resume`, or select the red box and use `Run this`. `Retries per section` in the advanced options makes the app try again by itself.
+
+**The Diff view is empty, or `Apply` says "Nothing accepted".** The Diff view only exists for a finished run that has something to apply. Every change is unchecked, or the run was review-only (`Improve Questions`, `Feedback Only`). `Accept all` checks them again.
+
+**Dialogue lines became bullet points in the Word file.** Lines that start with `- ` are lists. Switch off `Turn Markdown lists into real lists` in the `Book` tab (or use an en dash `–` for dialogue; Clean can convert `--` to the dash of your language).
+
+**A project says "changed elsewhere".** The same project was saved from another tab or window. Use `Save project` and confirm to keep the version on screen, or export it first to keep both.
+
 **AI output stops early or errors on long text.** The model's context window is too small for the request. Use `Rewrite Chunked` / `AI Clean Chunked`, or lower `Chunk size`.
 
 **AI preview shows structure warnings on every run.** The model is rewriting your `#`/`>`/`:::` lines. Try a lower rewrite strength, a more conservative preset, or a better model; the warning system exists precisely to catch this before you apply.
@@ -983,6 +1009,7 @@ The AI API key is kept in the browser's localStorage so you do not have to re-en
 - A small provider context length can cause errors with large selections; chunked mode reduces this but chunk boundaries can still need review.
 - A paused run lives in the preview of the current page: reloading the page forgets it (apply the finished sections first).
 - DOCX export of lists is capped at three levels, list items are single paragraphs (an indented continuation line becomes its own paragraph), and table cells hold inline text only (no lists or images inside a cell).
+- The EPUB export has no images or cover, and has not been checked with the official `epubcheck` validator; open it in a reader (Calibre, Apple Books) before you upload it to a store.
 - DOCX import is style-aware but not a full Word layout converter: images, footnotes/endnotes, text boxes and nested tables are skipped, and a table cell that spans several paragraphs becomes one cell with `<br>`.
 - RTF import extracts plain text only.
 - HTML/URL import is practical extraction, not a browser; JavaScript-heavy pages may import incompletely.
@@ -999,6 +1026,8 @@ The AI API key is kept in the browser's localStorage so you do not have to re-en
 - If you see "Missing or invalid session token", reload the page (the token changes each time the app is restarted).
 - The Markdown preview blocks images from other servers by default, so a manuscript cannot make your browser contact a third party. Turn it on in `Book` → `Preview` and reload the page if you want remote images.
 - The preview removes scripts and other active content. Unknown HTML tags such as `<font>` are dropped but their text stays visible.
+- The AI API key stays in your browser. It is never written to a file, never part of a project, and never returned by the app; projects, snapshots and the settings file contain no secrets.
+- Manuscript text is only sent to the AI endpoint you configure. If that endpoint is not on your own machine or network, the app asks for confirmation (once per host and session) before the first request.
 
 ## 23. Recommended Daily Workflow
 
@@ -1007,6 +1036,6 @@ The AI API key is kept in the browser's localStorage so you do not have to re-en
 3. Run `Safe Cleanup`, then fix what Diagnostics still flags.
 4. Add structure with `#`, `##`, `***`, and special blocks where needed; check the Markdown tab for `CHECK` candidates.
 5. Use `Preview` to check the readable version.
-6. Use AI on selections, paragraphs, or chunked text — review guardrails before every apply.
+6. Use AI on selections, paragraphs, or chunked text — review the Diff view and the guardrails before every apply.
 7. Run `Preflight`.
-8. Export to Markdown (archive) and DOCX (delivery).
+8. Export to Markdown (archive) and DOCX or EPUB (delivery).

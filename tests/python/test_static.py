@@ -1,6 +1,8 @@
 """The frontend is served from static/: right content types, no path traversal, strict script CSP."""
 from __future__ import annotations
 
+import json
+
 import pytest
 
 
@@ -18,6 +20,13 @@ def test_index_references_external_assets_and_has_no_inline_script(server):
     csp = headers["Content-Security-Policy"]
     assert "script-src 'self'" in csp and "style-src 'self'" in csp
     assert "unsafe-inline" not in csp
+
+
+def test_the_page_shows_the_version_the_server_reports(mw, server):
+    page = server.request("GET", "/", token=False)[2].decode("utf-8")
+    assert f"v{mw.APP_VERSION} " in page and f"Version {mw.APP_VERSION}<" in page
+    health = json.loads(server.request("GET", "/api/health", token=False)[2])
+    assert health["version"] == mw.APP_VERSION
 
 
 @pytest.mark.parametrize("path,content_type", [

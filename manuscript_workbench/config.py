@@ -7,7 +7,7 @@ from pathlib import Path
 APP_HOST = "127.0.0.1"
 APP_PORT = int(os.environ.get("MANUSCRIPT_WORKBENCH_PORT") or os.environ.get("VELLUM_PREP_PORT", "8765"))
 APP_NAME = "Manuscript Workbench — Python"
-APP_VERSION = "1.2"
+APP_VERSION = "2.0"
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = ROOT_DIR / "static"
