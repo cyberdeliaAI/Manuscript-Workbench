@@ -35,4 +35,6 @@ export const state = {
   findScopeRange: null,
   detectedLanguage: '',
   ignoredCandidates: [],
+  analysis: null,
+  markdownPreviewAbort: null,
 };

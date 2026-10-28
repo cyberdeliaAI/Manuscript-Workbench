@@ -1,68 +1,19 @@
 // Live statistics, line gutter, editor events and the selection menu.
 import { state } from './state.js';
-import { diagnose } from '../core/diagnostics.js';
-import { markdownLineInfo } from '../core/structure.js';
-import { renderDiagnose } from './diagnostics.js';
+import { scheduleAnalysis } from './analysis.js';
 import { $, editor, gutter } from './dom.js';
 import { handleTabIndent } from './editor-ops.js';
 import { refreshFindMatches, syncFindHighlights } from './find.js';
-import { scheduleLanguageDetection, typographyOptions, updateLanguageHint } from './language.js';
-import { renderOutline } from './outline.js';
+import { updateLanguageHint } from './language.js';
 import { renderMarkdownPreview } from './preview.js';
 import { scheduleAutosave } from './settings.js';
-import { renderStructurePanel } from './structure-panel.js';
 
 export function updateStats() {
-  const text = editor.value;
-  $('#statChars').textContent = text.length.toLocaleString();
-  $('#statWords').textContent = (text.match(/\S+/g) || []).length.toLocaleString();
-  $('#statLines').textContent = text.split('\n').length.toLocaleString();
-  $('#statChapters').textContent = (text.match(/^\s{0,3}#\s+\S/gm) || []).length.toLocaleString();
-  $('#statSubheads').textContent = (text.match(/^\s{0,3}#{2,6}\s+\S/gm) || []).length.toLocaleString();
-  const diag = diagnose(text, typographyOptions());
-  renderGutter(diag);
-  renderDiagnose(diag);
-  renderOutline();
-  renderStructurePanel();
+  // Cheap on purpose: the heavy analysis runs in a worker after a pause in typing (see analysis.js).
+  scheduleAnalysis();
   renderMarkdownPreview();
   scheduleAutosave();
-  scheduleLanguageDetection();
   updateLanguageHint();
-}
-document.addEventListener('mw:language-changed', () => updateStats());
-function renderGutter(diag) {
-  const lines = diag ? diag.lines : editor.value.split('\n');
-  if (lines.length > 12000) {
-    gutter.innerHTML = '<div class="gline">…</div>';
-    return;
-  }
-  const frag = document.createDocumentFragment();
-  for (let i = 0; i < lines.length; i++) {
-    const f = diag ? diag.flags[i] : new Set();
-    const d = document.createElement('div');
-    let cls = 'gline';
-    const notes = [];
-    if (f.has('mojibake') || f.has('invisible') || f.has('control') || f.has('specialSpace') || f.has('ligature')) {
-      cls += ' issue-violet';
-      notes.push('encoding/hidden character issue');
-    } else if (f.has('trailingWs') || f.has('tabs') || f.has('extraBlank')) {
-      cls += ' issue-rust';
-      notes.push('spacing issue');
-    } else if (f.has('wrap') || f.has('pageNum') || f.has('repeatLine')) {
-      cls += ' issue-amber';
-      notes.push('structure candidate');
-    } else if (f.has('doubleSpace') || f.has('spaceBeforePunct') || f.has('apostrophe')) {
-      cls += ' issue-blue';
-      notes.push('typography spacing');
-    } else if (markdownLineInfo(lines[i]) || /^\s*:::\s*[a-z0-9_-]*\s*$/i.test(lines[i])) cls += ' issue';
-    d.className = cls;
-    if (notes.length) d.title = notes.join(', ');
-    d.textContent = i + 1;
-    frag.appendChild(d);
-  }
-  gutter.innerHTML = '';
-  gutter.appendChild(frag);
-  gutter.scrollTop = editor.scrollTop;
 }
 function syncScroll(source, target) {
   if (state.scrollSyncing || !target) return;

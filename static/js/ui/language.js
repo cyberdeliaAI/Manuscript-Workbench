@@ -1,7 +1,8 @@
 // Language of the manuscript: Book > Language, or a suggestion detected from the text.
 import { state } from './state.js';
-import { $, editor } from './dom.js';
-import { PROFILES, detectLanguage, normalizeLanguage } from '../core/language.js';
+import { PROFILES, normalizeLanguage } from '../core/language.js';
+import { scheduleAnalysis } from './analysis.js';
+import { $ } from './dom.js';
 
 /** The language the typography rules use: what the author chose, else what the text looks like, else English. */
 export function effectiveLanguage() {
@@ -17,16 +18,13 @@ export function typographyOptions() {
   };
 }
 
-let detectTimer = null;
-export function scheduleLanguageDetection() {
-  clearTimeout(detectTimer);
-  detectTimer = setTimeout(() => {
-    const before = effectiveLanguage();
-    state.detectedLanguage = detectLanguage(editor.value).id;
-    updateLanguageHint();
-    // diagnostics depend on the language: refresh them once if a new suggestion changed the profile
-    if (effectiveLanguage() !== before) document.dispatchEvent(new CustomEvent('mw:language-changed'));
-  }, 700);
+/** Called with the language the analysis suggested for the text ('' when it is not sure). */
+export function applyDetectedLanguage(id) {
+  const before = effectiveLanguage();
+  state.detectedLanguage = id || '';
+  updateLanguageHint();
+  // the diagnostics depend on the language: look again once if the suggestion changed the profile
+  if (effectiveLanguage() !== before) scheduleAnalysis(0);
 }
 
 export function updateLanguageHint() {

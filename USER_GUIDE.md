@@ -219,6 +219,10 @@ The large text area on the left is the editor. It is a plain-text Markdown edito
 
 Above the editor: **chars**, **words**, **lines**, **chapters** (lines starting with a single `#`), **subheads** (lines starting with `##` through `######`). These update live as you type.
 
+### Large manuscripts
+
+The statistics, diagnostics, outline, Markdown tab and gutter are computed in a background thread (a Web Worker), about a tenth of a second after you stop typing, so typing itself stays responsive. With a 500,000-word manuscript (100 chapters, 21,000 lines) the analysis takes roughly 35 ms in the worker; the panels refresh about 0.2 seconds after a pause. What remains slow at that size is the browser's own text area: very large texts make every edit a little heavier. For very large projects, work chapter by chapter (`Merge Folder` joins them for export). The Markdown preview is rendered by the server and is given more time between refreshes as the text grows.
+
 ### Line gutter
 
 The gutter shows line numbers with colored stripes for lines that need attention:
@@ -231,7 +235,7 @@ The gutter shows line numbers with colored stripes for lines that need attention
 | blue | typography spacing (double spaces, space before punctuation) |
 | amber (thin) | recognized Markdown structure line |
 
-Hover a stripe to see a short description. On documents over 12,000 lines the gutter switches off for performance (the editor itself keeps working normally). The gutter is also hidden while `Word wrap` is on, because wrapped visual lines no longer match physical line numbers.
+Hover a stripe to see a short description. The gutter only builds the lines that are on screen, so it costs the same for a short story and a 500,000-word manuscript. It is hidden while `Word wrap` is on, because wrapped visual lines no longer match physical line numbers.
 
 ### Scope toggle
 
@@ -846,7 +850,7 @@ The AI API key is kept in the browser's localStorage so you do not have to re-en
 
 **Text is full of `Ã©`-style characters after import.** Encoding damage from the source. Run `Repair mojibake` (also part of Safe Cleanup).
 
-**The line-number gutter disappeared.** Word wrap is on, or the document exceeds 12,000 lines. Both are intentional.
+**The line-number gutter disappeared.** Word wrap is on; the gutter is hidden then, by design.
 
 **Autosave warning: "browser storage is full".** The manuscript is too large for localStorage. Export to disk; the app keeps working, only the crash-recovery net is unavailable at that size.
 

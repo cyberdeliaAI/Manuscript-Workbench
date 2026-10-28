@@ -1,5 +1,6 @@
 // Chapter navigator.
-import { headingOutline, outlineKey } from '../core/structure.js';
+import { state } from './state.js';
+import { outlineKey } from '../core/structure.js';
 import { escapeHtml } from '../core/text-utils.js';
 import { startLM } from './ai.js';
 import { $, editor, gutter } from './dom.js';
@@ -14,10 +15,9 @@ function selectChapterRange(row) {
   gutter.scrollTop = editor.scrollTop;
   updateSelInfo();
 }
-export function renderOutline() {
+export function renderOutline(rows = state.analysis?.outline || []) {
   const list = $('#outlineList');
   if (!list) return;
-  const rows = headingOutline(editor.value);
   list.innerHTML = '';
   if (!rows.length) {
     list.innerHTML = '<div class="empty-hint">No # headings yet. Mark chapters with # to build an outline.</div>';

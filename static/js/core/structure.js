@@ -1,4 +1,6 @@
 // Markdown structure parsing shared by outline, gutter, preview helpers and AI guardrails.
+import { countWords } from './text-utils.js';
+
 // The same rule as CHAPTER_CANDIDATE_RE in manuscript_workbench/preflight.py (tests/fixtures/parity.json keeps them equal).
 export const CHAPTER_CANDIDATE_RE =
   /^\s*(?:(?:chapter|hoofdstuk|chapitre|cap[ií]tulo)\s+([0-9ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|elf|twaalf)\b.*|(?:part|deel)\s+([0-9ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien)\b.*|prologue|epilogue|acknowledg(?:e)?ments|about the author|copyright|dedication|preface|introduction|afterword|also by|inhoud|voorwoord|nawoord|dankwoord|proloog|epiloog|colofon|inhoudsopgave|over de auteur|over de schrijver|ook van|(?:appendix|bijlage)(?:\s+(?:[0-9]+|[a-z]|[ivxlcdm]+))?)\s*$/i;
@@ -120,7 +122,7 @@ export function lineOffsetsFor(text) {
   return { lines, offs };
 }
 export function wordCount(text) {
-  return (String(text || '').match(/\S+/g) || []).length;
+  return countWords(text);
 }
 export function headingOutline(text) {
   const { lines, offs } = lineOffsetsFor(text);

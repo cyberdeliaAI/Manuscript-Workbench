@@ -9,10 +9,10 @@ export function renderDiagnose(diag) {
   if (!list) return;
   list.innerHTML = '';
   DIAG_DEFS.forEach(([key, label, dot]) => {
-    const arr = diag.matches[key] || [];
+    const count = (diag.positions[key]?.length || 0) / 2;
     const row = document.createElement('div');
-    row.className = 'diag-row' + (arr.length ? '' : ' zero');
-    row.innerHTML = `<span class="dot ${dot}"></span><span class="lbl">${label}</span><span class="count">${arr.length}</span><button class="jump">next</button>`;
+    row.className = 'diag-row' + (count ? '' : ' zero');
+    row.innerHTML = `<span class="dot ${dot}"></span><span class="lbl">${label}</span><span class="count">${count}</span><button class="jump">next</button>`;
     row.querySelector('.jump').addEventListener('click', () => jumpToDiag(key));
     list.appendChild(row);
   });
@@ -24,15 +24,17 @@ export function renderDiagnose(diag) {
   state.lastDiag = diag;
 }
 function jumpToDiag(key) {
-  const arr = state.lastDiag?.matches?.[key] || [];
-  if (!arr.length) return;
-  jumpPointers[key] = ((jumpPointers[key] ?? -1) + 1) % arr.length;
-  const m = arr[jumpPointers[key]];
-  const start = Math.max(0, Math.min(m.start, editor.value.length));
-  const end = Math.max(start, Math.min(m.end, editor.value.length));
-  const lineNo = editor.value.slice(0, start).split('\n').length;
+  const positions = state.lastDiag?.positions?.[key];
+  if (!positions || !positions.length) return;
+  const total = positions.length / 2;
+  jumpPointers[key] = ((jumpPointers[key] ?? -1) + 1) % total;
+  const at = jumpPointers[key] * 2;
+  const text = editor.value;
+  const start = Math.max(0, Math.min(positions[at], text.length));
+  const end = Math.max(start, Math.min(positions[at + 1], text.length));
+  const lineNo = text.slice(0, start).split('\n').length;
   editor.focus();
-  editor.setSelectionRange(start, end > start ? end : Math.min(editor.value.length, start + 1));
+  editor.setSelectionRange(start, end > start ? end : Math.min(text.length, start + 1));
   editor.scrollTop = Math.max(0, (lineNo - 1) * 20 - editor.clientHeight / 2);
   gutter.scrollTop = editor.scrollTop;
 }

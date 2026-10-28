@@ -2,6 +2,7 @@
 import { state } from './state.js';
 import { $, editor } from './dom.js';
 import { syncFindHighlights } from './find.js';
+import { renderGutterWindow } from './gutter.js';
 import { renderMarkdownPreview } from './preview.js';
 import { saveSettings } from './settings.js';
 import { storage } from './storage.js';
@@ -21,6 +22,7 @@ $('#wrapToggle').addEventListener('change', () => {
   editor.classList.toggle('wrap', on);
   $('#editorArea').classList.toggle('wrap', on);
   editor.setAttribute('wrap', on ? 'soft' : 'off');
+  renderGutterWindow();
   syncFindHighlights();
   saveSettings();
 });

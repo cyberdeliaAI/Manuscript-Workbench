@@ -25,6 +25,8 @@ def test_index_references_external_assets_and_has_no_inline_script(server):
     ("/static/js/main.js", "text/javascript"),
     ("/static/js/core/cleaning.js", "text/javascript"),
     ("/static/js/ui/ai.js", "text/javascript"),
+    ("/static/js/workers/analysis.worker.js", "text/javascript"),
+    ("/static/js/core/analysis.js", "text/javascript"),
 ])
 def test_static_files_are_served_with_their_content_type(server, path, content_type):
     status, headers, body = server.request("GET", path, token=False)

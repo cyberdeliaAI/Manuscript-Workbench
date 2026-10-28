@@ -43,3 +43,30 @@ export function escapeHtml(s) {
 export function progressPercent(done, total) {
   return total ? Math.max(0, Math.min(100, Math.round((done / total) * 100))) : 0;
 }
+// The characters that regular expressions treat as whitespace (\s), by char code.
+function isSpaceCode(c) {
+  if (c < 128) return c === 32 || (c >= 9 && c <= 13);
+  return (
+    c === 0xa0 ||
+    c === 0x1680 ||
+    (c >= 0x2000 && c <= 0x200a) ||
+    c === 0x2028 ||
+    c === 0x2029 ||
+    c === 0x202f ||
+    c === 0x205f ||
+    c === 0x3000 ||
+    c === 0xfeff
+  );
+}
+/** Number of words (runs of non-whitespace). Same result as `text.match(/\S+/g).length`, without building the array. */
+export function countWords(text) {
+  const s = String(text || '');
+  let words = 0;
+  let inWord = false;
+  for (let i = 0; i < s.length; i++) {
+    const space = isSpaceCode(s.charCodeAt(i));
+    if (!space && !inWord) words++;
+    inWord = !space;
+  }
+  return words;
+}

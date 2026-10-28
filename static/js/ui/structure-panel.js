@@ -4,16 +4,17 @@ import { analyzeStructure, markCandidateLines } from '../core/candidates.js';
 import { escapeHtml } from '../core/text-utils.js';
 import { $, editor, toast } from './dom.js';
 import { jumpToLine, replaceRange } from './editor-ops.js';
+import { scheduleAnalysis } from './analysis.js';
 import { saveSettings } from './settings.js';
 
 const MAX_STRUCTURE_ROWS = 80;
 const MAX_CANDIDATE_ROWS = 200;
 
-export function renderStructurePanel() {
+export function renderStructurePanel(result = state.analysis?.structure) {
   const summary = $('#structureSummary'),
     list = $('#structureList');
   if (!summary || !list) return;
-  const result = analyzeStructure(editor.value, state.ignoredCandidates);
+  if (!result) result = { chapters: 0, subheads: 0, special: 0, rows: [], candidates: [], ignored: [] };
   const { chapters, subheads, special, rows, candidates, ignored } = result;
   summary.innerHTML = `<div class="vsum"><b>${chapters}</b> chapters/parts</div><div class="vsum"><b>${subheads}</b> subheads</div><div class="vsum"><b>${special}</b> special</div><div class="vsum"><b>${candidates.length}</b> candidates</div>`;
   renderCandidates(candidates, ignored);
@@ -47,7 +48,7 @@ function renderCandidates(candidates, ignored) {
   head.className = 'candidate-head';
   head.innerHTML = `<span class="candidate-title">Possible chapters <b>${candidates.length}</b></span><span class="candidate-actions"></span>`;
   const actions = head.querySelector('.candidate-actions');
-  if (candidates.length) actions.appendChild(button('Mark all as chapters', () => markAllCandidates(candidates)));
+  if (candidates.length) actions.appendChild(button('Mark all as chapters', () => markAllCandidates()));
   if (ignored.length) actions.appendChild(button(`Ignored (${ignored.length}) - restore`, restoreIgnored));
   box.appendChild(head);
   candidates.slice(0, MAX_CANDIDATE_ROWS).forEach((c) => {
@@ -92,9 +93,12 @@ function markCandidate(candidate, level) {
   toast(`Marked "${candidate.text}"`);
 }
 
-function markAllCandidates(candidates) {
-  if (!confirm(`Mark ${candidates.length} line(s) as chapters?`)) return;
+function markAllCandidates() {
+  // look at the text as it is now: the list on screen may be a moment old
   const text = editor.value;
+  const candidates = analyzeStructure(text, state.ignoredCandidates).candidates;
+  if (!candidates.length) return;
+  if (!confirm(`Mark ${candidates.length} line(s) as chapters?`)) return;
   const next = markCandidateLines(
     text,
     candidates.map((c) => c.line),
@@ -109,11 +113,11 @@ function markAllCandidates(candidates) {
 function ignoreCandidate(candidate) {
   if (!state.ignoredCandidates.includes(candidate.key)) state.ignoredCandidates.push(candidate.key);
   saveSettings();
-  renderStructurePanel();
+  scheduleAnalysis(0);
 }
 
 function restoreIgnored() {
   state.ignoredCandidates = [];
   saveSettings();
-  renderStructurePanel();
+  scheduleAnalysis(0);
 }
