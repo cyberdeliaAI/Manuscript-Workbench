@@ -619,13 +619,25 @@ A productive loop: select a passage → `Improve Questions` → paste your answe
 
 Every AI action opens a before/after preview that streams the output live:
 
-- `Split` / `After only` / `Before only` switch the layout (remembered between sessions);
+- `Split` / `After only` / `Before only` / `Diff` switch the layout (remembered between sessions; see [Reviewing the changes](#reviewing-the-changes-diff-view) for `Diff`);
 - `auto-scroll` follows the generation; `Bottom` jumps to the end;
 - `Stop generation` aborts; partial output stays visible but **cannot** be applied. Stopping also closes the connection to the provider, so a local model stops generating;
 - if the provider connection drops or the stream ends before the provider says it is finished, the preview shows an error and the incomplete output **cannot** be applied;
 - reasoning models: while the model is thinking the status shows `thinking...`; the reasoning itself is never added to your text;
 - `Apply change` replaces the original text with the result — nothing touches your manuscript until you click it;
 - closing the modal keeps the result available behind the `Show Preview` button in the AI tab.
+
+### Reviewing the changes (Diff view)
+
+`Diff` shows the result as a list of changes instead of two long panes, and lets you keep some changes and refuse others:
+
+- Each paragraph that the AI changed is one **change**. Inside a rewritten paragraph the words that were removed are struck through in red and the words that were added are green, so a small edit is easy to see in a long paragraph. A paragraph that only exists in the new text is shown as *added*, one that is gone as *removed*.
+- Paragraphs the AI did not touch are folded into a single line such as `▸ 12 unchanged paragraphs`; click it to read them.
+- Every change has a checkbox, checked by default. Uncheck it to keep the **original** paragraph for that change. The status line counts how many changes are accepted, and the button reads for example `Apply 3 of 5 changes`. `Accept all` and `Reject all` set every box at once; `Previous` / `Next` jump between changes.
+- `Apply` writes the original text with only the accepted changes into the editor. With everything accepted the result is exactly the AI output; with everything rejected there is nothing to apply.
+- The Diff view needs a finished generation and is not offered for review-only results (`Improve Questions`, `Feedback Only`). Very long reviews show the first 250 rows and a `Show more` button.
+
+Changes are matched paragraph by paragraph, so a rewrite that splits or merges paragraphs shows as a changed paragraph next to an added or removed one.
 
 ### Structure warnings and content guardrails
 

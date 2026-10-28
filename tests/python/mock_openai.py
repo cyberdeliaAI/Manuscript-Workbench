@@ -10,10 +10,16 @@ The requested model name selects the scenario:
   abort        a few deltas, then the connection is dropped mid-chunk (no [DONE])
   slow         many deltas with a delay; records whether the client went away
   error500     HTTP 500 with a text body
+  rewrite      streams a deterministic rewrite of the text between <<<BEGIN TEXT>>> and <<<END TEXT>>>
+               (two paragraphs out of three are reworded, the third is returned unchanged)
+  flaky        like rewrite, but the first attempt for each input fails with HTTP 500
+  fail-marked  like rewrite, but an input that contains FAILME always fails with HTTP 500
 """
 from __future__ import annotations
 
+import hashlib
 import json
+import re
 import socket
 import threading
 import time
@@ -34,6 +40,23 @@ SCENARIOS: Dict[str, List[Any]] = {
 }
 
 
+def reworded(text: str) -> str:
+    """The mock's idea of a rewrite: reword two of every three paragraphs, keep the third."""
+    out = []
+    for i, para in enumerate(re.split(r"\n\s*\n", text.strip("\n"))):
+        if i % 3 != 1 and para.strip():
+            para = para.replace(" and ", " & ", 1).replace(" the ", " that ", 2)
+            para = re.sub(r"\.(\s|$)", ", truly.\\1", para, count=1)
+        out.append(para)
+    return "\n\n".join(out)
+
+
+def text_of_request(body: Dict[str, Any]) -> str:
+    user = next((m.get("content", "") for m in body.get("messages", []) if m.get("role") == "user"), "")
+    match = re.search(r"<<<BEGIN TEXT>>>\n(.*?)\n<<<END TEXT>>>", user, re.S)
+    return match.group(1) if match else user
+
+
 class MockOpenAI:
     def __init__(self, api_key: Optional[str] = None, models: Optional[List[str]] = None) -> None:
         self.requests: List[Dict[str, Any]] = []
@@ -41,6 +64,7 @@ class MockOpenAI:
         self.models = models or ["normal"]
         self.slow_client_gone = threading.Event()
         self.slow_started = threading.Event()
+        self.attempts: Dict[str, int] = {}  # how often each input was requested (for the flaky scenario)
         outer = self
 
         class Handler(BaseHTTPRequestHandler):
@@ -87,6 +111,16 @@ class MockOpenAI:
                 if scenario == "error500":
                     self._send(500, b"provider exploded", "text/plain")
                     return
+                source = text_of_request(body)
+                if scenario == "flaky":
+                    key = hashlib.sha1(source.encode("utf-8")).hexdigest()
+                    outer.attempts[key] = outer.attempts.get(key, 0) + 1
+                    if outer.attempts[key] == 1:
+                        self._send(500, b"flaky provider: try again", "text/plain")
+                        return
+                if scenario == "fail-marked" and "FAILME" in source:
+                    self._send(500, b"this input always fails", "text/plain")
+                    return
                 self.send_response(200)
                 self.send_header("Content-Type", "text/event-stream")
                 self.send_header("Transfer-Encoding", "chunked")
@@ -103,6 +137,15 @@ class MockOpenAI:
                         for i in range(200):
                             self._write_chunk("data: " + _chunk({"reasoning_content": f"r{i} "}) + "\n\n")
                             time.sleep(0.05)
+                        self._write_chunk("data: [DONE]\n\n")
+                        self.wfile.write(b"0\r\n\r\n")
+                        return
+                    if scenario in ("rewrite", "flaky", "fail-marked"):
+                        result = reworded(source)
+                        for at in range(0, len(result), 40):
+                            self._write_chunk("data: " + _chunk({"content": result[at:at + 40]}) + "\n\n")
+                            time.sleep(0.01)
+                        self._write_chunk("data: " + _chunk({}, "stop") + "\n\n")
                         self._write_chunk("data: [DONE]\n\n")
                         self.wfile.write(b"0\r\n\r\n")
                         return

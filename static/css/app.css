@@ -39,3 +39,11 @@ textarea.prompt{height:190px;resize:vertical;font-family:var(--mono);line-height
 .menu-panel{max-height:calc(100vh - 90px);overflow-y:auto}
 .snapshot-add{display:flex;gap:8px;padding:10px;border-bottom:1px solid var(--line)}.snapshot-add input{flex:1}
 .badge{font-family:var(--mono);font-size:10px;font-weight:800;border-radius:4px;padding:2px 5px;margin-right:7px}.badge.auto{background:var(--blue);color:#071720}.badge.manual{background:var(--amber);color:#211507}
+.diff-panel{display:none;flex:1;min-height:0;flex-direction:column;margin:10px;border:1px solid var(--line);border-radius:8px;background:#181713;overflow:hidden}.modal.diff-view .preview-grid{display:none}.modal.diff-view .diff-panel{display:flex}
+.diff-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:7px 9px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;color:var(--muted)}.diff-actions{display:flex;gap:6px}
+.diff-list{flex:1;min-height:0;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
+.hunk{border:1px solid var(--line-soft);border-radius:7px;background:#1c1b17}.hunk-head{display:flex;align-items:center;gap:8px;padding:5px 9px;font-family:var(--mono);font-size:10.5px;color:var(--muted);cursor:pointer;border-bottom:1px solid var(--line-soft)}
+.hunk-body{padding:9px 11px}.hunk-text{white-space:pre-wrap;font-family:var(--mono);font-size:12.5px;line-height:1.6;color:var(--text)}.hunk-text.kept{color:var(--muted)}
+.hunk.rejected{opacity:.75;border-style:dashed}.hunk.same{background:transparent;border-color:transparent}.hunk.same .hunk-text{padding:4px 11px}
+.w-del{background:rgba(214,92,92,.22);color:#ffb4b4;text-decoration:line-through;text-decoration-color:rgba(255,180,180,.55)}.w-ins{background:rgba(92,184,120,.2);color:#a8e8b8;text-decoration:none}
+.hunk-gap,.hunk-more{align-self:flex-start;font-family:var(--mono);font-size:10.5px;color:var(--faint);background:transparent;border:1px dashed var(--line);padding:4px 9px}.hunk-empty{padding:18px;color:var(--muted);font-size:12.5px}

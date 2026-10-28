@@ -103,3 +103,30 @@ def test_think_stripper(mw, chunks, expected):
     stripper = mw.ThinkStripper()
     out = "".join(stripper.feed(c) for c in chunks) + stripper.flush()
     assert out == expected
+
+
+# ---- the mock provider's rewrite scenarios (used to test review and resumable runs) ----------------
+
+def wrapped(text):
+    return f"Rewrite the following text.\n\n<<<BEGIN TEXT>>>\n{text}\n<<<END TEXT>>>"
+
+
+def test_rewrite_scenario_rewords_two_of_three_paragraphs(server, mock_provider):
+    source = "One and the end.\n\nTwo stays.\n\nThree and the other.\n\nFour and the last."
+    evts = events(stream(server, mock_provider, "rewrite", input=wrapped(source))[2])
+    result = text_of(evts).split("\n\n")
+    assert result[1] == "Two stays."
+    assert result[0] != "One and the end." and result[2] != "Three and the other." and result[3] != "Four and the last."
+    assert evts[-1] == {"t": "done"}
+
+
+def test_flaky_scenario_fails_the_first_attempt_per_input_only(server, mock_provider):
+    first = stream(server, mock_provider, "flaky", input=wrapped("Alpha and beta."))
+    assert first[0] >= 400
+    assert text_of(events(stream(server, mock_provider, "flaky", input=wrapped("Alpha and beta."))[2])) != ""
+    assert stream(server, mock_provider, "flaky", input=wrapped("Other text and more."))[0] >= 400
+
+
+def test_fail_marked_scenario_fails_only_marked_inputs(server, mock_provider):
+    assert stream(server, mock_provider, "fail-marked", input=wrapped("Fine and good."))[0] == 200
+    assert stream(server, mock_provider, "fail-marked", input=wrapped("This is FAILME and more."))[0] >= 400

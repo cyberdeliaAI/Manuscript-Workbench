@@ -6,6 +6,7 @@ import { escapeHtml, progressPercent } from '../core/text-utils.js';
 import { setLmBusy } from './ai.js';
 import { openCompare } from './compare.js';
 import { $, toast } from './dom.js';
+import { nothingAccepted, refreshReview, renderReview, resetReview, reviewedText } from './ai-review.js';
 import { replaceRange } from './editor-ops.js';
 import { snapshotBefore } from './project.js';
 import { storage } from './storage.js';
@@ -22,6 +23,12 @@ export function reportPreviewMarkerDrift() {
         : `Structure count changed: before ${beforeCount}, after ${afterCount}. Review before applying.`;
     $('#lmStatus').textContent = $('#previewStatus').textContent;
   }
+}
+/** A run ended with output to look at: show the guardrails, flag moved structure, refresh the Diff view. */
+export function showRunOutcome() {
+  renderIntegrityGuardrails(state.previewState.before, state.previewState.after);
+  reportPreviewMarkerDrift();
+  refreshReview();
 }
 export function renderIntegrityGuardrails(before, after) {
   const panel = $('#integrityPanel');
@@ -65,7 +72,9 @@ export function openPreview(title, before, after, start, end, running, applyMode
     expectedMarkers: null,
     applyMode,
     progress: null,
+    review: null,
   };
+  resetReview();
   clearIntegrityGuardrails();
   $('#previewTitle').textContent = title;
   $('#previewSub').textContent = previewSubText();
@@ -126,8 +135,12 @@ $('#applyPreviewBtn').addEventListener('click', () => {
   }
   if (!state.previewState.finished || state.previewState.partial) return;
   reportPreviewMarkerDrift();
+  if (nothingAccepted()) {
+    toast('No change is accepted. Accept at least one change, or close the preview.');
+    return;
+  }
   snapshotBefore(`Before applying: ${String(state.previewState.title).replace(/^Preview:\s*/, '')}`);
-  replaceRange(state.previewState.start, state.previewState.end, state.previewState.after);
+  replaceRange(state.previewState.start, state.previewState.end, reviewedText());
   $('#previewModal').classList.remove('open');
   state.previewState.after = '';
   $('#showPreviewBtn').disabled = true;
@@ -166,14 +179,16 @@ $('#beforeBox').addEventListener('scroll', () => syncPreviewScroll($('#beforeBox
 $('#afterBox').addEventListener('scroll', () => syncPreviewScroll($('#afterBox'), $('#beforeBox')));
 document.querySelectorAll('.viewBtn').forEach((b) => b.addEventListener('click', () => setPreviewView(b.dataset.view)));
 function setPreviewView(view) {
-  if (!['split', 'after-only', 'before-only'].includes(view)) view = 'split';
+  if (!['split', 'after-only', 'before-only', 'diff'].includes(view)) view = 'split';
   const modal = $('#previewModal'),
     card = $('#modalCard');
   [modal, card].forEach((el) => {
-    el.classList.remove('after-only', 'before-only');
+    el.classList.remove('after-only', 'before-only', 'diff-view');
     if (view === 'after-only') el.classList.add('after-only');
     if (view === 'before-only') el.classList.add('before-only');
+    if (view === 'diff') el.classList.add('diff-view');
   });
+  if (view === 'diff') renderReview();
   document.querySelectorAll('.viewBtn').forEach((btn) => btn.classList.toggle('active', btn.dataset.view === view));
   storage.set('previewView', view);
 }

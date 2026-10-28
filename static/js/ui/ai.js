@@ -15,10 +15,9 @@ import {
   finishPreviewError,
   markLmStopped,
   openPreview,
-  renderIntegrityGuardrails,
-  reportPreviewMarkerDrift,
   setPreviewProgress,
   setStopButtons,
+  showRunOutcome,
   updatePreview,
 } from './ai-preview.js';
 import { api, apiHeaders } from './api.js';
@@ -238,8 +237,7 @@ export async function startLM(task, scope, chunked) {
       : 'Generation produced no applicable text.';
     $('#lmStatus').textContent = $('#previewStatus').textContent;
     if (hasOutput) {
-      renderIntegrityGuardrails(state.previewState.before, state.previewState.after);
-      reportPreviewMarkerDrift();
+      showRunOutcome();
     }
   } catch (err) {
     if (err?.name === 'AbortError' || state.previewState.partial) {
@@ -296,8 +294,7 @@ async function startGuidedAI(kind, scope) {
           : 'Generation produced no applicable text.';
     $('#lmStatus').textContent = $('#previewStatus').textContent;
     if (applyMode === 'replace' && hasOutput) {
-      renderIntegrityGuardrails(state.previewState.before, state.previewState.after);
-      reportPreviewMarkerDrift();
+      showRunOutcome();
     }
   } catch (err) {
     if (err?.name === 'AbortError' || state.previewState.partial) {
@@ -424,8 +421,7 @@ function finishSectionedPreview(label) {
       : `${label} produced no applicable text.${notes ? ' ' + notes : ''}`;
   $('#lmStatus').textContent = $('#previewStatus').textContent;
   if (!state.previewState.partial && hasOutput) {
-    renderIntegrityGuardrails(state.previewState.before, state.previewState.after);
-    reportPreviewMarkerDrift();
+    showRunOutcome();
   }
 }
 async function startLMChunked(task, scope, range, promptText) {
@@ -481,8 +477,7 @@ async function startLMChunked(task, scope, range, promptText) {
       : `Chunked generation produced no applicable text.${notes ? ' ' + notes : ''}`;
   $('#lmStatus').textContent = $('#previewStatus').textContent;
   if (!state.previewState.partial && hasOutput) {
-    renderIntegrityGuardrails(state.previewState.before, state.previewState.after);
-    reportPreviewMarkerDrift();
+    showRunOutcome();
   }
 }
 const confirmedRemoteHosts = new Set();
