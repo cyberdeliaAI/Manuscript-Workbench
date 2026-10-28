@@ -33,4 +33,5 @@ export const state = {
   findMatches: [],
   findIndex: -1,
   findScopeRange: null,
+  detectedLanguage: '',
 };

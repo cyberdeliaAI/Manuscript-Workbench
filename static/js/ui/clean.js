@@ -5,9 +5,10 @@ import { stripMarkers } from '../core/structure.js';
 import { openPreview } from './ai-preview.js';
 import { $, editor, toast } from './dom.js';
 import { getScope, replaceRange } from './editor-ops.js';
+import { typographyOptions } from './language.js';
 
 export function fixOptions() {
-  return { dehyphenate: $('#dehyphenate')?.checked ?? true };
+  return { dehyphenate: $('#dehyphenate')?.checked ?? true, ...typographyOptions() };
 }
 function buildFixResult(id) {
   const fn = FIXES[id];

@@ -230,9 +230,13 @@
         </div>
         <div class="fix-group">
           <div class="fix-group-title">Typography</div>
+          <div class="fix-note" id="profileNote"></div>
+          <div class="fix-row"><label class="fix-select"><span>Quote style</span><select id="quoteStyle"><option value="auto">Auto (by language)</option><option value="standard">“ ”  ‘ ’  standard</option><option value="low-high">„ ”  ‚ ’  low-high</option></select></label></div>
+          <div class="fix-row"><label class="fix-select"><span>Dash style</span><select id="dashStyle"><option value="auto">Auto (by language)</option><option value="em">— em dash</option><option value="spaced-en">– spaced en dash</option></select></label></div>
           <div class="fix-row"><button data-fix="quotesCurly">Quotes to curly</button></div>
           <div class="fix-row"><button data-fix="quotesStraight">Quotes to straight</button></div>
-          <div class="fix-row"><button data-fix="dashEm">-- to em dash</button></div>
+          <div class="fix-row"><button data-fix="apostrophes">Repair apostrophes (‘t → ’t)</button></div>
+          <div class="fix-row"><button data-fix="dashEm">-- to dash</button></div>
           <div class="fix-row"><button data-fix="ellipsis">... to ellipsis</button></div>
         </div>
         <div class="fix-group">
@@ -256,8 +260,8 @@
       <div class="card">
         <div class="panel-title">Metadata</div>
         <div class="panel-body"><div class="meta-grid">
-          <label>Book Title<input id="metaTitle" type="text"></label><label>Subtitle<input id="metaSubtitle" type="text"></label><label>Author<input id="metaAuthor" type="text"></label><label>Language<input id="metaLanguage" type="text" placeholder="en / nl"></label><label>Series<input id="metaSeries" type="text"></label><label>Book #<input id="metaBookNumber" type="text"></label><label>Publisher<input id="metaPublisher" type="text"></label><label>Filename base<input id="metaFilename" type="text" placeholder="manuscript"></label>
-        </div><p class="hint">Title/author go into DOCX core properties; the other fields are stored as keywords/comments where possible.</p></div>
+          <label>Book Title<input id="metaTitle" type="text"></label><label>Subtitle<input id="metaSubtitle" type="text"></label><label>Author<input id="metaAuthor" type="text"></label><label>Language<input id="metaLanguage" type="text" placeholder="en / nl" list="languageList"></label><label>Series<input id="metaSeries" type="text"></label><label>Book #<input id="metaBookNumber" type="text"></label><label>Publisher<input id="metaPublisher" type="text"></label><label>Filename base<input id="metaFilename" type="text" placeholder="manuscript"></label>
+        </div><datalist id="languageList"><option value="en"></option><option value="nl"></option></datalist><p class="hint" id="languageHint"></p><p class="hint">Title/author go into DOCX core properties; the other fields are stored as keywords/comments where possible. Language selects the typography rules of the Clean tab (English, Nederlands; other languages get only the language-neutral fixes).</p></div>
       </div>
       <div class="card">
         <div class="panel-title">Preview</div>

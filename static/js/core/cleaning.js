@@ -1,6 +1,7 @@
 // Clean operations. All of them are pure text-in, text-out functions.
 import { isLikelyPageNumberLine, repeatedLineCandidates, shouldJoinLines } from './line-heuristics.js';
 import { fixMojibake } from './mojibake.js';
+import { replaceElisions, resolveTypography } from './language.js';
 
 export const DESTRUCTIVE_FIXES = new Set([
   'htmlText',
@@ -11,6 +12,7 @@ export const DESTRUCTIVE_FIXES = new Set([
   'indentation',
   'spaceAfterPunct',
   'quotesCurly',
+  'apostrophes',
   'quotesStraight',
   'dashEm',
   'ellipsis',
@@ -46,8 +48,9 @@ export const FIX_LABELS = {
   spaceBeforePunct: 'Remove space before punctuation',
   spaceAfterPunct: 'Add missing space after punctuation',
   quotesCurly: 'Convert quotes to curly',
+  apostrophes: 'Repair apostrophes',
   quotesStraight: 'Convert quotes to straight',
-  dashEm: 'Convert double hyphen to em dash',
+  dashEm: 'Convert double hyphen to dash',
   ellipsis: 'Convert three dots to ellipsis',
   trimDoc: 'Trim document edges',
   htmlText: 'Extract text from HTML',
@@ -137,7 +140,8 @@ export function fixCollapseSpaces(text) {
     .map((l) => l.replace(/(?<=\S) {2,}/g, ' '))
     .join('\n');
 }
-export function fixSpaceBeforePunct(text) {
+export function fixSpaceBeforePunct(text, opts = {}) {
+  if (resolveTypography(opts).spaceBeforePunct === 'keep') return text; // e.g. French puts a space before : ; ! ?
   return text.replace(/ +([,.;:!?])/g, '$1');
 }
 export function fixSpaceAfterPunct(text) {
@@ -145,28 +149,43 @@ export function fixSpaceAfterPunct(text) {
     .replace(/([a-zà-ÿ]{2})([.!?])([A-ZÀ-Ý])(?=[a-zà-ÿ])/g, '$1$2 $3')
     .replace(/([a-zà-ÿ]),([a-zà-ÿA-ZÀ-Ý])/g, '$1, $2');
 }
-export function fixQuotesCurly(text) {
-  return text
-    .replace(/(^|[\s([{—–-])'(?=(?:em|cause|til|tis|twas|n|round|bout|fore|gain|neath|cross)\b)/gi, '$1’')
-    .replace(/(^|[\s([{—–-])'(?=\d{2}s\b)/g, '$1’')
-    .replace(/(^|[\s([{—–-])'(?=[stmkr]\b)/g, '$1’')
-    .replace(/(^|[\s([{—–-])"/g, '$1“')
-    .replace(/"/g, '”')
-    .replace(/(^|[\s([{—–-])'/g, '$1‘')
-    .replace(/'/g, '’');
+export function fixQuotesCurly(text, opts = {}) {
+  const { quotes, elisions } = resolveTypography(opts);
+  return replaceElisions(text, "'", '’', elisions)
+    .replace(/(^|[\s([{—–-])"/g, `$1${quotes.open}`)
+    .replace(/"/g, quotes.close)
+    .replace(/(^|[\s([{—–-])'/g, `$1${quotes.openSingle}`)
+    .replace(/'/g, quotes.closeSingle);
+}
+/** Opening single quotes that are really apostrophes (‘t huis, ‘s avonds, ‘em) become closing ones (’). */
+export function fixApostrophes(text, opts = {}) {
+  return replaceElisions(text, '‘', '’', resolveTypography(opts).elisions);
 }
 export function fixQuotesStraight(text) {
-  return text.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
+  return text.replace(/[“”„]/g, '"').replace(/[‘’‚]/g, "'");
 }
 export function isDashProtectedLine(line) {
   return /^\s*[-–—]{3,}\s*$/.test(line) || /^\s*\|?\s*:?-{2,}:?\s*(?:\|\s*:?-{2,}:?\s*)+\|?\s*$/.test(line);
 }
-export function fixDashEm(text) {
+function convertDashesEm(line) {
+  return line.replace(/(^|[^-])---(?!-)/g, '$1—').replace(/(^|[^-])--(?!-)/g, '$1—');
+}
+// Dutch typography: a spaced en dash ("woord – woord"); at the start of a line it marks dialogue.
+function convertDashesSpacedEn(line) {
+  return line.replace(/[ \t]*(?<!-)(?:---|--)(?!-)[ \t]*/g, (match, offset, whole) => {
+    const atStart = whole.slice(0, offset).trim() === '';
+    const atEnd = whole.slice(offset + match.length).trim() === '';
+    if (atStart && atEnd) return '–';
+    if (atStart) return '– ';
+    if (atEnd) return ' –';
+    return ' – ';
+  });
+}
+export function fixDashEm(text, opts = {}) {
+  const convert = resolveTypography(opts).dash === 'spaced-en' ? convertDashesSpacedEn : convertDashesEm;
   return text
     .split('\n')
-    .map((line) =>
-      isDashProtectedLine(line) ? line : line.replace(/(^|[^-])---(?!-)/g, '$1—').replace(/(^|[^-])--(?!-)/g, '$1—'),
-    )
+    .map((line) => (isDashProtectedLine(line) ? line : convert(line)))
     .join('\n');
 }
 export function fixEllipsis(text) {
@@ -296,6 +315,7 @@ export const FIXES = {
   spaceBeforePunct: fixSpaceBeforePunct,
   spaceAfterPunct: fixSpaceAfterPunct,
   quotesCurly: fixQuotesCurly,
+  apostrophes: fixApostrophes,
   quotesStraight: fixQuotesStraight,
   dashEm: fixDashEm,
   ellipsis: fixEllipsis,

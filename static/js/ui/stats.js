@@ -6,6 +6,7 @@ import { renderDiagnose } from './diagnostics.js';
 import { $, editor, gutter } from './dom.js';
 import { handleTabIndent } from './editor-ops.js';
 import { refreshFindMatches, syncFindHighlights } from './find.js';
+import { scheduleLanguageDetection, typographyOptions, updateLanguageHint } from './language.js';
 import { renderOutline } from './outline.js';
 import { renderMarkdownPreview } from './preview.js';
 import { scheduleAutosave } from './settings.js';
@@ -18,14 +19,17 @@ export function updateStats() {
   $('#statLines').textContent = text.split('\n').length.toLocaleString();
   $('#statChapters').textContent = (text.match(/^\s{0,3}#\s+\S/gm) || []).length.toLocaleString();
   $('#statSubheads').textContent = (text.match(/^\s{0,3}#{2,6}\s+\S/gm) || []).length.toLocaleString();
-  const diag = diagnose(text);
+  const diag = diagnose(text, typographyOptions());
   renderGutter(diag);
   renderDiagnose(diag);
   renderOutline();
   renderStructurePanel();
   renderMarkdownPreview();
   scheduleAutosave();
+  scheduleLanguageDetection();
+  updateLanguageHint();
 }
+document.addEventListener('mw:language-changed', () => updateStats());
 function renderGutter(diag) {
   const lines = diag ? diag.lines : editor.value.split('\n');
   if (lines.length > 12000) {
@@ -47,7 +51,7 @@ function renderGutter(diag) {
     } else if (f.has('wrap') || f.has('pageNum') || f.has('repeatLine')) {
       cls += ' issue-amber';
       notes.push('structure candidate');
-    } else if (f.has('doubleSpace') || f.has('spaceBeforePunct')) {
+    } else if (f.has('doubleSpace') || f.has('spaceBeforePunct') || f.has('apostrophe')) {
       cls += ' issue-blue';
       notes.push('typography spacing');
     } else if (markdownLineInfo(lines[i]) || /^\s*:::\s*[a-z0-9_-]*\s*$/i.test(lines[i])) cls += ' issue';

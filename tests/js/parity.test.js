@@ -29,3 +29,15 @@ for (const c of cases.page_numbers) {
     assert.equal(api.isLikelyPageNumberLine(c.lines[c.index], c.index, c.lines), c.expected);
   });
 }
+
+for (const [value, expected] of cases.languages) {
+  test(`language: ${JSON.stringify(value)}`, () => {
+    assert.equal(api.normalizeLanguage(value), expected);
+  });
+}
+
+for (const [text, language, expected] of cases.apostrophes) {
+  test(`wrong apostrophes: ${JSON.stringify(text)} (${language})`, () => {
+    assert.equal(api.countWrongApostrophes(text, language), expected);
+  });
+}

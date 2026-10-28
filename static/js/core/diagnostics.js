@@ -1,6 +1,7 @@
 // Diagnostics: finds cleanup candidates in a text.
 import { isLikelyPageNumberLine, repeatedLineCandidates, shouldJoinLines } from './line-heuristics.js';
 import { SIG_RE_G } from './mojibake.js';
+import { elisionRules, resolveTypography } from './language.js';
 
 export function markLine(offs, count, pos, flags, flagName) {
   let lo = 0,
@@ -15,7 +16,8 @@ export function markLine(offs, count, pos, flags, flagName) {
   }
   if (flags[li]) flags[li].add(flagName);
 }
-export function diagnose(text) {
+export function diagnose(text, opts = {}) {
+  const typography = resolveTypography(opts);
   const lines = text.split('\n');
   const flags = lines.map(() => new Set());
   const matches = {
@@ -24,6 +26,7 @@ export function diagnose(text) {
     tabs: [],
     doubleSpace: [],
     spaceBeforePunct: [],
+    apostrophe: [],
     extraBlank: [],
     doubleHyphen: [],
     tripleDot: [],
@@ -68,10 +71,12 @@ export function diagnose(text) {
       flags[i].add('doubleSpace');
       matches.doubleSpace.push({ start: lineStart + m.index, end: lineStart + m.index + m[0].length });
     }
-    const sbRe = / +[,.;:!?]/g;
-    while ((m = sbRe.exec(line))) {
-      flags[i].add('spaceBeforePunct');
-      matches.spaceBeforePunct.push({ start: lineStart + m.index, end: lineStart + m.index + m[0].length });
+    if (typography.spaceBeforePunct === 'remove') {
+      const sbRe = / +[,.;:!?]/g;
+      while ((m = sbRe.exec(line))) {
+        flags[i].add('spaceBeforePunct');
+        matches.spaceBeforePunct.push({ start: lineStart + m.index, end: lineStart + m.index + m[0].length });
+      }
     }
     if (isLikelyPageNumberLine(line, i, lines)) {
       flags[i].add('pageNum');
@@ -107,6 +112,15 @@ export function diagnose(text) {
     matches.ligature.push({ start: m.index, end: m.index + 1 });
     markLine(offs, lines.length, m.index, flags, 'ligature');
   }
+  for (const re of elisionRules('‘', typography.elisions)) {
+    // an opening quote that is really an apostrophe (‘t huis); group 1 is the character before it
+    while ((m = re.exec(text))) {
+      const at = m.index + m[1].length;
+      matches.apostrophe.push({ start: at, end: at + 1 });
+      markLine(offs, lines.length, at, flags, 'apostrophe');
+    }
+  }
+  matches.apostrophe.sort((a, b) => a.start - b.start);
   SIG_RE_G.lastIndex = 0;
   while ((m = SIG_RE_G.exec(text))) {
     matches.mojibake.push({ start: m.index, end: m.index + m[0].length });
@@ -149,6 +163,7 @@ export const DIAG_DEFS = [
   ['tabs', 'Tabs in the text', 'rust'],
   ['doubleSpace', 'Double spaces', 'blue'],
   ['spaceBeforePunct', 'Space before punctuation', 'blue'],
+  ['apostrophe', 'Opening quote used as apostrophe', 'blue'],
   ['doubleHyphen', 'Exact -- instead of em dash', 'blue'],
   ['tripleDot', 'Three dots instead of ellipsis', 'blue'],
 ];

@@ -399,7 +399,8 @@ Details worth knowing:
 | Trailing whitespace | spaces/tabs at line ends |
 | Tabs in the text | literal tab characters |
 | Double spaces | two or more spaces inside a line |
-| Space before punctuation | ` ,` ` .` ` !` and similar |
+| Space before punctuation | ` ,` ` .` ` !` and similar (not reported for languages where it is correct) |
+| Opening quote used as apostrophe | `‘t huis`, `‘s avonds`, `‘90s` |
 | Exact `--` instead of em dash | double hyphens |
 | Three dots instead of ellipsis | `...` instead of `…` |
 | Quotes counter | straight vs curly quote counts; flags mixed usage |
@@ -412,7 +413,7 @@ Each diagnostic has a matching Clean operation, so the Check tab doubles as a to
 
 - **missing title/author** — Book metadata is empty;
 - **no chapters** — nothing is marked with `#` yet (error);
-- **chapter candidates** — lines that look like chapter titles ("Chapter Seven", "Hoofdstuk 3", "Prologue", "Epilogue", "Part Two", front matter like "Copyright" or "About the author") but are not marked;
+- **chapter candidates** — lines that look like chapter titles ("Chapter Seven", "Hoofdstuk 3", "Prologue", "Proloog", "Part Two", front and back matter like "Copyright", "About the author", "Bijlage 2", "Colofon", "Inhoudsopgave") but are not marked;
 - **page numbers** — standalone page-number-like lines still present;
 - **tabs** — literal tabs (Word imports are safer with styles instead of tabs);
 - **trailing whitespace / extra blank runs**;
@@ -422,7 +423,9 @@ Each diagnostic has a matching Clean operation, so the Check tab doubles as a to
 - **repeated lines** — short lines that repeat throughout the text (header/footer suspects);
 - **chapter numbering sequence** — chapter numbers that skip or reset (works with digits, roman numerals, and English/Dutch number words);
 - **lists / tables as literal text** — Markdown lists and tables preview correctly but are written as literal text in DOCX export;
-- **invisible/control/mojibake characters** still present.
+- **invisible/control/mojibake characters** still present;
+- **mixed quotes** — straight and typographic double quotes in the same text (and an info line when the whole text uses straight quotes);
+- **wrong apostrophes** — an opening quote used as an apostrophe (`‘t huis`); `Clean` → `Repair apostrophes` fixes them.
 
 Each issue that has a location gets a `line N` button that jumps straight to it.
 
@@ -503,10 +506,23 @@ Tabs to spaces · Collapse multiple spaces · Remove space before punctuation ·
 
 | Operation | Notes |
 |---|---|
-| Quotes to curly | converts straight quotes to typographic quotes; handles leading apostrophes in English (`'em`, `'cause`, `'90s`) and Dutch (`'s avonds`, `'t huis`, `'k`, `'m`, `'s-Hertogenbosch`), which get a closing apostrophe `’` rather than an opening quote |
-| Quotes to straight | the reverse |
-| `--` to em dash | converts `--` and `---` between words to `—`. Lines that consist only of dashes (`---`, a scene break or Markdown divider) and Markdown table separator rows (`\|---\|---\|`) are left alone |
+| Quotes to curly | converts straight quotes to typographic quotes (`“ ” ‘ ’`, or `„ ” ‚ ’` with the low-high quote style); handles leading apostrophes in English (`'em`, `'cause`, `'90s`) and Dutch (`'s avonds`, `'t huis`, `'k`, `'m`, `'s-Hertogenbosch`), which get a closing apostrophe `’` rather than an opening quote |
+| Quotes to straight | the reverse (also for `„ ‚`) |
+| Repair apostrophes | turns an opening single quote that is really an apostrophe into `’`: `‘t huis` → `’t huis`, `‘s avonds` → `’s avonds`, `‘90s` → `’90s`. This is what word processors do wrong in Dutch. Real quotes (`‘Dag’`) are left alone |
+| `--` to dash | converts `--` and `---` to the dash of the language profile: `—` for English (spacing kept), a spaced en dash ` – ` for Dutch (and `– ` at the start of a line, for dialogue). Lines that consist only of dashes (`---`, a scene break or Markdown divider) and Markdown table separator rows (`\|---\|---\|`) are left alone |
 | `...` to ellipsis | converts three dots (also spaced `. . .`) to `…` |
+
+#### Language profiles
+
+The typography operations follow a **language profile**, chosen in `Book` → `Language` (`en`, `nl`, or the language name). If you leave it empty, the app suggests one after looking at the text (a hint with a button appears under the Language field) and uses that suggestion; if it cannot tell, it uses English. The Typography group shows which profile is active.
+
+| Profile | Quotes | Dash | Space before `, . ; : ! ?` |
+|---|---|---|---|
+| English (`en`) | `“ ”` | `—` | removed |
+| Nederlands (`nl`) | `“ ”` | spaced `–` | removed |
+| any other language | `“ ”` | `—` | **kept** (French, for instance, puts a space before `: ; ! ?`), and no English/Dutch apostrophe guesses |
+
+The `Quote style` and `Dash style` menus in the Typography group override the profile (`Auto` follows it). Safe Cleanup and the Diagnostics respect the profile too.
 
 ### File
 
@@ -633,7 +649,7 @@ The Book tab stores export metadata:
 | Book Title | DOCX core property "title" |
 | Subtitle | DOCX core property "subject" |
 | Author | DOCX core property "author" |
-| Language / Series / Book # / Publisher | DOCX keywords |
+| Language / Series / Book # / Publisher | DOCX keywords. Language also selects the typography rules of the Clean tab (see [Language profiles](#language-profiles)) |
 | Filename base | base name for all exported files |
 
 Preflight warns when Title or Author is empty. Metadata is included in the autosave, so it survives restarts.

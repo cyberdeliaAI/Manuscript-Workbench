@@ -29,3 +29,13 @@ def test_chapter_candidate(mw, line, expected):
 @pytest.mark.parametrize("case", CASES["page_numbers"], ids=lambda c: "|".join(c["lines"])[:40] + f"@{c['index']}")
 def test_page_number_line(mw, case):
     assert mw.is_page_number_line(case["lines"], case["index"]) is case["expected"]
+
+
+@pytest.mark.parametrize("value,expected", CASES["languages"])
+def test_normalize_language(mw, value, expected):
+    assert mw.normalize_language(value) == expected
+
+
+@pytest.mark.parametrize("text,language,expected", CASES["apostrophes"])
+def test_wrong_apostrophes(mw, text, language, expected):
+    assert mw.count_wrong_apostrophes(text, language) == expected

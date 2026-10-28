@@ -8,7 +8,7 @@ from .structure import MARKDOWN_CONTAINER_RE, strip_structure_line, structure_ma
 
 
 CHAPTER_CANDIDATE_RE = re.compile(
-    r"^\s*(?:(?:chapter|hoofdstuk|chapitre|cap[ií]tulo)\s+([0-9ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|elf|twaalf)\b.*|(?:part|deel)\s+([0-9ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien)\b.*|prologue|epilogue|acknowledg(?:e)?ments|about the author|copyright|dedication|preface|introduction|afterword|also by|inhoud|voorwoord|nawoord|dankwoord)\s*$",
+    r"^\s*(?:(?:chapter|hoofdstuk|chapitre|cap[ií]tulo)\s+([0-9ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|elf|twaalf)\b.*|(?:part|deel)\s+([0-9ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien)\b.*|prologue|epilogue|acknowledg(?:e)?ments|about the author|copyright|dedication|preface|introduction|afterword|also by|inhoud|voorwoord|nawoord|dankwoord|proloog|epiloog|colofon|inhoudsopgave|over de auteur|over de schrijver|ook van|(?:appendix|bijlage)(?:\s+(?:[0-9]+|[a-z]|[ivxlcdm]+))?)\s*$",
     re.I,
 )
 
@@ -29,6 +29,35 @@ WORD_NUMS = {
 }
 
 ROMAN_ONLY_RE = re.compile(r"^[ivxlcdm]{2,}$", re.I)
+
+
+def normalize_language(value: Any) -> str:
+    """'English', 'en-GB' -> 'en'; 'Nederlands', 'nl-BE' -> 'nl'; anything else -> 'other'; empty -> ''.
+    static/js/core/language.js has the same rule."""
+    v = str(value or "").strip().lower()
+    if not v:
+        return ""
+    if v in ("en", "eng", "english", "engels") or re.match(r"^en[-_]", v):
+        return "en"
+    if v in ("nl", "nld", "dut", "dutch", "nederlands", "vlaams") or re.match(r"^nl[-_]", v):
+        return "nl"
+    return "other"
+
+
+# An opening single quote that is really an apostrophe: English ('em, 'cause, 'tis, '90s) and Dutch ('s avonds,
+# 't huis, 'n, 'k, 'm, 'r) elisions. static/js/core/language.js has the same rules.
+_OPENER = r"(?:^|(?<=[\s(\[{—–-]))"
+_DECADE_RULE = re.compile(_OPENER + "‘" + r"(?=\d{2}s\b)")
+_ELISION_RULES = [
+    re.compile(_OPENER + "‘" + r"(?=(?i:em|cause|til|tis|twas|n|round|bout|fore|gain|neath|cross)\b)"),
+    _DECADE_RULE,
+    re.compile(_OPENER + "‘" + r"(?=[stmkr]\b)"),
+]
+
+
+def count_wrong_apostrophes(text: str, language: Any = "") -> int:
+    rules = _ELISION_RULES if normalize_language(language) != "other" else [_DECADE_RULE]
+    return sum(len(rule.findall(text)) for rule in rules)
 
 
 def is_chapter_candidate(line: str) -> bool:
@@ -83,6 +112,7 @@ def parse_chapter_number(line: str) -> Optional[int]:
 
 def preflight(text: str, metadata: Dict[str, str]) -> Dict[str, Any]:
     lines = text.split("\n")
+    language = normalize_language(metadata.get("language"))
     issues: List[Dict[str, Any]] = []
     info: List[Dict[str, Any]] = []
 
@@ -211,6 +241,18 @@ def preflight(text: str, metadata: Dict[str, str]) -> Dict[str, Any]:
     mojibake_count = len(re.findall(r"[\u00C2-\u00F4][\u0080-\u00BF\u20AC\u201A\u0192\u201E\u2026\u2020\u2021\u02C6\u2030\u0160\u2039\u0152\u017D\u2018\u2019\u201C\u201D\u2022\u2013\u2014\u02DC\u2122\u0161\u203A\u0153\u017E\u0178]", text))
     if mojibake_count:
         add("warning", "mojibake", "Possible mojibake/encoding damage found.", mojibake_count)
+
+    straight_quotes = text.count('"')
+    typographic_quotes = sum(text.count(ch) for ch in "“”„")
+    if straight_quotes and typographic_quotes:
+        add("warning", "mixed-quotes", f"Straight and typographic double quotes are mixed ({straight_quotes} straight, {typographic_quotes} typographic).", min(straight_quotes, typographic_quotes))
+    elif straight_quotes >= 10:
+        add("info", "straight-quotes", "The text uses straight quotes. Clean > Quotes to curly converts them.", straight_quotes)
+    wrong_apostrophes = count_wrong_apostrophes(text, language)
+    if wrong_apostrophes:
+        add("warning", "wrong-apostrophe", "An opening quote is used as an apostrophe (‘t huis instead of ’t huis). Clean > Repair apostrophes fixes this.", wrong_apostrophes)
+    if language:
+        info.append({"label": "Language profile", "value": language})
 
     levels = {"error": 0, "warning": 0, "info": 0}
     for issue in issues:

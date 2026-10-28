@@ -988,7 +988,7 @@
           },
           {
             "code": "chapter-candidates",
-            "count": 3,
+            "count": 4,
             "level": "warning",
             "line": 9,
             "message": "Possible chapter/front-matter lines are not marked.",
@@ -1021,7 +1021,7 @@
         "issues": [
           {
             "code": "chapter-candidates",
-            "count": 3,
+            "count": 4,
             "level": "warning",
             "line": 9,
             "message": "Possible chapter/front-matter lines are not marked.",
@@ -1218,12 +1218,20 @@
             "line": null,
             "message": "Possible mojibake/encoding damage found.",
             "sample": null
+          },
+          {
+            "code": "straight-quotes",
+            "count": 10,
+            "level": "info",
+            "line": null,
+            "message": "The text uses straight quotes. Clean > Quotes to curly converts them.",
+            "sample": null
           }
         ],
         "lineCount": 78,
         "summary": {
           "error": 1,
-          "info": 1,
+          "info": 2,
           "warning": 12
         },
         "wordCount": 551
@@ -1326,12 +1334,20 @@
             "line": null,
             "message": "Possible mojibake/encoding damage found.",
             "sample": null
+          },
+          {
+            "code": "straight-quotes",
+            "count": 10,
+            "level": "info",
+            "line": null,
+            "message": "The text uses straight quotes. Clean > Quotes to curly converts them.",
+            "sample": null
           }
         ],
         "lineCount": 78,
         "summary": {
           "error": 1,
-          "info": 1,
+          "info": 2,
           "warning": 10
         },
         "wordCount": 551

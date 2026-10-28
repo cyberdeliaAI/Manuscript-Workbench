@@ -3,11 +3,15 @@ import { escapeHtml } from '../core/text-utils.js';
 import { api } from './api.js';
 import { $, editor } from './dom.js';
 import { jumpToLine } from './editor-ops.js';
+import { effectiveLanguage } from './language.js';
 import { getMetadata } from './settings.js';
 
 $('#preflightBtn').addEventListener('click', runPreflight);
 async function runPreflight() {
-  const res = await api('/api/preflight', { text: editor.value, metadata: getMetadata() });
+  const metadata = getMetadata();
+  // the checks judge typography by the language the Clean tools use: the chosen one, else the suggested one
+  metadata.language = metadata.language || effectiveLanguage();
+  const res = await api('/api/preflight', { text: editor.value, metadata });
   const data = await res.json();
   renderPreflight(data);
 }
