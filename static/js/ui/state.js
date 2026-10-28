@@ -36,5 +36,9 @@ export const state = {
   detectedLanguage: '',
   ignoredCandidates: [],
   analysis: null,
+  project: null, // { id, name, updatedAt, status } while a project is open
+  projectGlossary: '',
+  projectLoading: false,
+  projectVersion: 0, // counts changes, so a save knows whether more happened while it was running
   markdownPreviewAbort: null,
 };

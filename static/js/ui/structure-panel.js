@@ -5,6 +5,7 @@ import { escapeHtml } from '../core/text-utils.js';
 import { $, editor, toast } from './dom.js';
 import { jumpToLine, replaceRange } from './editor-ops.js';
 import { scheduleAnalysis } from './analysis.js';
+import { markProjectDirty } from './project.js';
 import { saveSettings } from './settings.js';
 
 const MAX_STRUCTURE_ROWS = 80;
@@ -113,11 +114,13 @@ function markAllCandidates() {
 function ignoreCandidate(candidate) {
   if (!state.ignoredCandidates.includes(candidate.key)) state.ignoredCandidates.push(candidate.key);
   saveSettings();
+  markProjectDirty();
   scheduleAnalysis(0);
 }
 
 function restoreIgnored() {
   state.ignoredCandidates = [];
   saveSettings();
+  markProjectDirty();
   scheduleAnalysis(0);
 }

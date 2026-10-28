@@ -18,13 +18,16 @@ import './ui/prompts.js';
 import './ui/ai.js';
 import './ui/ai-preview.js';
 import './ui/settings.js';
+import './ui/project-ui.js';
 
 import { loadPrompts } from './ui/prompts.js';
+import { restoreLastProject } from './ui/project.js';
 import { loadSettings, showRecoveryIfNeeded } from './ui/settings.js';
 import { updateStats } from './ui/stats.js';
 
 loadPrompts();
-loadSettings().then(() => {
+loadSettings().then(async () => {
   showRecoveryIfNeeded();
   updateStats();
+  await restoreLastProject();
 });

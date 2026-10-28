@@ -21,7 +21,7 @@ export function getMetadata() {
     filename: $('#metaFilename').value.trim(),
   };
 }
-function setMetadata(m) {
+export function setMetadata(m) {
   m = m || {};
   $('#metaTitle').value = m.title || '';
   $('#metaSubtitle').value = m.subtitle || '';
@@ -58,7 +58,7 @@ export function scheduleAutosave() {
     }
   }, 700);
 }
-function getSettings() {
+export function getSettings() {
   return {
     wrap: $('#wrapToggle').checked,
     previewOn: document.querySelector('.editor-card')?.classList.contains('preview-on') || false,
@@ -235,3 +235,40 @@ $('#discardRestoreBtn').addEventListener('click', () => {
   $('#recovery').classList.remove('show');
   updateStats();
 });
+
+// The elements behind the settings that travel with a project (see PROJECT_SETTING_KEYS).
+const PROJECT_SETTING_FIELDS = {
+  lmProvider: '#lmProvider',
+  lmBase: '#lmBase',
+  lmStrength: '#lmStrength',
+  chunkSize: '#chunkSize',
+  guidedContext: '#guidedContext',
+  translateTarget: '#translateTarget',
+  quoteStyle: '#quoteStyle',
+  dashStyle: '#dashStyle',
+  advTemperature: '#advTemperature',
+  advTopP: '#advTopP',
+  advTopK: '#advTopK',
+  advRepeatPenalty: '#advRepeatPenalty',
+  advMaxTokens: '#advMaxTokens',
+};
+/** Applies the settings stored in a project (opening a project). Keys the project does not have are left alone. */
+export function applyProjectSettings(settings) {
+  const s = settings || {};
+  if (s.lmProvider && !AI_PROVIDERS[s.lmProvider]) delete s.lmProvider;
+  for (const [key, selector] of Object.entries(PROJECT_SETTING_FIELDS)) {
+    if (s[key] !== undefined && $(selector)) $(selector).value = String(s[key]);
+  }
+  if (s.lmModel) {
+    const sel = $('#lmModel');
+    if (!Array.from(sel.options).some((o) => o.value === s.lmModel)) {
+      const opt = document.createElement('option');
+      opt.value = s.lmModel;
+      opt.textContent = s.lmModel;
+      sel.appendChild(opt);
+    }
+    sel.value = s.lmModel;
+  }
+  updateProviderUi();
+  saveSettings();
+}

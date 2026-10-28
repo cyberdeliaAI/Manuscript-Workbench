@@ -35,3 +35,7 @@ textarea.prompt{height:190px;resize:vertical;font-family:var(--mono);line-height
 .fix-select{display:flex;align-items:center;gap:8px;flex:1;font-size:11px;color:var(--muted)}.fix-select span{min-width:74px}.fix-select select{flex:1;padding:6px 8px}#languageHint:empty{display:none}#languageHint button{margin-left:4px}
 .candidate-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 16px;border-top:1px solid var(--line-soft);font-size:11px;color:var(--muted)}.candidate-title b{color:var(--text)}.candidate-actions{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}.candidate-row{flex-wrap:wrap}.candidate-row .vtext{min-width:40%}.candidate-row .jump{font-size:10.5px;padding:3px 6px}
 .gutter-inner{position:relative}.gutter-window{position:absolute;left:0;right:0;top:0}
+.project-status{font-family:var(--mono);font-size:12px;color:var(--muted);max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}.project-status:empty{display:none}.project-status.saved{color:var(--green)}.project-status.dirty,.project-status.saving{color:var(--amber)}.project-status.error,.project-status.conflict{color:#e89a7e}
+.menu-panel{max-height:calc(100vh - 90px);overflow-y:auto}
+.snapshot-add{display:flex;gap:8px;padding:10px;border-bottom:1px solid var(--line)}.snapshot-add input{flex:1}
+.badge{font-family:var(--mono);font-size:10px;font-weight:800;border-radius:4px;padding:2px 5px;margin-right:7px}.badge.auto{background:var(--blue);color:#071720}.badge.manual{background:var(--amber);color:#211507}

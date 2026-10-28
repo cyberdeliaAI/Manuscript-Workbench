@@ -11,10 +11,20 @@
 <header>
   <div class="brand"><div class="mark">Manuscript <span>Workbench</span></div><div class="sub">v1.2 · local Python edition · Markdown-friendly structure · DOCX import/export · local AI streaming</div></div>
   <div class="actions">
+    <span class="project-status" id="projectStatus" title="Click to save the project"></span>
     <span class="filename" id="filename">no file loaded</span>
     <details class="header-menu" id="headerMenu">
       <summary class="btn">☰ Menu</summary>
       <div class="menu-panel">
+        <button id="projectNewBtn">New project…</button>
+        <button id="projectOpenBtn">Open project…</button>
+        <button id="projectSaveBtn">Save project</button>
+        <button id="projectSaveAsBtn">Save project as…</button>
+        <button id="projectSnapshotsBtn" disabled>Snapshots…</button>
+        <button id="projectExportBtn">Export project file</button>
+        <label class="btn" for="projectImportInput">Import project file</label><input type="file" id="projectImportInput" accept=".json,application/json">
+        <button id="projectCloseBtn" disabled>Close project</button>
+        <div class="menu-sep"></div>
         <label class="btn" for="fileInput">Load File</label><input type="file" id="fileInput" accept=".txt,.md,.markdown,.rtf,.docx,.doc,.html,.htm,text/plain,text/markdown,text/x-markdown,text/html,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
         <button id="importUrlBtn">Import URL</button>
         <label class="btn" for="folderInput">Merge Folder</label><input type="file" id="folderInput" webkitdirectory directory multiple accept=".txt,.md,.markdown,.rtf,.docx,.doc,.html,.htm,text/plain,text/markdown,text/x-markdown,text/html,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
@@ -303,6 +313,28 @@
   <button id="selectionRunBtn" class="mini primary" type="button">Run</button>
 </div>
 <div class="toast" id="toast"></div>
+<div class="modal" id="projectsModal">
+  <div class="modal-card modal-tall-760">
+    <div class="modal-head"><div><div class="modal-title">Projects</div><div class="small" id="projectsDir"></div></div><div class="modal-actions"><button id="projectsNewBtn" class="mini primary">New project…</button><button id="projectsCloseBtn" class="mini">Close</button></div></div>
+    <div class="merge-list" id="projectList"></div>
+    <div class="modal-foot"><span class="lm-status">Projects keep the text, the book details, ignored chapter candidates, prompts and AI settings. Deleted projects are moved to .trash.</span></div>
+  </div>
+</div>
+<div class="modal" id="snapshotsModal">
+  <div class="modal-card modal-tall-760">
+    <div class="modal-head"><div><div class="modal-title" id="snapshotsTitle">Snapshots</div><div class="small" id="snapshotSummary"></div></div><div class="modal-actions"><button id="snapshotsCloseBtn" class="mini">Close</button></div></div>
+    <div class="snapshot-add"><input id="snapshotLabel" type="text" placeholder="Label for a new snapshot, e.g. Before rewriting chapter 3" spellcheck="false"><button id="snapshotTakeBtn" class="primary">Take snapshot</button></div>
+    <div class="merge-list" id="snapshotList"></div>
+    <div class="modal-foot"><span class="lm-status">Compare shows a snapshot next to the text on screen. Restore keeps what you replace as a snapshot.</span></div>
+  </div>
+</div>
+<div class="modal" id="nameModal">
+  <div class="modal-card modal-narrow-560">
+    <div class="modal-head"><div class="modal-title" id="nameModalTitle">Name</div><div class="modal-actions"><button id="nameModalCancel" class="mini">Cancel</button></div></div>
+    <div class="find-body"><div class="find-field"><label for="nameModalInput" id="nameModalLabel">Name</label><input id="nameModalInput" type="text" spellcheck="false" maxlength="120"></div><div class="hint" id="nameModalHint"></div></div>
+    <div class="modal-foot"><span></span><div class="modal-actions"><button id="nameModalOk" class="primary">OK</button></div></div>
+  </div>
+</div>
 <div class="modal" id="aboutModal">
   <div class="modal-card modal-narrow-560">
     <div class="modal-head"><div><div class="modal-title">About Manuscript Workbench</div><div class="small">Version 1.2</div></div><div class="modal-actions"><button id="closeAboutBtn" class="mini">Close</button></div></div>

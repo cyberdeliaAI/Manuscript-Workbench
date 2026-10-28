@@ -5,6 +5,7 @@ import { $, editor, gutter } from './dom.js';
 import { handleTabIndent } from './editor-ops.js';
 import { refreshFindMatches, syncFindHighlights } from './find.js';
 import { updateLanguageHint } from './language.js';
+import { markProjectDirty } from './project.js';
 import { renderMarkdownPreview } from './preview.js';
 import { scheduleAutosave } from './settings.js';
 
@@ -14,6 +15,7 @@ export function updateStats() {
   renderMarkdownPreview();
   scheduleAutosave();
   updateLanguageHint();
+  markProjectDirty();
 }
 function syncScroll(source, target) {
   if (state.scrollSyncing || !target) return;
