@@ -3,6 +3,7 @@ import { state } from './state.js';
 import { cleanFilename, compareStats } from '../core/text-utils.js';
 import { $, editor, toast } from './dom.js';
 import { replaceRange } from './editor-ops.js';
+import { snapshotBefore } from './project.js';
 import { downloadBlob, importFileObject } from './files.js';
 
 function updateCompareMeta() {
@@ -90,6 +91,7 @@ $('#compareCopyRevisedBtn').addEventListener('click', () => {
   }
   if (editor.value && editor.value !== text && !confirm('Replace the current editor text with the revised side?'))
     return;
+  snapshotBefore('Before copying the revised text into the editor');
   replaceRange(0, editor.value.length, text);
   $('#compareStatus').textContent = 'Revised copied to editor.';
   toast('Revised copied to editor');

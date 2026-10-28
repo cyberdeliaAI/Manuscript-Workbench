@@ -12,6 +12,7 @@ import {
 import { api } from './api.js';
 import { $, editor, filenameEl, toast } from './dom.js';
 import { getMetadata } from './settings.js';
+import { snapshotBefore } from './project.js';
 import { updateStats } from './stats.js';
 import { pushUndoSnapshot, undoStack, updateUndoButton } from './undo.js';
 
@@ -32,6 +33,7 @@ function applyImportedText(data, displayName, sizeLabel = '') {
     !confirm(`Replace the current editor text with "${displayName || data.filename || 'the imported file'}"?`)
   )
     return false;
+  snapshotBefore(`Before loading ${displayName || data.filename || 'a file'}`);
   editor.value = data.text || '';
   state.currentFilename = data.filename || displayName || 'manuscript.txt';
   filenameEl.textContent = sizeLabel ? `${displayName} (${sizeLabel})` : displayName;
@@ -235,6 +237,7 @@ $('#mergeBtn').addEventListener('click', () => {
     return;
   }
   if (editor.value && !confirm('Replace the current editor text with the merged folder?')) return;
+  snapshotBefore('Before merging a folder');
   pushUndoSnapshot();
   const merged = state.mergeFiles
     .map((item) => item.text.trim())
@@ -252,6 +255,7 @@ $('#mergeBtn').addEventListener('click', () => {
 });
 $('#clearBtn').addEventListener('click', () => {
   if (editor.value && !confirm('Clear the editor?')) return;
+  snapshotBefore('Before clearing the editor');
   pushUndoSnapshot();
   editor.value = '';
   state.currentFilename = 'manuscript.txt';

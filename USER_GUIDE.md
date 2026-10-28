@@ -28,7 +28,7 @@ Nothing else leaves your machine. Your manuscript text is never sent to a cloud 
 15. [Find / Replace](#15-find--replace)
 16. [Selection Menu](#16-selection-menu)
 17. [Exporting](#17-exporting)
-18. [Autosave, Undo, and Local Storage](#18-autosave-undo-and-local-storage)
+18. [Projects, Snapshots, Autosave, and Undo](#18-projects-snapshots-autosave-and-undo)
 19. [Keyboard Shortcuts](#19-keyboard-shortcuts)
 20. [Practical Workflows](#20-practical-workflows)
 21. [Troubleshooting](#21-troubleshooting)
@@ -105,6 +105,10 @@ The default port is `8765`. To use another port:
 MANUSCRIPT_WORKBENCH_PORT=8766 ./start_mac_linux.sh
 ```
 
+### Changing the data folder
+
+Projects and their snapshots are stored in a `projects` folder next to the app. Set `MANUSCRIPT_WORKBENCH_DATA_DIR` to keep them somewhere else; see [section 18](#18-projects-snapshots-autosave-and-undo).
+
 ### If Port 8765 Is Already in Use
 
 If you see:
@@ -132,8 +136,8 @@ Replace `<PID>` with the number shown by `lsof`. Or simply start a second copy o
 
 From top to bottom:
 
-- **Header bar** — filename display and the main file actions: `Load File`, `Import URL`, `Merge Folder`, `Undo`, `Clear`, `Export TXT`, `Export Markdown`, `Export DOCX`.
-- **Recovery bar** — appears only when a previous autosave is found (see [section 18](#18-autosave-undo-and-local-storage)).
+- **Header bar** — the project status and filename display, and the `☰ Menu` with the project actions (`New`, `Open`, `Save`, `Save as`, `Snapshots`, `Export`/`Import project file`, see [section 18](#18-projects-snapshots-autosave-and-undo)) and the main file actions: `Load File`, `Import URL`, `Merge Folder`, `Undo`, `Clear`, `Export TXT`, `Export Markdown`, `Export DOCX`.
+- **Recovery bar** — appears only when a previous autosave is found (see [section 18](#18-projects-snapshots-autosave-and-undo)).
 - **Stats bar** — live counts: characters, words, lines, chapters (`#` headings), subheads (`##`–`######` headings).
 - **Quick formatting bar** — text style dropdown, inline formatting buttons (B, I, U, SC, Mono, Sans), `Find`, `Preview`, `AI`, `Clean`, `Clear`.
 - **Markdown tools toolbar** — collapsible toolbar with every structure marker, special block, and inline style. Click `Expand` to open it.
@@ -727,9 +731,57 @@ Details:
 
 The DOCX round-trips: importing an exported DOCX back into the app restores the Markdown structure.
 
-## 18. Autosave, Undo, and Local Storage
+## 18. Projects, Snapshots, Autosave, and Undo
 
-### Autosave
+### Projects
+
+A **project** is your manuscript saved on disk under a name, so it survives a cleared browser, a different browser, or a crash. Everything is in the `☰ Menu` at the top right:
+
+| Menu item | What it does |
+|---|---|
+| `New project…` | Asks for a name and starts an empty project (the current project is saved first). |
+| `Open project…` | Lists the saved projects, newest first, with word count and last change. |
+| `Save project` | Saves now. Also `Cmd+S` / `Ctrl+S`, or a click on the status next to the filename. |
+| `Save project as…` | Saves the text on screen under a new name (this is also how an unsaved session becomes a project). |
+| `Snapshots…` | Opens the snapshot list of the current project (see below). |
+| `Export project file` / `Import project file` | Downloads or loads a single `.mwb.json` file, for moving a project to another machine. If the name is taken, the import asks for another one. |
+| `Close project` | Saves, then leaves the project and keeps the text on screen as an unsaved session. |
+
+What a project keeps: the text, the book details (`Book` tab), the chapter candidates you chose to ignore, your custom prompts, and the AI and typography settings. The AI API key is **never** part of a project.
+
+The status next to the filename shows where you stand: `saved`, `unsaved changes`, `saving...`, `could not save`, or `changed elsewhere`. Changes are saved automatically about three seconds after you stop typing, and the app asks before you close the tab while something is unsaved. The last project you used opens again after a reload.
+
+**Changed elsewhere.** If the same project was saved from another tab or window since you opened it, the app does not overwrite that version silently. Use `Save project` and confirm to let the version on screen win, or `Export project file` first if you want to keep both.
+
+**Where the files are.** Projects are `<name>.mwb.json` files in the `projects` folder next to the app (the exact path is shown at the top of the `Open project…` list). Every save keeps the previous version as `<name>.mwb.json.bak`. Deleting a project moves its files to `projects/.trash/`; nothing is erased for good. To keep projects elsewhere (for instance in a synced folder), start the app with another data folder:
+
+```bash
+MANUSCRIPT_WORKBENCH_DATA_DIR="$HOME/Documents/Manuscripts" ./start_mac_linux.sh
+```
+
+The projects folder is then `Manuscripts/projects`.
+
+### Snapshots
+
+A snapshot is a full copy of the text at one moment, stored with the project (`<name>.snapshots/`). Open the list with `☰ Menu` → `Snapshots…`.
+
+- **Manual** snapshots (`MANUAL`): type a label such as "Before rewriting chapter 3" and press `Take snapshot`. They are never deleted automatically.
+- **Automatic** snapshots (`AUTO`) are taken for you, with the reason as the label, right before something that can replace a lot of text:
+  - applying an AI result (`Before applying: …`);
+  - `Replace All` in Find / Replace;
+  - loading a file, merging a folder, or clearing the editor;
+  - a Clean action that changes the whole text (`Before Safe Cleanup`, previewed fixes);
+  - `Mark all` chapter candidates;
+  - copying the revised text from the Compare window.
+
+  A change that leaves the text identical to the newest automatic snapshot does not make a new one. While a project is open and its text changed, one more is taken every 15 minutes. Only the newest 50 automatic snapshots are kept.
+- **Compare** shows the snapshot (left) against the text on screen (right).
+- **Restore** replaces the text on screen with the snapshot. The text you replace is saved as a snapshot first, and the top-bar `Undo` also works.
+- **Delete** removes one snapshot.
+
+Snapshots need a project: with an unsaved session, use `Save project as…` first.
+
+### Autosave (browser)
 
 The app autosaves your text, metadata, and settings to the **browser's localStorage** shortly after every change. When you reopen the app and the editor is empty, a recovery bar offers:
 
@@ -742,7 +794,7 @@ Limits to be aware of:
 - browsers cap localStorage (typically 5–10 MB); on very large manuscripts the app warns when autosave fails;
 - clearing browser site data deletes the autosave and your saved prompts/settings.
 
-**Autosave is a safety net, not a saving system.** Export a Markdown file for anything you care about.
+**Browser autosave is a safety net, not a saving system.** Keep anything you care about in a project (above) or export a Markdown file.
 
 ### Undo
 
@@ -764,6 +816,7 @@ The AI API key is kept in the browser's localStorage so you do not have to re-en
 
 | Keys | Action |
 |---|---|
+| `Cmd+S` / `Ctrl+S` | save the project (asks for a name when there is none yet) |
 | `Cmd+F` / `Ctrl+F` | open Find/Replace |
 | `Escape` | close Find/Replace |
 | `Enter` in Find field | next match |
@@ -866,7 +919,9 @@ The AI API key is kept in the browser's localStorage so you do not have to re-en
 - HTML/URL import is practical extraction, not a browser; JavaScript-heavy pages may import incompletely.
 - Old binary `.doc` files are not supported — convert them first.
 - Loading a file resets the undo history (the app asks for confirmation before replacing existing text).
-- Autosave uses browser localStorage and is not a substitute for exported files.
+- Browser autosave uses localStorage and is not a substitute for a saved project or exported files.
+- Projects are plain files on this computer: there is no sync, no sharing and no merging of two versions of the same project. Use `Export project file` to move one.
+- Snapshots store the whole text each time, so a very large manuscript with many manual snapshots takes disk space (automatic ones are capped at 50).
 - The app binds to `127.0.0.1` only: it is not reachable from other machines, by design.
 
 ### Security notes
@@ -879,7 +934,7 @@ The AI API key is kept in the browser's localStorage so you do not have to re-en
 ## 23. Recommended Daily Workflow
 
 1. Import text.
-2. **Immediately export a Markdown backup.**
+2. **Immediately save the text as a project** (`☰ Menu` → `Save project as…`), and export a Markdown backup if you want a copy outside the app.
 3. Run `Safe Cleanup`, then fix what Diagnostics still flags.
 4. Add structure with `#`, `##`, `***`, and special blocks where needed; check the Markdown tab for `CHECK` candidates.
 5. Use `Preview` to check the readable version.

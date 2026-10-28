@@ -6,6 +6,7 @@ import { openPreview } from './ai-preview.js';
 import { $, editor, toast } from './dom.js';
 import { getScope, replaceRange } from './editor-ops.js';
 import { typographyOptions } from './language.js';
+import { snapshotBefore } from './project.js';
 
 export function fixOptions() {
   return { dehyphenate: $('#dehyphenate')?.checked ?? true, ...typographyOptions() };
@@ -34,6 +35,8 @@ export function applyTextChange(before, after, start, end, label) {
     toast('Nothing to change.');
     return;
   }
+  if (start === 0 && end === editor.value.length)
+    snapshotBefore(`Before ${String(label || 'Clean').replace(/ applied.*$/i, '')}`); // a whole-text change
   replaceRange(start, end, after);
   toast(label || 'Applied');
 }

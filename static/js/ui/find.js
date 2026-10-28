@@ -2,6 +2,7 @@
 import { state } from './state.js';
 import { escapeHtml, escapeRegExp } from '../core/text-utils.js';
 import { $, editor, toast } from './dom.js';
+import { snapshotBefore } from './project.js';
 import { restoreEditorScroll, scrollEditorToOffset } from './editor-ops.js';
 import { updateSelInfo, updateStats } from './stats.js';
 import { pushUndoSnapshot } from './undo.js';
@@ -219,6 +220,7 @@ function replaceAllFind() {
     $('#findStatus').textContent = 'No matches.';
     return;
   }
+  snapshotBefore('Before Replace All');
   const top = editor.scrollTop,
     val = editor.value,
     chunk = val.slice(range.start, range.end);

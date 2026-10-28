@@ -37,6 +37,9 @@ Node (22.12 or newer) is only needed for the JavaScript tests and lint.
    2026-10-27 analysis (security hardening, sanitizer, SSRF, typography, AI stream). While a defect was open its test was
    written as a strict `xfail` / `todo`; once fixed the marker was removed and the test is now an ordinary guard.
 
+Feature suites sit next to these: `test_project.py` / `project.test.js` cover project files and snapshots (atomic writes,
+conflict detection, retention, path safety, the HTTP routes and the project file format).
+
 ## Mock provider
 
 `tests/python/mock_openai.py` is a stdlib OpenAI-compatible server. The requested *model name* selects the scenario

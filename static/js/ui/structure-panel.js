@@ -5,7 +5,7 @@ import { escapeHtml } from '../core/text-utils.js';
 import { $, editor, toast } from './dom.js';
 import { jumpToLine, replaceRange } from './editor-ops.js';
 import { scheduleAnalysis } from './analysis.js';
-import { markProjectDirty } from './project.js';
+import { markProjectDirty, snapshotBefore } from './project.js';
 import { saveSettings } from './settings.js';
 
 const MAX_STRUCTURE_ROWS = 80;
@@ -106,6 +106,7 @@ function markAllCandidates() {
     'h1',
   );
   if (next === text) return;
+  snapshotBefore('Before marking all chapters');
   replaceRange(0, text.length, next); // a single undo step
   editor.setSelectionRange(0, 0);
   toast(`Marked ${candidates.length} chapter(s)`);

@@ -403,6 +403,7 @@ export async function snapshotBefore(reason) {
   const p = state.project;
   if (!p || state.projectLoading) return;
   const text = editor.value;
+  if (!text.trim()) return;
   try {
     await call('snapshots/create', { id: p.id, text, kind: 'auto', reason });
   } catch (err) {

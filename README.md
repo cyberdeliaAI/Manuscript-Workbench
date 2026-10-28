@@ -89,6 +89,11 @@ Use **Export Markdown** to keep the editable Markdown manuscript.
 
 Use **Export DOCX** for a formatted Word document.
 
+Use **Save project as…** (in the `☰ Menu`) to keep the manuscript with its book details, ignored chapter candidates and
+prompts on disk. Projects autosave, keep a `.bak` of the previous version, and have snapshots that are taken before AI
+applies, Replace All, imports and large clean-ups. They live in `projects/` next to the app (gitignored); set
+`MANUSCRIPT_WORKBENCH_DATA_DIR` to store them elsewhere.
+
 ## Project layout
 
 ```text
@@ -101,12 +106,13 @@ manuscript_workbench/       the Python backend
   mdrender.py  structure.py   Markdown preview (sanitizer) and structure vocabulary
   docx_export.py  preflight.py  export and preflight checks
   ai.py                       helpers for OpenAI-compatible providers
+  project.py                  project files (.mwb.json), snapshots, atomic writes
 static/                     the frontend (served from /static/, no build step)
   index.html  css/app.css
   js/main.js                  entry point (ES modules)
-  js/core/                    pure logic: cleaning, diagnostics, language profiles, analysis, chunking, guardrails (no DOM, unit-tested)
+  js/core/                    pure logic: cleaning, diagnostics, language profiles, analysis, chunking, guardrails, project file format (no DOM, unit-tested)
   js/workers/                 the analysis Web Worker (runs core/analysis.js off the main thread)
-  js/ui/                      DOM-bound modules, one per feature
+  js/ui/                      DOM-bound modules, one per feature (project.js / project-ui.js: projects and snapshots)
 tests/                      pytest + node:test suites (see tests/README.md)
 ```
 

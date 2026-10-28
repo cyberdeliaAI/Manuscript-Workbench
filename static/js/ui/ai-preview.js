@@ -7,6 +7,7 @@ import { setLmBusy } from './ai.js';
 import { openCompare } from './compare.js';
 import { $, toast } from './dom.js';
 import { replaceRange } from './editor-ops.js';
+import { snapshotBefore } from './project.js';
 import { storage } from './storage.js';
 
 export function reportPreviewMarkerDrift() {
@@ -125,6 +126,7 @@ $('#applyPreviewBtn').addEventListener('click', () => {
   }
   if (!state.previewState.finished || state.previewState.partial) return;
   reportPreviewMarkerDrift();
+  snapshotBefore(`Before applying: ${String(state.previewState.title).replace(/^Preview:\s*/, '')}`);
   replaceRange(state.previewState.start, state.previewState.end, state.previewState.after);
   $('#previewModal').classList.remove('open');
   state.previewState.after = '';
