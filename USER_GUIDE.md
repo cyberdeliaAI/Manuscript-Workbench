@@ -781,6 +781,7 @@ Creates `<base>-formatted.docx`: a Word document where every Markdown structure 
 Details:
 
 - Book metadata is written into the document properties.
+- Control characters that a Word or EPUB file cannot hold (form feeds and other codes left over from PDFs) are dropped during export instead of making it fail; Preflight lists them as `control-chars` so you can clean them first.
 - Special manuscript blocks use clear named Word styles such as `Manuscript Verse`, `Manuscript Written Note`, and `Manuscript Block Quote`. In Word, you can restyle those centrally.
 - **Lists.** Lines that start with `- `, `* `, `+ ` or `1. ` / `1) ` become real Word lists, using Word's `List Bullet` / `List Number` styles (and `List Bullet 2`, `List Bullet 3`... for nested lists; indent a nested item by two spaces, four spaces or a tab). Every numbered list starts again at its own number, also when it starts at 5, and a sub-list starts again under every item. A blank line between items does not end a list. Lists nested deeper than three levels use the third level. Inside a `:::` block, list-looking lines stay ordinary text.
 - **Tables.** A pipe table (a header row, a `|---|---|` separator row, then the rows) becomes a real Word table in the `Table Grid` style: the header row is bold and repeats on every page, `:---:` / `---:` set the alignment of a column, inline markup works inside cells, `\|` is a pipe inside a cell, `<br>` is a line break inside a cell, and shorter rows are padded with empty cells.

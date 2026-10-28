@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import io
+import re
 import struct
+import zipfile
 import zlib
 
 import pytest
@@ -221,3 +223,33 @@ def test_markdown_images_are_not_mistaken_for_links(mw):
 
     doc = Document(io.BytesIO(mw.create_manuscript_docx(source, {})))
     assert doc.paragraphs[0].text == "A link and ![image](https://example.com/x.png)."
+
+
+# ---- the whole corpus through DOCX and back -----------------------------------------------------------
+
+CONTROL = re.compile("[\x00-\x08\x0b\x0c\x0e-\x1f]")
+
+
+def words(text: str):
+    """The words of a text, without the marker syntax that export and import rewrite on purpose."""
+    text = re.sub(r"(?m)^\s*:::.*$", "", text)  # block fences (an alias such as ::: note comes back as ::: written-note)
+    text = re.sub(r"\[\[\w+:|\]\]", "", text)  # [[sc:..]] style markers (backticks come back as [[mono:..]])
+    return re.findall(r"\w+", text.lower())
+
+
+def test_no_words_are_lost_when_the_corpus_goes_through_docx_and_back(mw, corpus):
+    for name, text in corpus.items():
+        back, _notes = mw.import_docx_bytes(mw.create_manuscript_docx(text, {}))
+        assert words(back) == words(CONTROL.sub("", text)), name
+
+
+def test_control_characters_from_pdfs_do_not_break_the_exports(mw, corpus):
+    text = "Page one" + chr(12) + "Page two" + chr(0) + " end\n\n# Chapter\n\nBell" + chr(7) + " ring"
+    docx_text, _ = mw.import_docx_bytes(mw.create_manuscript_docx(text, {"title": "T" + chr(12)}))
+    assert docx_text.startswith("Page onePage two end") and docx_text.endswith("Bell ring")
+    z = zipfile.ZipFile(io.BytesIO(mw.create_manuscript_epub(text, {"title": "T" + chr(12)})))
+    from lxml import etree
+
+    for name in z.namelist():
+        if name.endswith((".xhtml", ".opf", ".ncx")):
+            etree.fromstring(z.read(name))

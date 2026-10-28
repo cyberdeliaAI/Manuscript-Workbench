@@ -23,6 +23,7 @@ from .structure import (
     list_item,
     read_table,
     structure_marker_for_line,
+    xml_safe,
 )
 
 NAV_LEVELS = 2  # the table of contents lists chapters and, under them, subheads (## headings)
@@ -193,6 +194,7 @@ def build_chapters(text: str, lists_enabled: bool = True) -> List[Chapter]:
     chapters: List[Chapter] = []
     current = Chapter("Front matter", front=True)
     block_marker = ""
+    block_open = False  # a <div> for the :::-block is open in the current chapter file
     lists = ListState()
     quote_open = False
     heading_count = 0
@@ -211,11 +213,13 @@ def build_chapters(text: str, lists_enabled: bool = True) -> List[Chapter]:
         if container:
             close_flow()
             if block_marker:
-                current.html.append("</div>")
-                block_marker = ""
+                if block_open:
+                    current.html.append("</div>")
+                block_marker, block_open = "", False
             else:
                 block_marker = canonical_structure_marker(container.group(1) or "") or "block"
                 current.html.append(f'<div class="block block-{escape(block_marker)}">')
+                block_open = True
             index += 1
             continue
         if not block_marker and is_table_start(lines, index):
@@ -240,6 +244,9 @@ def build_chapters(text: str, lists_enabled: bool = True) -> List[Chapter]:
         else:
             close_flow()
         if marker in ("chapter", "part"):
+            if block_open:
+                current.html.append("</div>")  # a heading inside an unclosed block ends the block in this file
+                block_open = False
             if current.html:
                 chapters.append(current)
             current = Chapter(plain_text(content), part=marker == "part")
@@ -275,7 +282,7 @@ def build_chapters(text: str, lists_enabled: bool = True) -> List[Chapter]:
         css = MARKER_CLASS.get(marker, "")
         current.html.append(f'<p class="{css}">{inline_html(content)}</p>' if css else f"<p>{inline_html(content)}</p>")
     close_flow()
-    if block_marker:
+    if block_open:
         current.html.append("</div>")
     if current.html or not chapters:
         chapters.append(current)
@@ -322,6 +329,8 @@ def book_language(metadata: Dict[str, str]) -> str:
 def create_manuscript_epub(text: str, metadata: Dict[str, str], options: Optional[Dict[str, Any]] = None) -> bytes:
     """The manuscript as an EPUB 3 file. `options["lists"] = False` keeps list markers as literal text."""
     lists_enabled = (options or {}).get("lists") is not False
+    text = xml_safe(text)
+    metadata = {key: xml_safe(value) if isinstance(value, str) else value for key, value in metadata.items()}
     title = (metadata.get("title") or "").strip() or "Untitled manuscript"
     author = (metadata.get("author") or "").strip()
     language = book_language(metadata)

@@ -14,6 +14,7 @@ from .structure import (
     list_item,
     read_table,
     structure_marker_for_line,
+    xml_safe,
 )
 
 
@@ -74,6 +75,8 @@ def create_manuscript_docx(text: str, metadata: Dict[str, str], options: Optiona
     lists_enabled = (options or {}).get("lists") is not False
     if Document is None:
         raise RuntimeError("python-docx is not installed. Run: pip install -r requirements.txt")
+    text = xml_safe(text)
+    metadata = {key: xml_safe(value) if isinstance(value, str) else value for key, value in metadata.items()}
     doc = Document()
     for style_name in EXPORT_PARAGRAPH_STYLES:
         ensure_paragraph_style(doc, style_name)

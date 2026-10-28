@@ -189,3 +189,14 @@ def read_table(lines: Sequence[str], index: int) -> Tuple[List[str], List[str], 
         rows.append(split_table_row(lines[position]))
         position += 1
     return header, alignments, rows, position
+
+
+# ---- text that XML (DOCX and EPUB are XML) cannot hold --------------------------------------------------------
+
+# XML 1.0 allows tab, line feed and carriage return among the control characters, and nothing else below a space.
+XML_INVALID_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f" + chr(0xFFFE) + chr(0xFFFF) + "]")
+
+
+def xml_safe(text: str) -> str:
+    """The text without the characters an XML document cannot contain (form feeds from PDFs, stray control codes)."""
+    return XML_INVALID_RE.sub("", text or "")
