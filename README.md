@@ -61,12 +61,26 @@ To build an app for your system, with the Python server frozen into it (PyInstal
 
 ```bash
 pip install -r requirements-build.txt
-python tools/build_desktop.py        # electron/out/manuscript-workbench-desktop-<version>-<os>-<arch>.zip (.tar.gz on Linux)
-python tools/build_desktop.py --dir  # only the unpacked app
+python tools/build_desktop.py        # dist/packages/manuscript-workbench-<version>-<os>-<arch>.zip (.tar.gz on Linux)
+python tools/build_desktop.py --dir  # only the unpacked app (electron/out)
 ```
 
-Every platform builds on itself (see `.github/workflows/desktop.yml`; start it by hand or with a `v*` tag). The builds are
-not signed: on macOS the first start needs right-click, Open, and Windows shows a SmartScreen warning.
+A local build is not signed: on macOS the first start needs right-click, Open.
+
+### Releasing
+
+Every platform builds on its own runner (a frozen Python server only runs on the system it was built on):
+`.github/workflows/release.yml` builds macOS (Apple Silicon and Intel), Windows and Linux, checks each result by starting
+it, and puts the downloads and their checksums in a **draft** GitHub release, which you publish by hand. The macOS builds
+are signed with a Developer ID and notarized (secrets `CSC_LINK`, `CSC_KEY_PASSWORD`, `APPLE_ID`,
+`APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`); the Windows and Linux builds are not signed.
+
+1. Set the version in `electron/package.json` and `manuscript_workbench/config.py` (and the header in `static/index.html`),
+   and describe it in `CHANGELOG.md`: the section for the version becomes the release notes.
+2. Commit, then `git tag v<version> && git push origin v<version>`. The tag must match `electron/package.json`.
+3. Watch the run (`gh run watch`), check the draft, and publish it.
+
+Started by hand (Actions, "Release") without a tag, the workflow only builds and checks, unsigned.
 
 - **Data**: projects, snapshots and settings live in the app's own folder (`~/Library/Application Support/Manuscript Workbench`
   on macOS, `%APPDATA%\Manuscript Workbench` on Windows, `~/.config/Manuscript Workbench` on Linux); `File` → `Show Projects Folder`

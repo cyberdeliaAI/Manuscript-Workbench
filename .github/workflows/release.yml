@@ -1,0 +1,128 @@
+# Builds the desktop app on every platform and puts the downloads in a DRAFT GitHub release, which is published by hand.
+#
+# A frozen Python server only runs on the system it was built on, so every platform builds on its own runner.
+# The macOS builds are signed with a Developer ID and notarized (secrets CSC_LINK, CSC_KEY_PASSWORD, APPLE_ID,
+# APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID); Windows and Linux builds are not signed.
+#
+# Release: bump the version (electron/package.json, manuscript_workbench/config.py, CHANGELOG.md), commit, then
+#   git tag v2.0.0 && git push origin v2.0.0
+# Run by hand without a tag to only build and check (unsigned); with a tag name to build that tag and draft its release.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to build and draft a release for, for example v2.0.0 (empty: only build and check, unsigned)"
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and check · ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: ${{ startsWith(matrix.target, 'macos-') && 75 || 40 }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: macos-arm64, os: macos-latest }
+          - { target: macos-x64, os: macos-15-intel }
+          - { target: windows-x64, os: windows-latest }
+          - { target: linux-x64, os: ubuntu-latest }
+    env:
+      RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag || '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements-build.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: electron/package-lock.json
+      - name: The tag must match the version of the app
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          version = json.load(open("electron/package.json"))["version"]
+          tag = os.environ["RELEASE_TAG"]
+          if tag and tag != "v" + version:
+              raise SystemExit(f"The tag is {tag}, but electron/package.json is {version}: the tag must be v{version}.")
+          PY
+      - name: Python packages
+        run: python -m pip install -r requirements-build.txt
+      - name: System packages for Electron (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y xvfb libgtk-3-0t64 libnss3 libgbm1 libasound2t64
+      - name: Tests of the Electron modules
+        if: runner.os != 'Windows'
+        run: cd electron && npm ci && npm test
+      - name: Build and check the app (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a python tools/build_desktop.py
+      - name: Build and check the app (Windows, and macOS without a release tag)
+        if: runner.os == 'Windows' || (runner.os == 'macOS' && env.RELEASE_TAG == '')
+        run: python tools/build_desktop.py
+      - name: Build, sign, notarize and check the app (macOS, release)
+        if: runner.os == 'macOS' && env.RELEASE_TAG != ''
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: python tools/build_desktop.py --sign-macos
+      - uses: actions/upload-artifact@v4
+        with:
+          name: manuscript-workbench-${{ matrix.target }}
+          path: |
+            dist/packages/manuscript-workbench-*.zip
+            dist/packages/manuscript-workbench-*.tar.gz
+            dist/packages/manuscript-workbench-*.sha256
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-reports-${{ matrix.target }}
+          path: build/reports/*.json
+          if-no-files-found: ignore
+
+  draft:
+    name: Draft the GitHub release
+    needs: build
+    if: github.ref_type == 'tag' || inputs.tag != ''
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: smoke-reports-*
+          path: reports
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: manuscript-workbench-*
+          path: downloads
+          merge-multiple: true
+      - name: Create the draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: python tools/release_assets.py --tag "$RELEASE_TAG" --commit "$(git rev-parse HEAD)"
