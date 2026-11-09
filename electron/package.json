@@ -1,7 +1,7 @@
 {
   "name": "manuscript-workbench-desktop",
   "productName": "Manuscript Workbench",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Manuscript Workbench in its own desktop window.",
   "author": "Cyberdelia",
   "main": "main.cjs",

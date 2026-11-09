@@ -1,6 +1,6 @@
 # Roadmap and Check Report
 
-Status: version 2.0. See [CHANGELOG.md](CHANGELOG.md) for what the 2.0 overhaul changed.
+Status: version 2.0.1. See [CHANGELOG.md](CHANGELOG.md) for what changed since 1.2.
 
 ## Current Product Shape
 
