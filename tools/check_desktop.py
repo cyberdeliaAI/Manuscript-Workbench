@@ -118,6 +118,17 @@ def run_app(command: List[str], profile: Path, report: Path, layout: Optional[di
     return json.loads(report.read_text(encoding="utf-8"))
 
 
+def overlap(bounds: dict, area: dict) -> int:
+    width = min(bounds["x"] + bounds["width"], area["x"] + area["width"]) - max(bounds["x"], area["x"])
+    height = min(bounds["y"] + bounds["height"], area["y"] + area["height"]) - max(bounds["y"], area["y"])
+    return max(0, width) * max(0, height)
+
+
+def close(actual: dict, wanted: dict, tolerance: int = 3) -> bool:
+    """The same place and size, give or take a few pixels (screen scaling rounds)."""
+    return all(abs(actual[key] - wanted[key]) <= tolerance for key in wanted)
+
+
 def on_a_screen(window: dict) -> bool:
     bounds = window["bounds"]
     return any(
@@ -135,14 +146,21 @@ def check_window_state(command: List[str]) -> None:
         state = profile / "window-state.json"
         first = run_app(command, profile, report)["window"]
         assert on_a_screen(first), first
-        place = {"x": 140, "y": 160, "width": 1111, "height": 777}
+        # A size that fits the screen it is tried on: a small virtual screen (as on a CI runner) clamps anything bigger.
+        area = max(first["workAreas"], key=lambda a: overlap(first["bounds"], a))
+        place = {
+            "x": area["x"] + 10,
+            "y": area["y"] + 10,
+            "width": max(900, min(1111, area["width"] - 20)),
+            "height": max(600, min(777, area["height"] - 20)),
+        }
         run_app(command, profile, report, {"bounds": place})
         again = run_app(command, profile, report, {"maximize": True})["window"]
-        assert {key: again["normalBounds"][key] for key in place} == place, ("size and position are remembered", again)
+        assert close(again["normalBounds"], place), ("size and position are remembered", again, place)
         assert again["isMaximized"] is False
         maximized = run_app(command, profile, report)["window"]
         assert maximized["isMaximized"] is True, ("maximized is remembered", maximized)
-        assert {key: maximized["normalBounds"][key] for key in place} == place, ("the normal size is kept", maximized)
+        assert close(maximized["normalBounds"], place), ("the normal size is kept", maximized, place)
         # Unplugged screen: coordinates that are on no display must not leave the window out of reach.
         state.write_text(json.dumps({"x": 31000, "y": 29000, "width": 1200, "height": 800, "isMaximized": False}))
         lost = run_app(command, profile, report)["window"]

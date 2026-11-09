@@ -1,12 +1,25 @@
 # Changelog
 
+## 2.0.1
+
+The first version with downloads: the desktop app, and everything that 2.0 brought (see the next section, or the
+[2.0 notes](https://github.com/cyberdeliaAI/Manuscript-Workbench/blob/main/CHANGELOG.md#20)).
+
+### Desktop app
+
+- **Desktop app (Electron)**: the app runs in a window of its own, with the Python server built into it for people without Python (macOS Apple Silicon and Intel, Windows, Linux; downloads under Releases). The window remembers its size and position, keeps one instance, opens other sites in your browser, and stops the server when it quits. Projects and settings live in the app's own data folder (`File` → `Show Projects Folder`). The macOS builds are signed and notarized; Windows and Linux builds are not signed. `python app.py` and the browser keep working as before.
+
+### Also changed
+
+- **The settings file lives in the data folder** (`MANUSCRIPT_WORKBENCH_DATA_DIR`) like the projects; without that variable it is still next to the app.
+- The version of the Python app, the page and the desktop app is 2.0.1 everywhere (2.0.0 was tagged but never released: its first build run failed in a test of the build tooling).
+
 ## 2.0
 
 Version 2.0 is an overhaul of the whole app: the bugs found in a full review are fixed, the server is hardened, the code is split into modules with a test suite behind it, and four feature areas are new (language-aware editing, projects with snapshots, an AI review workflow, and lists/tables/EPUB in the exports). `python app.py` is still the only start step.
 
 ### Things that behave differently from 1.2
 
-- **The settings file lives in the data folder** (`MANUSCRIPT_WORKBENCH_DATA_DIR`) like the projects; without that variable it is still next to the app.
 - **The API key is no longer written to disk.** It stays in your browser (localStorage). A key that an older version saved in `manuscript_workbench_settings.json` is removed when the app starts; enter it again if the field is empty.
 - **Every call to the app's API needs a session token**, and requests with a foreign `Host` or `Origin` are refused. This only matters for scripts you wrote yourself against the app; the page handles it by itself. Reload the page after restarting the app.
 - **Remote images are blocked in the Markdown preview** by default (switch them on under `Book` → `Preview`).
@@ -51,7 +64,6 @@ Version 2.0 is an overhaul of the whole app: the bugs found in a full review are
   - clear provider error messages, and a `thinking... 12 s` status for reasoning models.
 - **DOCX export of lists, tables and links** (nested lists, numbering that restarts per list, header rows that repeat, column alignment), and **DOCX import in document order** (tables, lists, hyperlinks; images and footnotes are reported as skipped).
 - **EPUB export** (EPUB 3, chapters at `#` headings, table of contents, metadata from the Book tab).
-- **Desktop app (Electron)**: the app runs in a window of its own, with the Python server built into it for people without Python (macOS Apple Silicon and Intel, Windows, Linux; downloads under Releases). The window remembers its size and position, keeps one instance, opens other sites in your browser, and stops the server when it quits. Projects and settings live in the app's own data folder (`File` → `Show Projects Folder`). The macOS builds are signed and notarized; Windows and Linux builds are not signed. `python app.py` and the browser keep working as before.
 
 ### Under the hood
 
