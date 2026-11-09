@@ -8,9 +8,9 @@ delete mac.identity; // use the Developer ID imported from CSC_LINK, never the a
 
 module.exports = {
   ...build,
-  forceCodeSigning: true,
   mac: {
     ...mac,
+    forceCodeSigning: true, // fail the macOS build when it cannot be signed; Windows and Linux builds are not signed
     type: 'distribution',
     hardenedRuntime: true,
     entitlements: path.join(__dirname, 'entitlements.mac.plist'),
