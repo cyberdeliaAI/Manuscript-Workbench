@@ -46,6 +46,40 @@ To use another port:
 MANUSCRIPT_WORKBENCH_PORT=8766 ./start_mac_linux.sh
 ```
 
+## Desktop app (Electron)
+
+The same app also runs in a window of its own, without a browser tab and without Python installed. The window shows the
+local server, which the desktop app starts and stops itself (`python app.py` and the browser keep working as before).
+
+```bash
+cd electron
+npm ci && node node_modules/electron/install.js   # once
+npm start                                         # a window around the Python server of this checkout
+```
+
+To build an app for your system, with the Python server frozen into it (PyInstaller) and the result tried out once:
+
+```bash
+pip install -r requirements-build.txt
+python tools/build_desktop.py        # electron/out/manuscript-workbench-desktop-<version>-<os>-<arch>.zip (.tar.gz on Linux)
+python tools/build_desktop.py --dir  # only the unpacked app
+```
+
+Every platform builds on itself (see `.github/workflows/desktop.yml`; start it by hand or with a `v*` tag). The builds are
+not signed: on macOS the first start needs right-click, Open, and Windows shows a SmartScreen warning.
+
+- **Data**: projects, snapshots and settings live in the app's own folder (`~/Library/Application Support/Manuscript Workbench`
+  on macOS, `%APPDATA%\Manuscript Workbench` on Windows, `~/.config/Manuscript Workbench` on Linux); `File` → `Show Projects Folder`
+  opens it. The API key stays in the window's browser storage, as in the browser version.
+- **Address**: the server listens on `127.0.0.1` on the port it used last time (a free one the first time). A page's browser
+  storage belongs to its address, so the port is kept; if it is taken by something else, a free port is used and the window
+  starts with empty browser storage (projects and settings on disk are not affected).
+- **Log**: `logs/backend.log` in the data folder holds what the server printed.
+- **Window**: size, position, maximized and full screen are remembered. Links to other sites open in your browser, the
+  User Manual opens in its own window, and closing with unsaved changes asks first.
+- **Code**: `electron/` (main process, no build step), `manuscript_workbench/desktop_host.py` (the server's side of the
+  protocol), `tools/build_desktop.py` and `tools/check_desktop.py`. `./scripts/check.sh` also runs the Electron module tests.
+
 | Environment variable | Meaning | Default |
 |---|---|---|
 | `MANUSCRIPT_WORKBENCH_PORT` | port of the local server | `8765` |

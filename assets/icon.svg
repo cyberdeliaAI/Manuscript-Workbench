@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2048" height="2048" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+<title id="title">Manuscript Workbench</title>
+<desc id="desc">An editorial manuscript page with an amber monogram and fountain pen on a dark ink-colored app tile.</desc>
+<defs>
+  <linearGradient id="base" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#302b24"/><stop offset=".48" stop-color="#1f1d19"/><stop offset="1" stop-color="#111210"/></linearGradient>
+  <radialGradient id="warmGlow" cx=".68" cy=".21" r=".75"><stop stop-color="#a36b35" stop-opacity=".31"/><stop offset=".54" stop-color="#67472a" stop-opacity=".12"/><stop offset="1" stop-color="#1c1b18" stop-opacity="0"/></radialGradient>
+  <linearGradient id="paper" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#fff7e5"/><stop offset=".52" stop-color="#eee1c9"/><stop offset="1" stop-color="#cdbd9e"/></linearGradient>
+  <linearGradient id="backPaper" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#ba986a"/><stop offset="1" stop-color="#6a543b"/></linearGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe3a1"/><stop offset=".42" stop-color="#e2a657"/><stop offset="1" stop-color="#b96b31"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#fff1c8"/><stop offset=".34" stop-color="#e2ae67"/><stop offset=".58" stop-color="#9b5f31"/><stop offset="1" stop-color="#e7b778"/></linearGradient>
+  <filter id="tileShadow" x="-25%" y="-25%" width="150%" height="160%"><feGaussianBlur stdDeviation="18"/></filter>
+  <filter id="pageShadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="3" dy="21" stdDeviation="18" flood-color="#000000" flood-opacity=".44"/></filter>
+  <filter id="penShadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="9" dy="12" stdDeviation="7" flood-color="#30200d" flood-opacity=".5"/></filter>
+  <clipPath id="tileClip"><rect x="30" y="30" width="964" height="964" rx="222"/></clipPath>
+</defs>
+<!-- carefully profiled macOS-style tile, based on the application color palette -->
+<rect x="35" y="49" width="954" height="951" rx="222" fill="#000" opacity=".25" filter="url(#tileShadow)"/>
+<rect x="30" y="30" width="964" height="964" rx="222" fill="url(#base)"/>
+<g clip-path="url(#tileClip)">
+  <rect x="30" y="30" width="964" height="964" fill="url(#warmGlow)"/>
+  <path d="M-22 845 L475 1038 M145 39 L1067 397" fill="none" stroke="#fff1ce" stroke-width="1.8" opacity=".07"/>
+  <path d="M95 785 L786 95" stroke="#e0a458" stroke-width="2" opacity=".085"/>
+  <circle cx="814" cy="240" r="320" fill="#d39a51" opacity=".065"/>
+  <circle cx="814" cy="240" r="240" fill="none" stroke="#e0a458" stroke-width="1.5" opacity=".12"/>
+</g>
+<rect x="45" y="45" width="934" height="934" rx="209" fill="none" stroke="#bc9156" stroke-width="2" opacity=".35"/>
+<path d="M248 100 C382 65 641 72 746 118" fill="none" stroke="#fff1c8" stroke-width="3" opacity=".12" stroke-linecap="round"/>
+
+<!-- tucked manuscript underneath -->
+<g filter="url(#pageShadow)" transform="rotate(-9 493 506)">
+  <rect x="221" y="192" width="560" height="643" rx="24" fill="url(#backPaper)" stroke="#c59c67" stroke-width="4"/>
+  <path d="M253 222 H717" stroke="#efdcbd" stroke-width="4" opacity=".38"/>
+  <path d="M258 787 H738" stroke="#3b281b" stroke-width="5" opacity=".25"/>
+</g>
+
+<!-- main document -->
+<g transform="rotate(4 501 508)" filter="url(#pageShadow)">
+  <path d="M271 194 H682 L785 302 V826 Q785 846 766 846 H271 Q252 846 252 826 V213 Q252 194 271 194 Z" fill="url(#paper)" stroke="#f9e8c9" stroke-width="4"/>
+  <path d="M682 194 V283 Q682 302 701 302 H785 Z" fill="#cbb58e"/>
+  <path d="M682 194 L785 302 H701 Q682 302 682 283 Z" fill="#fbeed5" opacity=".8"/>
+  <path d="M684 194 V283 Q684 302 703 302 H785" fill="none" stroke="#a99878" stroke-width="3" opacity=".7"/>
+  <path d="M301 254 V789" stroke="#e4b46c" stroke-width="4" opacity=".6"/>
+  <path d="M328 267 H624" stroke="#bca989" stroke-width="5" opacity=".45" stroke-linecap="round"/>
+  <!-- ornamental manuscript M: distinctive monogram, drawn as paths -->
+  <path d="M349 500 V334 L423 421 L502 324 L586 421 L655 334 V500" fill="none" stroke="#483b31" stroke-width="32" stroke-linejoin="round" stroke-linecap="round" opacity=".96"/>
+  <path d="M347 338 L422 423 L503 324 L586 423 L657 337" fill="none" stroke="url(#gold)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- structure lines and a preflight correction mark -->
+  <path d="M355 563 H681" stroke="#6a5b47" stroke-width="15" opacity=".69" stroke-linecap="round"/>
+  <path d="M355 609 H646" stroke="#6a5b47" stroke-width="15" opacity=".58" stroke-linecap="round"/>
+  <path d="M355 655 H680" stroke="#6a5b47" stroke-width="15" opacity=".51" stroke-linecap="round"/>
+  <path d="M355 701 H551" stroke="#6a5b47" stroke-width="15" opacity=".43" stroke-linecap="round"/>
+  <path d="M356 753 H480" stroke="#d29a4d" stroke-width="9" stroke-linecap="round" opacity=".85"/>
+</g>
+
+<!-- fountain-pen stroke and nib, aligned with a flowing edit -->
+<g filter="url(#penShadow)" transform="rotate(34 705 605)">
+  <!-- shaft -->
+  <path d="M672 320 Q672 304 689 304 H725 Q742 304 742 320 V643 H672 Z" fill="#242522" stroke="#e0b879" stroke-width="5"/>
+  <path d="M680 320 H695 V632 H680 Z" fill="#51514a" opacity=".6"/>
+  <path d="M716 324 H731 V634 H716 Z" fill="#090c0e" opacity=".55"/>
+  <rect x="672" y="343" width="70" height="22" rx="3" fill="url(#metal)"/>
+  <rect x="669" y="614" width="76" height="25" rx="5" fill="url(#metal)"/>
+  <!-- nib -->
+  <path d="M676 639 H738 L741 706 Q728 749 707 791 Q686 752 674 706 Z" fill="url(#gold)" stroke="#835329" stroke-width="4"/>
+  <path d="M707 654 V762" stroke="#714421" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="707" cy="688" r="10" fill="#30302b" stroke="#f3d29a" stroke-width="2"/>
+  <path d="M693 766 L707 795 L721 766" fill="#2e2921"/>
+  <path d="M694 656 Q679 706 700 754" stroke="#ffedba" stroke-width="4" opacity=".6" fill="none"/>
+</g>
+<!-- quiet edit sparkle -->
+<g fill="url(#gold)">
+ <path d="M821 170 L833 206 L869 218 L833 230 L821 267 L809 230 L772 218 L809 206 Z"/>
+ <circle cx="874" cy="160" r="5" opacity=".77"/>
+</g>
+</svg>

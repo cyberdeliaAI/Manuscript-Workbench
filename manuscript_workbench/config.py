@@ -14,8 +14,8 @@ STATIC_DIR = ROOT_DIR / "static"
 INDEX_PATH = STATIC_DIR / "index.html"
 USER_GUIDE_PATH = ROOT_DIR / "USER_GUIDE.md"
 
-# Projects (.mwb.json) and their snapshots live in <data dir>/projects. The data dir is next to the app unless
-# MANUSCRIPT_WORKBENCH_DATA_DIR says otherwise.
+# Projects (.mwb.json) and their snapshots live in <data dir>/projects, and the settings file in the data dir itself.
+# The data dir is next to the app unless MANUSCRIPT_WORKBENCH_DATA_DIR says otherwise (the desktop app sets it).
 DATA_DIR = Path(os.environ.get("MANUSCRIPT_WORKBENCH_DATA_DIR") or ROOT_DIR).expanduser()
 PROJECTS_DIR = DATA_DIR / "projects"
 

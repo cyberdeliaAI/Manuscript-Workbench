@@ -21,12 +21,14 @@ if command -v node >/dev/null 2>&1; then
   find static/js -name "*.js" -print0 | xargs -0 -n1 node --check && echo ok
   if [ -x node_modules/.bin/eslint ]; then
     echo "== javascript: lint"
-    node_modules/.bin/eslint static tests
+    node_modules/.bin/eslint static tests electron tools
   else
     echo "== javascript: lint skipped (run 'npm install' once to enable it)"
   fi
   echo "== javascript: tests"
   node --test tests/js/
+  echo "== desktop app: Electron module tests"
+  node --test electron/tests/
 else
   echo "== javascript: node not found, skipping JS checks" >&2
 fi

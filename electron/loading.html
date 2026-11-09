@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">
+<title>Manuscript Workbench</title>
+<style>
+  html, body { height: 100%; margin: 0; background: #171613; color: #ede7da; font: 15px -apple-system, "Segoe UI", system-ui, sans-serif; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+  h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: .02em; }
+  h1 span { color: #e0a458; }
+  .ring { width: 28px; height: 28px; border: 3px solid #3a362e; border-top-color: #e0a458; border-radius: 50%; animation: turn 0.9s linear infinite; }
+  p { margin: 0; color: #a79f90; font-size: 13px; }
+  @keyframes turn { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .ring { animation-duration: 3s; } }
+</style>
+</head>
+<body>
+<h1>Manuscript <span>Workbench</span></h1>
+<div class="ring" role="progressbar" aria-label="Starting"></div>
+<p>Starting the local server…</p>
+</body>
+</html>

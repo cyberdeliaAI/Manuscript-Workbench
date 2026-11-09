@@ -20,3 +20,8 @@ manuscript_workbench_settings.json.tmp
 # Local data and tooling
 projects/
 node_modules/
+
+# Desktop app build output
+dist/
+build/
+electron/out/

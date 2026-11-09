@@ -4,7 +4,7 @@
   "description": "Development tooling only (JS tests, lint, format). The app itself has no npm dependencies.",
   "scripts": {
     "test": "node --test tests/js/",
-    "lint": "eslint static tests",
+    "lint": "eslint static tests electron tools",
     "format": "prettier --write \"static/js/**/*.js\"",
     "format:check": "prettier --check \"static/js/**/*.js\""
   },
