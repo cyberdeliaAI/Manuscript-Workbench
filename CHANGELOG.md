@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- **Desktop app (Electron)**: the app can run in a window of its own (`electron/`), with the Python server frozen into
+  it for people without Python. The window remembers its size and position, keeps one instance, opens other sites in the
+  browser, and stops the server when it quits. See "Desktop app" in the README. Not signed or notarized yet.
+- The settings file now lives in the data folder (`MANUSCRIPT_WORKBENCH_DATA_DIR`) like the projects; without that
+  variable it is still next to the app.
+
 ## 2.0
 
 Version 2.0 is an overhaul of the whole app: the bugs found in a full review are fixed, the server is hardened, the code is split into modules with a test suite behind it, and four feature areas are new (language-aware editing, projects with snapshots, an AI review workflow, and lists/tables/EPUB in the exports). `python app.py` is still the only start step.

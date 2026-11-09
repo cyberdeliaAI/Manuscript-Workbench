@@ -2,7 +2,7 @@ import js from '@eslint/js';
 import globals from 'globals';
 
 export default [
-  { ignores: ['node_modules/', '.venv/'] },
+  { ignores: ['node_modules/', '.venv/', 'build/', 'electron/out/'] },
   js.configs.recommended,
   {
     files: ['static/js/**/*.js'],
@@ -10,6 +10,11 @@ export default [
   },
   {
     files: ['tests/**/*.js'],
+    languageOptions: { ecmaVersion: 2024, sourceType: 'commonjs', globals: { ...globals.node } },
+  },
+  {
+    // The desktop app (Electron main process) and its build helpers are CommonJS for Node.
+    files: ['electron/**/*.cjs', 'tools/**/*.cjs'],
     languageOptions: { ecmaVersion: 2024, sourceType: 'commonjs', globals: { ...globals.node } },
   },
   {

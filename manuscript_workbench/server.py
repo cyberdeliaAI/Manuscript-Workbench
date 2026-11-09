@@ -514,7 +514,8 @@ def _provider_failure(exc: Exception, base_url: str) -> HttpError:
     return HttpError(502, f"The AI provider could not be reached: {exc}")
 
 
-def main() -> int:
+def missing_dependencies() -> list:
+    """Names of the required packages that are not installed."""
     missing = []
     if Document is None:
         missing.append("python-docx")
@@ -522,6 +523,11 @@ def main() -> int:
         missing.append("requests")
     if markdown_lib is None:
         missing.append("markdown")
+    return missing
+
+
+def main() -> int:
+    missing = missing_dependencies()
     if missing:
         print("Missing dependencies:", ", ".join(missing))
         print("Run: pip install -r requirements.txt")

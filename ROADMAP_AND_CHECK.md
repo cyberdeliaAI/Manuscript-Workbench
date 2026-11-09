@@ -17,6 +17,7 @@ Manuscript Workbench is a Markdown-first, local-first manuscript tool:
 - AI rewrite, clean, guided rewrite and translate through LM Studio, oMLX, Ollama or another OpenAI-compatible endpoint: streaming preview, resumable section runs, a word-level Diff view with per-paragraph accept/reject, a glossary, and content guardrails.
 - Export to TXT, Markdown, DOCX (Word styles, lists, tables, hyperlinks) and EPUB 3.
 - Browser autosave and recovery for sessions without a project.
+- A desktop app (Electron, `electron/`) around the same server, built per platform with PyInstaller (`tools/build_desktop.py`).
 
 ## Markdown to DOCX Mapping
 
@@ -86,6 +87,7 @@ Manual checks that no automated test covers:
 - A smoke test against a real provider: `Detect Model`, `Test`, `Rewrite Selection` with a reasoning model, `Stop generation`, a chunked run that is stopped and resumed, and (LM Studio) the loaded-model details.
 - Open an exported DOCX in Word (lists, tables, hyperlinks, heading styles) and an exported EPUB in a reader such as Apple Books, Calibre or Kobo; run `epubcheck` on it if you publish.
 - The Windows start script (`start_windows.bat`); only the macOS/Linux script has been exercised.
+- The desktop app on Windows and Linux (the build and smoke check were only run on macOS, arm64), and macOS signing and notarization (`tools/electron_signed.cjs`, untested).
 
 ## Highest-Value Next Work
 

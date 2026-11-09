@@ -5,9 +5,9 @@ import datetime as _dt
 import json
 from typing import Any, Dict
 
-from .config import APP_VERSION, ROOT_DIR, SECRET_SETTING_KEYS
+from .config import APP_VERSION, DATA_DIR, SECRET_SETTING_KEYS
 
-SETTINGS_PATH = ROOT_DIR / "manuscript_workbench_settings.json"
+SETTINGS_PATH = DATA_DIR / "manuscript_workbench_settings.json"  # next to the projects folder
 
 
 def settings_path():
@@ -41,6 +41,7 @@ def write_app_settings(settings: Dict[str, Any]) -> None:
         "savedAt": _dt.datetime.now(_dt.timezone.utc).isoformat(),
         "settings": without_secret_settings(settings),
     }
+    SETTINGS_PATH.parent.mkdir(parents=True, exist_ok=True)
     tmp = SETTINGS_PATH.with_suffix(".json.tmp")
     tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
     tmp.replace(SETTINGS_PATH)

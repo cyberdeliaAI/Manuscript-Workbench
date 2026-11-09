@@ -1,0 +1,3 @@
+# Everything needed to build the desktop app (tools/build_desktop.py): the app itself plus PyInstaller.
+-r requirements.txt
+pyinstaller>=6.17
